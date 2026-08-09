@@ -539,7 +539,7 @@ table.mr-table input.form-control.ro{background:var(--bg);color:var(--muted)}
 <body>
 <div class="wrap">
 <aside class="side">
-  <div class="brand"><div class="brand-row"><img src="/icon-192.png" alt="DAMDA" class="brand-logo"><span class="brand-word">DAMDA</span></div><small>프로토타입 v0.66 · 구매/입고 화면 UX 개선 8건 — 34차 라운드</small></div>
+  <div class="brand"><div class="brand-row"><img src="/icon-192.png" alt="DAMDA" class="brand-logo"><span class="brand-word">DAMDA</span></div><small>프로토타입 v0.67 · 외주단가 관리 + 마감 이월 — 35차 라운드</small></div>
   <nav class="nav">
     <!-- 2026-07-21(항목11) 대분류 재구성: 운영 모니터링-기본정보-영업,수주-구매-생산-납품,마감-자재-인사,급여-품질-원가관리-가이드-환경설정 (12개, 상현님 지시안) -->
     <div class="grp">운영 모니터링</div>
@@ -1732,9 +1732,10 @@ table.mr-table input.form-control.ro{background:var(--bg);color:var(--muted)}
 <section class="page" id="p-out">
   <h1>외주생산 입고 진행현황</h1>
   <div class="sub">결재완료된 외주 발주 건의 진행상태를 확인하고, 실제 발생한 외주비를 원가에 반영하는 화면입니다(2026-07-28, 21차 라운드: "외주비 구매이력"에서 명칭 변경, "입고 진행현황"/"원가계산 반영값" 2개 탭으로 재구성). 발주 등록·결재상신은 <a href="#" onclick="event.preventDefault();navTo('outpo')" style="color:var(--blue-d)">외주 발주관리</a>에서 합니다.</div>
-  <div class="mr-tabbar" style="display:flex;gap:8px;margin-bottom:14px">
+  <div class="mr-tabbar" style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
     <button class="btn" onclick="switchOutCostTab('receive')" id="outtab-receive">📦 입고 진행현황</button>
     <button class="btn gh" onclick="switchOutCostTab('cost')" id="outtab-cost">💰 원가계산 반영값</button>
+    <button class="btn gh" onclick="switchOutCostTab('trend')" id="outtab-trend">📈 외주단가 변동 추이</button>
   </div>
 
   <div id="out-receive-wrap">
@@ -1789,11 +1790,31 @@ table.mr-table input.form-control.ro{background:var(--bg);color:var(--muted)}
       </table>
     </div>
   </div>
+
+  <div id="out-trend-wrap" style="display:none">
+    <div class="sub">매입처+품목 조합별로 <b>최초 발주단가</b>와 <b>최근 발주단가</b>를 비교해 절감액을 보여주는 조회 화면입니다(구매부 단가 절감 실적 근거용). 발주단가가 등록된(0원 초과) 건만 집계하며, 취소된 발주는 제외합니다. 행을 클릭하면 해당 조합의 전체 발주 이력이 아래에 펼쳐집니다.</div>
+    <div class="card">
+      <table>
+        <thead><tr><th style="width:16%">매입처</th><th style="width:22%">품목</th><th class="num" style="width:8%">발주건수</th>
+          <th class="num" style="width:14%">최초단가</th><th class="num" style="width:14%">최근단가</th>
+          <th class="num" style="width:13%">절감액</th><th class="num" style="width:9%">절감률</th><th style="width:4%"></th></tr></thead>
+        <tbody id="t-out-price-trend"></tbody>
+      </table>
+    </div>
+    <div class="card" id="out-trend-detail-card" style="display:none">
+      <h2 style="margin-top:0" id="out-trend-detail-title"></h2>
+      <table>
+        <thead><tr><th style="width:16%">발주번호</th><th style="width:20%">발주일</th><th class="num" style="width:20%">수량</th><th class="num" style="width:20%">단가</th><th class="num" style="width:24%">전건 대비</th></tr></thead>
+        <tbody id="t-out-trend-detail"></tbody>
+      </table>
+    </div>
+  </div>
 </section>
 <!-- ══════════ 외주 입고 마감 — 2026-08-01, 28차 라운드 신설 ══════════ -->
 <section class="page" id="p-outclosing">
   <h1>외주 입고 마감</h1>
   <div class="sub">입고완료된 발주 건을 매입처별·기간별로 조회해 <b>마감내역서</b>를 등록하고 엑셀로 내려받는 화면입니다(내부 매입 정산·대사용). <a href="#" onclick="event.preventDefault();navTo('out')" style="color:var(--blue-d)">외주생산 입고 진행현황</a>과 달리, 여기서 등록해도 발주 데이터 자체는 바뀌지 않고 "이 건은 정산 완료로 묶였다"는 표시만 남습니다(중복 정산 방지용).</div>
+  <div class="note"><b>마감수량</b>은 기본값이 잔여수량(입고량 − 이미 마감된 수량)이며, 직접 수정할 수 있습니다. 잔여수량보다 적게 입력해 마감등록하면 <b>남은 수량은 마감되지 않고 다음 조회에 다시 후보로 나타납니다</b>(부분마감·이월).</div>
   <div class="card">
     <div class="lv-search">
       <div><label>매입처</label><input type="text" placeholder="매입처명" oninput="setClosingSearchField('out','vendor',this.value)"></div>
@@ -1807,7 +1828,7 @@ table.mr-table input.form-control.ro{background:var(--bg);color:var(--muted)}
     <div style="overflow-x:auto"><table class="th-center" style="table-layout:fixed">
       <thead><tr>
         <th style="width:30px"><input type="checkbox" id="outclosing-all" onchange="toggleAllClosingCandidates('out',this.checked)"></th><th style="width:78px">입고일</th><th style="width:88px">매입처</th><th style="width:96px">수주번호</th><th style="width:138px">품목명</th><th style="width:120px">규격명</th>
-        <th class="num" style="width:66px">수량</th><th class="num" style="width:76px">단가</th><th class="num" style="width:92px">금액</th>
+        <th class="num" style="width:70px">마감수량</th><th class="num" style="width:72px">단가</th><th class="num" style="width:92px">금액</th>
       </tr></thead>
       <tbody id="t-outclosing-candidates"></tbody>
     </table></div>
@@ -1930,6 +1951,7 @@ table.mr-table input.form-control.ro{background:var(--bg);color:var(--muted)}
 <section class="page" id="p-matclosing">
   <h1>원재료 입고 마감</h1>
   <div class="sub">입고완료된 발주 건을 매입처별·기간별로 조회해 <b>마감내역서</b>를 등록하고 엑셀로 내려받는 화면입니다(내부 매입 정산·대사용). <a href="#" onclick="event.preventDefault();navTo('mat')" style="color:var(--blue-d)">원재료 입고 진행현황</a>과 달리, 여기서 등록해도 발주 데이터 자체는 바뀌지 않고 "이 건은 정산 완료로 묶였다"는 표시만 남습니다(중복 정산 방지용).</div>
+  <div class="note"><b>마감수량</b>은 기본값이 잔여수량(입고량 − 이미 마감된 수량)이며, 직접 수정할 수 있습니다. 잔여수량보다 적게 입력해 마감등록하면 <b>남은 수량은 마감되지 않고 다음 조회에 다시 후보로 나타납니다</b>(부분마감·이월).</div>
   <div class="card">
     <div class="lv-search">
       <div><label>매입처</label><input type="text" placeholder="매입처명" oninput="setClosingSearchField('mat','vendor',this.value)"></div>
@@ -1942,7 +1964,7 @@ table.mr-table input.form-control.ro{background:var(--bg);color:var(--muted)}
     <div style="overflow-x:auto"><table class="th-center" style="table-layout:fixed">
       <thead><tr>
         <th style="width:30px"><input type="checkbox" id="matclosing-all" onchange="toggleAllClosingCandidates('mat',this.checked)"></th><th style="width:76px">입고일</th><th style="width:92px">입고처</th><th style="width:142px">원재료명</th><th style="width:86px">구분</th>
-        <th class="num" style="width:78px">수량(kg)</th><th class="num" style="width:82px">단가</th><th class="num" style="width:96px">금액</th>
+        <th class="num" style="width:80px">마감수량(kg)</th><th class="num" style="width:78px">단가</th><th class="num" style="width:92px">금액</th>
       </tr></thead>
       <tbody id="t-matclosing-candidates"></tbody>
     </table></div>
@@ -2609,6 +2631,7 @@ BEP 매출  = 월 고정비 ÷ 공헌이익률
         <tr><td>브랜드 리뉴얼 — 몰디온(MOLD:ON) → 담다 (2026-08-08, v0.63)</td><td>상현님 지시: "몰디온을 이제 담다로 바꾸기로 했으니 담다 디자인으로 전면 교체하자. 빠진곳 없이 구석구석 확인해서 디자인 교체 해줘." <b>①브랜드명 교체</b> — 타이틀바·PWA 매니페스트/서비스워커·사이드바 워드마크·조직도/근태집계표/발주서/재고현황 엑셀·PDF 출력 크레딧·운영모니터링 연동률 배지 등 화면에 실제로 노출되는 브랜드 표기 지점을 전수 확인해 "담다"로 교체했습니다 (단, 이 변경이력 표의 과거 라운드 기록은 당시 실제 사용하던 이름 그대로 보존 — 상현님 지시 "이 내용은 저장해두고"에 따라 역사적 기록을 임의로 고치지 않았습니다). <b>②컬러 팔레트</b> — 기존에 확정돼 있던 라이트 테마 구조(카드·여백·그림자)는 그대로 유지하되, 포인트 브랜드컬러만 인디고블루(#3D6FE0 계열)에서 담다 틸(#0F7A72 계열, "담다"의 담아냄·깊이감을 표현)로 교체했습니다. CSS 변수(--blue/--blue-d/--blue-l) 값만 바꿔 전 화면에 일괄 적용되는 기존 설계(2026-07-19 개편 당시 확립된 방식)를 그대로 활용했고, 변수를 안 쓰고 하드코딩돼 있던 동일 헥스값(폰 목업 상단바 그라디언트 등)도 함께 찾아 교체했습니다. <b>③표(그리드) 스타일 개편</b> — 상현님 요청("엑셀 표에 가까운 형태로 격자이지만 너무 딱딱하지 않은 느낌")에 따라 리스트뷰 계열 표(생산현황판·수주현황·재고관리 등, qdoc-table/mr-table/근태집계표류는 이미 자체 스타일이 있어 제외)의 기본 th/td에 옅은 세로 격자선과 짝수행 은은한 지브라 스트라이프를 추가하고, 헤더 배경을 브랜드 틸 톤(var(--blue-l))으로 물들여 스프레드시트에 더 가까운 느낌을 주되 격자선 색은 회색조를 옅게 유지해 딱딱해 보이지 않도록 했습니다. <b>④로고/아이콘</b> — "담다"(담아내다)의 의미를 살려 그릇(용기) 실루엣 안에 내용물을 뜻하는 원(담다 웜톤 액센트 #C1652F)을 담은 추상 마크로 앱 아이콘을 새로 제작했습니다 (icon-192/512.png, PWA 매니페스트·서비스워커 알림 아이콘에도 동일 적용). node --check 구문 검증과 jsdom 기반 검증(주요 화면 순회, 표/사이드바/타이틀 텍스트 확인)을 통과했습니다.</td></tr>
         <tr><td>기타구매 발주 결재 신설 + 웹 결재함 3분할 (2026-08-09, v0.65)</td><td>상현님 지시: "발주 결재함 화면에서 원재료와 외주발주 외에 추가로 기타구매(소모품, 설비 등)에 대한 결재가 추가로 필요할거같아... 사장님 입장에서는 지출에 대한건 모두 확인하고 싶을테니까." <b>①기타구매 발주관리 신설</b> — 원재료·외주와 달리 입고 추적이 불필요하다는 지시에 따라 발주관리 화면만 신설(입고등록·진행현황 화면 없음), 상태모델도 3단계(작성중→결재대기→결재완료, <code>MISC_PO_STAGES</code>)로 기존 5단계 <code>PO_STAGES</code>와 구분했습니다. 표 컬럼은 지시하신 대로 발주일·구매품명·규격·발주처·단가·수량·발주금액·상태·작업 9열로 구성(발주번호 G-000001~, 조달구분 없음 — 소모품·설비는 전부 자가구매라 원재료의 유상/무상사급 구분이 필요 없다고 판단). 등록→저장→결재상신→승인/반려→취소/복원, 결재완료 후 PDF 발주서 출력까지 원재료·외주와 동일한 흐름을 재사용했습니다(<code>S.miscPOs</code>, <code>canApprovePO()</code> 등 기존 함수 그대로 공유). <b>②발주 결재함 웹 3분할</b> — "웹에서는 너무 가로로 길어"라는 지적에 따라, 그동안 데스크톱(#p-poapproval)이 모바일과 동일한 세로 스택형 카드(<code>poApprovalMobileBody()</code>)를 그대로 쓰고 있던 것을 발견 — 웹 전용 <code>poApprovalWebBody()</code>를 신설해 원재료·외주·기타구매 결재대기 목록을 3열(<code>.row3</code>)로 나란히 배치했습니다. 승인/반려는 기존 함수를 그대로 호출해 로직 중복이 없고, 모바일 앱 3화면은 기존 <code>poApprovalMobileBody()</code>에 기타구매 섹션만 추가해 그대로 재사용했습니다("앱에서는 화면 폭이 좁기 때문에 괜찮을거 같다"는 말씀대로 구조는 유지). <b>③결재 생략(회사 규모별 분기)</b> — "소기업·중소기업은 결재 사용이 가능해 보이는데 영세기업은 어려울 수 있다, 이 과정을 둘로 나눌 수 있는 방법이 있을까?"라는 질문에는 이미 구축되어 있던 <code>S.poApprovalSkip</code>(환경설정 &gt; 구매 결재 설정, 기업 규모를 영세기업으로 바꾸면 자동 ON) 토글을 그대로 활용하도록 안내 — 기타구매도 원재료·외주와 동일하게 이 플래그를 참조해 결재상신 즉시 결재완료로 처리되므로, 회사 규모 하나의 설정으로 3개 발주유형이 함께 분기됩니다(별도 신규 메커니즘을 만들지 않음). node --check 구문 검증과 jsdom 기반 검증(기타구매 등록·저장·결재상신·승인·영세기업 결재생략 자동전환, 웹 결재함 3열 렌더 및 각 열 데이터 노출, 앱 결재화면 기타구매 섹션 포함, 64개 전 화면 순회)을 통과해 실제 오류 0건을 확인했습니다.</td></tr>
         <tr><td>34차 라운드 — 구매/입고 화면 UX 개선 8건 (2026-08-09, v0.66)</td><td>상현님이 원재료·외주·기타구매 발주/입고/마감 화면 전반에 걸쳐 8가지를 지적하셨습니다. <b>①구매사유 드롭다운 좌측정렬</b> — 원재료 발주관리의 구매사유 select가 전역 select 스타일(<code>text-align:right</code>, 숫자입력 위주로 설계된 기본값)을 그대로 물려받아 오른쪽으로 쏠려 있던 것을 해당 select 2개(사유구분·연결수주)에만 <code>text-align:left</code>를 지정해 바로잡았습니다. <b>②원재료 입고마감 표 재편</b> — 폭 미지정 열 2개(품목명·구분) 때문에 <code>table-layout:fixed</code>가 남는 공간을 나눠 배분하며 표가 늘어지던 것을, 외주 입고마감과 동일하게 전 열에 명시적 폭을 줘 한 줄에 들어오도록 했고, "품목명"을 "원재료명"으로 개칭, "입고처"(매입처) 열을 입고일 우측에 신설했습니다. <b>③외주 발주관리에 수주번호 입력</b> — 수주번호를 입력(자동완성 목록 제공)하면 <code>S.orderItems</code>에서 일치하는 건을 찾아 품목명·규격명을 자동으로 채웁니다(일치하는 건이 없으면 입력한 텍스트만 저장 — 임의 외주는 계속 자유 입력 가능). 발주서 PDF에는 수주번호를 넣지 않았는데, 이는 외부 매입처에게 발송하는 문서에 내부 수주·고객 정보가 노출되지 않게 하기 위한 판단입니다. <b>④수주번호 열 3화면 확산</b> — 외주 입고등록·외주생산 입고 진행현황(입고 진행현황 탭)·외주 입고마감 세 화면 모두에 수주번호 열을 추가하고 엑셀 다운로드에도 반영했습니다. <b>⑤외주 발주관리 조회조건</b> — 수주번호(부분일치)·상태(작성중/결재대기/결재완료/입고대기/입고완료/취소됨) 조회를 신설했습니다(취소됨은 <code>stage</code>와 별도인 <code>cancelled</code> 플래그라 조회조건에서 따로 분기 처리). <b>⑥외주 입고등록 조회조건</b> — 수주번호·매입처 조회를 신설했습니다(진행현황 탭의 기존 조회조건 <code>lv('outrecv')</code>와 이름이 겹치지 않도록 입고등록 화면은 별도 리스트뷰 키 <code>outrecv2</code>로 분리). <b>⑦마감 후보 표 일괄선택 체크박스</b> — 원재료·외주 입고마감 표의 헤더에 마스터 체크박스를 추가해 현재 검색조건에 걸린 후보 전체를 한 번에 선택/해제할 수 있게 했습니다(기존 "전체 선택"/"선택 해제" 버튼과 동일 동작을 체크박스로도 제공, 선택 상태가 바뀌면 헤더 체크박스 표시도 자동 동기화). <b>⑧기타구매 발주관리</b> — 단가 입력칸을 콤마 단위 구분 표시로 바꾸고(입력 시 콤마를 뗀 숫자로 파싱해 저장), 구매품명·발주처·상태 조회조건을 신설했습니다. 외주단가를 "직전 발주단가 자동 기본값"과 "품목별 단가 변동이력(구매부 절감실적 근거)" 중 어느 방식으로 관리할지는 상현님께 별도로 제안드리고 컨펌받은 뒤 다음 라운드에서 진행하기로 했고, 입고마감 수량을 매입량 기본값의 수정 가능한 입력으로 바꾸는 건도 부분마감 시 잔여수량 처리방식을 확인받은 뒤 진행하기로 남겨뒀습니다(각각 별도 제안 전달). node --check 구문 검증과 jsdom 기반 검증(구매사유 select 정렬값, 원재료입고마감 8열 헤더·마스터체크박스, 외주발주 수주번호 자동채움 실값 확인, 수주번호+상태 조회 필터링 결과건수, 외주입고등록/진행현황/입고마감 수주번호 열 노출, 기타구매 콤마 표시 왕복 확인 및 조회 필터링, 마감 표 일괄선택/해제 후 선택건수 반영, 64개 전 화면 순회)을 통과해 실제 오류 0건을 확인했습니다.</td></tr>
+        <tr><td>35차 라운드 — 외주단가 관리 + 마감 부분마감(이월) (2026-08-10, v0.67)</td><td>34차에서 제안드리고 컨펌받은 두 가지 설계를 구현했습니다. <b>①외주단가 자동 기본값</b> — "매입처+품목 조합의 최근 발주단가"를 기준으로 확정(품목 단독이 아닌 이유는 매입처마다 협상단가가 다를 수 있어서). <code>lastOutsourcePrice(vendor,item)</code>이 <code>S.outsourcePOs</code> 이력에서 취소되지 않고 단가가 등록된(0원 초과) 가장 최근 건을 찾고, <code>setOutsourcePOField()</code>에서 매입처·품목·수주번호 중 하나가 채워질 때 매입처+품목이 모두 있고 <b>단가가 아직 0원(미입력)일 때만</b> 자동 제안합니다 — 이미 입력한 단가를 덮어쓰지 않습니다. <b>②외주단가 변동 추이 탭</b> — 원재료 화면과 동일한 3탭 구조로 "외주생산 입고 진행현황"에 새 탭을 추가했습니다(새 마스터 데이터를 만들지 않고 기존 발주이력을 매입처+품목 조합으로 집계·파생 — 외주는 원재료의 <code>priceHistory</code>와 달리 매 발주가 이미 단가를 남기고 있어 별도 이력 필드가 필요 없었습니다). 최초단가→최근단가 절감액·절감률을 조합별로 보여주고, 행을 클릭하면 해당 조합의 전체 발주 이력(건별 전건 대비 등락)이 펼쳐집니다 — 구매부 단가 절감 실적 보고 근거로 쓸 수 있습니다. <b>③마감 부분마감(이월)</b> — "매입량보다 줄여서 등록하면 남은 수량을 어떻게 할까"라는 질문에 상현님이 "잔여수량은 다음 마감 대상으로 이월"을 선택하셔서, 기존 <code>closedStmtNo</code>(마감 즉시 완전 제외) 방식을 <code>closedQty</code>(누적 마감수량 차감) 방식으로 전환했습니다. 원재료·외주 입고마감의 마감수량 칸이 잔여수량(입고량−이미 마감된 수량) 기본값의 편집 가능한 입력으로 바뀌었고, 잔여수량보다 적게 등록하면 남은 수량은 마감되지 않은 채 다음 조회에 다시 후보로 나타납니다(<code>S.closingQtyOverride</code>로 입력값을 관리하다 등록 시 초기화). 마감내역서에 저장되는 <code>rows[].qty</code>도 실제 마감수량으로 기록되므로 엑셀 다운로드도 자동으로 정확한 값을 반영합니다. 매출 마감(cust)은 이번 컨펌 범위 밖이라 기존 완전마감 방식을 그대로 유지했습니다. node --check 구문 검증과 jsdom 기반 검증(외주단가 자동 제안값 실측, 단가이력 탭 절감액·절감률 계산, 원재료 3000kg 중 1000kg 부분마감 후 잔여 2000kg 재조회 확인, 나머지 2000kg 마감 후 후보 소멸 확인, 마감내역서 2건 발행 확인, 64개 전 화면 순회)을 통과해 실제 오류 0건을 확인했습니다.</td></tr>
       </tbody>
     </table>
   </div>
@@ -7880,6 +7903,11 @@ function toggleClosingSelect(kind, id){
   if(idx>=0) arr.splice(idx,1); else arr.push(id);
   recalc();
 }
+// 2026-08-10(35차): 상현님 컨펌에 따라 mat/out 마감은 "완전 마감"(closedStmtNo로 통째 제외)에서
+// "부분마감 이월"(closedQty 누적 차감) 방식으로 전환합니다. 매입량(p.qtyKg/p.qty)에서 이미 마감등록된
+// 누적수량(p.closedQty)을 뺀 잔여수량이 0보다 큰 동안 계속 후보로 남고, 마감수량을 잔여수량보다 적게
+// 등록하면 남은 잔여분이 다음 조회에 다시 나타납니다. cust(매출 마감)는 이번 컨펌 범위 밖이라 기존
+// closedStmtNo 완전마감 방식을 그대로 유지합니다.
 function closingCandidateRows(kind){
   const q = S.closingSearch[kind] || {};
   // 2026-08-06(31차): 매입처/거래처 검색이 정확일치(===)라 "승진"처럼 일부만 입력하면 실제 등록명
@@ -7890,10 +7918,32 @@ function closingCandidateRows(kind){
       .sort((a,b)=>a.date<b.date?1:-1);
   }
   const list = kind==='mat' ? S.materialPOs : S.outsourcePOs;
+  const overrideMap = (S.closingQtyOverride && S.closingQtyOverride[kind]) || {};
   // 2026-08-09(34차): out(외주)은 수주번호 검색조건도 지원 — 발주 시 입력한 orderNo 기준 부분일치.
-  return list.filter(p=>!p.closedStmtNo && matReceiveStatusLabel(p)==='입고완료' && lvMatch(p.vendor,q.vendor) && (!q.orderNo||lvMatch(p.orderNo,q.orderNo)) && (!q.from||('2026-'+p.date)>=q.from) && (!q.to||('2026-'+p.date)<=q.to))
-    .map(p=>({id:p.no, date:p.date, partner:p.vendor, orderNo:p.orderNo||'', name: kind==='mat'?p.matName:p.item, spec: kind==='mat'?p.procureType:(p.specName||'—'), qty: kind==='mat'?p.qtyKg:p.qty, unitPrice:p.unitPrice}))
-    .sort((a,b)=>a.date<b.date?1:-1);
+  return list.filter(p=>{
+    if(matReceiveStatusLabel(p)!=='입고완료') return false;
+    if(!lvMatch(p.vendor,q.vendor)) return false;
+    if(q.orderNo && !lvMatch(p.orderNo,q.orderNo)) return false;
+    if(q.from && ('2026-'+p.date)<q.from) return false;
+    if(q.to && ('2026-'+p.date)>q.to) return false;
+    const avail = (kind==='mat'?p.qtyKg:p.qty) - (p.closedQty||0);
+    return avail > 0.0001;
+  }).map(p=>{
+    const avail = (kind==='mat'?p.qtyKg:p.qty) - (p.closedQty||0);
+    const ov = overrideMap[p.no];
+    const closeQty = (ov!=null) ? Math.min(Math.max(ov,0), avail) : avail;
+    return {id:p.no, date:p.date, partner:p.vendor, orderNo:p.orderNo||'', name: kind==='mat'?p.matName:p.item, spec: kind==='mat'?p.procureType:(p.specName||'—'), qty: avail, closeQty, unitPrice:p.unitPrice};
+  }).sort((a,b)=>a.date<b.date?1:-1);
+}
+// 2026-08-10(35차 신설): 마감수량 입력칸 — 기본값은 잔여수량(qty)이며, 사용자가 그보다 적은 값을
+// 입력하면 부분마감으로 처리되고 남은 수량은 다음 조회에 다시 후보로 나타납니다(잔여수량 초과 입력은
+// 자동으로 잔여수량까지 클램프).
+function setClosingQty(kind, id, val){
+  if(!S.closingQtyOverride) S.closingQtyOverride = {};
+  if(!S.closingQtyOverride[kind]) S.closingQtyOverride[kind] = {};
+  const n = +val;
+  S.closingQtyOverride[kind][id] = isNaN(n) ? 0 : Math.max(0, n);
+  recalc();
 }
 // 2026-08-09(34차 신설): 마감 후보 표의 헤더 체크박스 — 현재 검색조건에 맞는 후보 전체를 한 번에
 // 선택/해제합니다(기존 "전체 선택"/"선택 해제" 버튼과 동일 동작을 체크박스로도 제공).
@@ -7930,14 +7980,27 @@ function registerClosing(kind){
   const noKey = noKeyMap[kind];
   const no = prefix + '-' + String(S[noKey]).padStart(5,'0');
   S[noKey]++;
-  const totalQty = rows.reduce((s,r)=>s+(r.qty||0), 0);
-  const totalAmount = rows.reduce((s,r)=>s+(r.qty||0)*(r.unitPrice||0), 0);
-  listMap[kind].push({no, kind, partner, from:q.from||'', to:q.to||'', rows, totalQty, totalAmount, issuedAt:todayMD()});
+  // 2026-08-10(35차): mat/out은 r.closeQty(마감수량 입력값, 없으면 잔여수량 전체)를 실제 마감수량으로
+  // 사용합니다. cust는 closeQty가 없으므로 기존처럼 r.qty를 그대로 씁니다.
+  const qtyOf = r => (r.closeQty!=null ? r.closeQty : (r.qty||0));
+  const totalQty = rows.reduce((s,r)=>s+qtyOf(r), 0);
+  const totalAmount = rows.reduce((s,r)=>s+qtyOf(r)*(r.unitPrice||0), 0);
+  const storedRows = rows.map(r => ({...r, qty: qtyOf(r)}));
+  listMap[kind].push({no, kind, partner, from:q.from||'', to:q.to||'', rows: storedRows, totalQty, totalAmount, issuedAt:todayMD()});
   if(kind==='cust'){
     rows.forEach(r=>{ const d = S.deliveries.find(x=>x.id===r.id); if(d) d.closedStmtNo = no; });
   } else {
     const srcList = kind==='mat' ? S.materialPOs : S.outsourcePOs;
-    rows.forEach(r=>{ const p = srcList.find(x=>x.no===r.id); if(p) p.closedStmtNo = no; });
+    if(!S.closingQtyOverride) S.closingQtyOverride = {};
+    if(!S.closingQtyOverride[kind]) S.closingQtyOverride[kind] = {};
+    rows.forEach(r=>{
+      const p = srcList.find(x=>x.no===r.id);
+      if(p){
+        p.closedQty = (p.closedQty||0) + qtyOf(r);
+        p.closedStmtNo = no; // 참고용(가장 최근 포함된 마감내역서 번호) — 필터링에는 더 이상 사용하지 않음
+        delete S.closingQtyOverride[kind][r.id]; // 다음 조회 시 잔여수량 기준으로 다시 시작
+      }
+    });
   }
   S.closingSelected[kind] = [];
   const kindLabel = kind==='cust' ? '매출' : '매입';
@@ -8048,6 +8111,12 @@ function renderClosingSection(kind){
     // 어느 업체 건인지 한눈에 안 보이던 문제를 지적받아, out만 매입처 열을 넣고 순서를
     // 입고일/매입처/품목/규격/수량/단가/금액으로 재배열했습니다(다른 kind는 기존 표 구조 유지).
     // 2026-08-09(34차): mat도 동일하게 "입고처" 열을 입고일 우측에 추가하고, out은 수주번호 열을 추가.
+    // 2026-08-10(35차): mat/out은 마감수량을 잔여수량(r.qty) 기본값의 편집 가능한 입력으로 바꿨습니다
+    // — 그보다 적게 입력하면 부분마감되고 남은 잔여분은 다음 조회에 다시 나타납니다(setClosingQty).
+    const closeQtyCell = r => `<td class="num">
+        <input type="number" value="${r.closeQty}" min="0" max="${r.qty}" onchange="setClosingQty('${kind}','${r.id}',this.value)" style="width:62px;text-align:right;font-size:12px">
+        <div style="font-size:9px;color:var(--muted);text-align:right;margin-top:1px">/${(r.qty||0).toLocaleString()}</div>
+      </td>`;
     tbl.innerHTML = rows.length ? rows.map(r=>{
       const checked = sel.includes(r.id);
       if(kind==='out'){
@@ -8058,9 +8127,9 @@ function renderClosingSection(kind){
           <td style="text-align:center;font-size:11.5px;color:var(--ink-soft)">${r.orderNo||'—'}</td>
           <td>${r.name}</td>
           <td style="text-align:center;font-size:11.5px;color:var(--ink-soft)">${r.spec||'—'}</td>
-          <td class="num">${(r.qty||0).toLocaleString()}</td>
+          ${closeQtyCell(r)}
           <td class="num">${(r.unitPrice||0).toLocaleString()}</td>
-          <td class="num">${W((r.qty||0)*(r.unitPrice||0))}</td>
+          <td class="num">${W((r.closeQty||0)*(r.unitPrice||0))}</td>
         </tr>`;
       }
       if(kind==='mat'){
@@ -8070,9 +8139,9 @@ function renderClosingSection(kind){
           <td>${r.partner}</td>
           <td>${r.name}</td>
           <td style="text-align:center;font-size:11.5px;color:var(--ink-soft)">${r.spec||'—'}</td>
-          <td class="num">${(r.qty||0).toLocaleString()}</td>
+          ${closeQtyCell(r)}
           <td class="num">${(r.unitPrice||0).toLocaleString()}</td>
-          <td class="num">${W((r.qty||0)*(r.unitPrice||0))}</td>
+          <td class="num">${W((r.closeQty||0)*(r.unitPrice||0))}</td>
         </tr>`;
       }
       return `<tr>
@@ -8092,7 +8161,7 @@ function renderClosingSection(kind){
   const selCntEl = $(kind==='cust' ? 'custclosing-selcount' : `${kind}closing-selcount`);
   if(selCntEl) selCntEl.textContent = selRows.length;
   const selSumEl = $(kind==='cust' ? 'custclosing-selsum' : `${kind}closing-selsum`);
-  if(selSumEl) selSumEl.textContent = W(selRows.reduce((s,r)=>s+(r.qty||0)*(r.unitPrice||0),0)) + '원';
+  if(selSumEl) selSumEl.textContent = W(selRows.reduce((s,r)=>s+(r.closeQty!=null?r.closeQty:(r.qty||0))*(r.unitPrice||0),0)) + '원';
   // 2026-08-09(34차): 헤더 마스터 체크박스 상태를 현재 후보/선택 상태와 동기화(전체선택이면 체크, 아니면 해제)
   const allBox = $(`${kind}closing-all`);
   if(allBox) allBox.checked = rows.length>0 && selRows.length===rows.length;
@@ -11234,6 +11303,7 @@ function recalc(){
   renderMatCostTabBar();
   renderMatReturnHistory();
   renderOutCostTabBar();
+  renderOutsourcePriceTrend();
   renderVendorClaims();
   renderPOApproval();
   updatePOApprovalBadges();
@@ -11757,6 +11827,15 @@ function removeOutsourcePO(no){ S.outsourcePOs = S.outsourcePOs.filter(p=>p.no!=
 // 채웁니다(일치하는 건이 없으면 입력한 텍스트만 저장하고 품목명·규격명은 그대로 둡니다 — 임의 문자열
 // 입력 자체는 막지 않되, 실제 수주와 연결되면 편의를 제공하는 방식). 이후에도 자동채움된 값은 계속
 // 수정 가능한 일반 입력칸입니다.
+// 2026-08-10(35차): 매입처+품목 조합의 가장 최근 발주단가를 자동 기본값으로 제안합니다(상현님 컨펌
+// — "같은 품목이라도 매입처마다 협상단가가 다를 수 있다"는 이유로 품목 단독이 아닌 매입처+품목 조합
+// 기준으로 확정). 단가를 아직 입력하지 않은(0원) 상태에서 매입처·품목·수주번호가 모두 채워지는
+// 순간에만 제안하고, 이미 단가를 입력한 건은 자동으로 덮어쓰지 않습니다.
+function lastOutsourcePrice(vendor, item){
+  const hist = S.outsourcePOs.filter(p=>!p.cancelled && p.vendor===vendor && p.item===item && (p.unitPrice||0)>0)
+    .sort((a,b)=>a.date<b.date?1:-1);
+  return hist.length ? hist[0].unitPrice : null;
+}
 function setOutsourcePOField(no, field, val){
   const p = S.outsourcePOs.find(x=>x.no===no);
   if(!p) return;
@@ -11765,6 +11844,10 @@ function setOutsourcePOField(no, field, val){
   if(field==='orderNo' && val){
     const o = S.orderItems.find(x=>x.orderNo===val);
     if(o){ p.item = o.item; p.specName = o.specName; }
+  }
+  if(['vendor','item','orderNo'].includes(field) && p.vendor && p.item && !p.unitPrice){
+    const suggested = lastOutsourcePrice(p.vendor, p.item);
+    if(suggested) p.unitPrice = suggested;
   }
   if(p.saved) p.saved = false;
   recalc();
@@ -12334,15 +12417,77 @@ function exportMatReturnHistoryExcel(){
   XLSX.utils.book_append_sheet(wb, ws, '불량반출이력');
   XLSX.writeFile(wb, `원재료_불량반출이력_${todayMD()}.xlsx`);
 }
+// 2026-08-10(35차): 기존 2탭(입고 진행현황/원가계산 반영값)에 "외주단가 변동 추이"를 3번째 탭으로
+// 추가 — 원재료 화면의 3탭 구조(renderMatCostTabBar)와 동일한 패턴입니다.
 function renderOutCostTabBar(){
-  const rBtn = $('outtab-receive'), cBtn = $('outtab-cost');
-  const rWrap = $('out-receive-wrap'), cWrap = $('out-cost-wrap');
-  if(!rBtn || !cBtn || !rWrap || !cWrap) return;
-  const isReceive = S.outCostTab !== 'cost';
-  rBtn.className = isReceive ? 'btn' : 'btn gh';
-  cBtn.className = isReceive ? 'btn gh' : 'btn';
-  rWrap.style.display = isReceive ? '' : 'none';
-  cWrap.style.display = isReceive ? 'none' : '';
+  const rBtn = $('outtab-receive'), cBtn = $('outtab-cost'), tBtn = $('outtab-trend');
+  const rWrap = $('out-receive-wrap'), cWrap = $('out-cost-wrap'), tWrap = $('out-trend-wrap');
+  if(!rBtn || !cBtn || !tBtn || !rWrap || !cWrap || !tWrap) return;
+  const tab = S.outCostTab || 'receive';
+  rBtn.className = tab==='receive' ? 'btn' : 'btn gh';
+  cBtn.className = tab==='cost' ? 'btn' : 'btn gh';
+  tBtn.className = tab==='trend' ? 'btn' : 'btn gh';
+  rWrap.style.display = tab==='receive' ? '' : 'none';
+  cWrap.style.display = tab==='cost' ? '' : 'none';
+  tWrap.style.display = tab==='trend' ? '' : 'none';
+}
+// 2026-08-10(35차 신설): 매입처+품목 조합별 단가 변동 추이 — 구매부 절감실적 근거용 조회 화면.
+// 새 마스터 데이터를 만들지 않고 S.outsourcePOs 발주이력을 그대로 집계해서 파생합니다(기존
+// 원재료 priceHistory와 달리, 외주는 이미 매 발주가 단가를 남기고 있어 별도 이력 필드가 필요 없음).
+function outsourcePriceTrendRows(){
+  const groups = {};
+  S.outsourcePOs.filter(p=>!p.cancelled && (p.unitPrice||0)>0).forEach(p=>{
+    const key = p.vendor+'|||'+p.item;
+    if(!groups[key]) groups[key] = {vendor:p.vendor, item:p.item, entries:[]};
+    groups[key].entries.push({no:p.no, date:p.date, qty:p.qty||0, unitPrice:p.unitPrice});
+  });
+  return Object.keys(groups).map(key=>{
+    const g = groups[key];
+    const sorted = g.entries.slice().sort((a,b)=>a.date<b.date?-1:(a.date>b.date?1:0));
+    const first = sorted[0], last = sorted[sorted.length-1];
+    const diff = first.unitPrice - last.unitPrice; // 양수 = 절감(단가 하락)
+    const pct = first.unitPrice ? (diff/first.unitPrice*100) : 0;
+    return {key, vendor:g.vendor, item:g.item, count:sorted.length, first, last, diff, pct, entries:sorted};
+  }).sort((a,b)=>b.diff-a.diff);
+}
+function toggleOutPriceTrendDetail(key){
+  S.outPriceTrendSelected = (S.outPriceTrendSelected===key) ? null : key;
+  recalc();
+}
+function renderOutsourcePriceTrend(){
+  const tbl = $('t-out-price-trend');
+  if(!tbl) return;
+  const rows = outsourcePriceTrendRows();
+  tbl.innerHTML = rows.length ? rows.map(g=>{
+    const diffColor = g.diff>0 ? 'var(--green)' : (g.diff<0 ? 'var(--red)' : 'var(--muted)');
+    const selected = S.outPriceTrendSelected===g.key;
+    return `<tr style="cursor:pointer;${selected?'background:var(--blue-l)':''}" onclick="toggleOutPriceTrendDetail('${g.key.replace(/'/g,"\\'")}')">
+      <td>${g.vendor}</td>
+      <td>${g.item}</td>
+      <td class="num">${g.count}</td>
+      <td class="num">${g.first.unitPrice.toLocaleString()} <span style="font-size:9.5px;color:var(--muted)">(${g.first.date})</span></td>
+      <td class="num">${g.last.unitPrice.toLocaleString()} <span style="font-size:9.5px;color:var(--muted)">(${g.last.date})</span></td>
+      <td class="num" style="color:${diffColor};font-weight:700">${g.diff>0?'▼':(g.diff<0?'▲':'—')} ${Math.abs(g.diff).toLocaleString()}</td>
+      <td class="num" style="color:${diffColor}">${g.pct.toFixed(1)}%</td>
+      <td style="text-align:center;color:var(--muted)">${selected?'▲':'▼'}</td>
+    </tr>`;
+  }).join('') : '<tr><td colspan="8" style="color:var(--muted)">단가가 등록된 외주 발주 이력이 없습니다</td></tr>';
+
+  const detailCard = $('out-trend-detail-card');
+  const sel = S.outPriceTrendSelected;
+  if(!detailCard) return;
+  if(!sel){ detailCard.style.display = 'none'; return; }
+  const g = rows.find(r=>r.key===sel);
+  if(!g){ detailCard.style.display = 'none'; S.outPriceTrendSelected = null; return; }
+  detailCard.style.display = '';
+  $('out-trend-detail-title').textContent = `${g.vendor} · ${g.item} — 발주 이력 ${g.count}건`;
+  $('t-out-trend-detail').innerHTML = g.entries.map((e,i)=>{
+    const prev = g.entries[i-1];
+    const chg = prev ? e.unitPrice - prev.unitPrice : 0;
+    const chgLabel = i===0 ? '—' : (chg===0 ? '변동없음' : `${chg>0?'▲':'▼'} ${Math.abs(chg).toLocaleString()}`);
+    const chgColor = chg>0 ? 'var(--red)' : (chg<0 ? 'var(--green)' : 'var(--muted)');
+    return `<tr><td>${e.no}</td><td>${e.date}</td><td class="num">${e.qty.toLocaleString()}</td><td class="num">${e.unitPrice.toLocaleString()}</td><td class="num" style="color:${chgColor}">${chgLabel}</td></tr>`;
+  }).join('');
 }
 // 2026-07-31(27차 신설): 상태 열이 결재단계(결재완료 등)를 그대로 노출해 헷갈린다는 지적에 따라,
 // 입고 관점의 3가지 값(입고대기/입고완료/발주취소)으로만 자동 표현합니다. 더 이상 이 화면에서 직접
