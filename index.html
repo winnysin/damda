@@ -62,6 +62,14 @@ body{font-family:'Pretendard',-apple-system,BlinkMacSystemFont,'Malgun Gothic','
 .nav a.on{background:var(--blue-l);color:var(--blue-d);font-weight:700}
 .nav .grp{padding:16px 12px 6px;font-size:10.5px;color:#9CA6B4;letter-spacing:.09em;font-weight:700;text-transform:uppercase}
 .nav .grp:first-child{padding-top:4px}
+/* 2026-08-10(36차 신설): 구매처럼 항목이 많은 그룹 안에서 세부 화면을 접고 펼치는 2단 하위카테고리.
+   .grp(대분류)와 시각적으로 구분되도록 톤을 낮추고, 클릭 가능함을 화살표로 표시합니다. */
+.nav-subgrp{display:flex;align-items:center;gap:8px;padding:9px 12px;margin-bottom:2px;color:var(--side-text);
+  font-size:13px;font-weight:700;cursor:pointer;border-radius:8px;transition:background .12s}
+.nav-subgrp:hover{background:#F2F5FA}
+.nav-sub-arrow{margin-left:auto;font-size:10px;color:#9CA6B4;transition:transform .15s}
+.nav-subgrp.open .nav-sub-arrow{transform:rotate(90deg)}
+.nav a[data-sub]{padding-left:30px;font-size:12.5px}
 /* 2026-07-31(27차): 결재 대기 건이 있을 때 nav 항목에 붙는 카운트 배지 — 사장님/결재자가 화면에
    들어오지 않아도 결재할 게 있는지 사이드바만 보고 알 수 있게 하기 위함(item3 보완책). */
 .nav-badge{display:inline-block;margin-left:6px;padding:1px 6px;border-radius:10px;background:var(--red);color:#fff;font-size:10px;font-weight:700;vertical-align:middle}
@@ -124,7 +132,7 @@ input[type=text],input[type=date]{text-align:left}
 input:focus,select:focus{outline:2px solid var(--blue);outline-offset:-1px;border-color:var(--blue)}
 input:disabled,select:disabled{background:#F5F6F8;color:var(--muted);cursor:not-allowed}
 .btn{background:var(--blue);color:#fff;border:none;border-radius:8px;padding:8px 15px;font-size:12.5px;
-  cursor:pointer;font-weight:700;font-family:inherit;transition:background .12s,transform .06s}
+  cursor:pointer;font-weight:700;font-family:inherit;transition:background .12s,transform .06s;white-space:nowrap}
 .btn:hover{background:var(--blue-d)}
 .btn:active{transform:translateY(1px)}
 .btn.gh{background:#fff;color:var(--blue);border:1px solid #C7D6F5}
@@ -539,7 +547,7 @@ table.mr-table input.form-control.ro{background:var(--bg);color:var(--muted)}
 <body>
 <div class="wrap">
 <aside class="side">
-  <div class="brand"><div class="brand-row"><img src="/icon-192.png" alt="DAMDA" class="brand-logo"><span class="brand-word">DAMDA</span></div><small>프로토타입 v0.67 · 외주단가 관리 + 마감 이월 — 35차 라운드</small></div>
+  <div class="brand"><div class="brand-row"><img src="/icon-192.png" alt="DAMDA" class="brand-logo"><span class="brand-word">DAMDA</span></div><small>프로토타입 v0.68 · 외주 화면 UX 정리 + 구매 사이드바 4분류 — 36차 라운드</small></div>
   <nav class="nav">
     <!-- 2026-07-21(항목11) 대분류 재구성: 운영 모니터링-기본정보-영업,수주-구매-생산-납품,마감-자재-인사,급여-품질-원가관리-가이드-환경설정 (12개, 상현님 지시안) -->
     <div class="grp">운영 모니터링</div>
@@ -573,15 +581,17 @@ table.mr-table input.form-control.ro{background:var(--bg);color:var(--muted)}
     <a data-p="planchangelog"><span class="nav-ic">📜</span> 생산계획변경 이력</a>
     <div class="grp">구매</div>
     <a data-p="poapproval"><span class="nav-ic">🖊</span> 발주 결재함<span id="nav-badge-poapproval"></span></a>
-    <a data-p="matpo"><span class="nav-ic">🧾</span> 원재료 발주관리<span id="nav-badge-matpo"></span></a>
-    <a data-p="matrecv"><span class="nav-ic">📥</span> 원재료 입고등록</a>
-    <a data-p="mat"><span class="nav-ic">📦</span> 원재료 입고 진행현황</a>
-    <a data-p="matclosing"><span class="nav-ic">🔒</span> 원재료 입고 마감</a>
-    <a data-p="outpo"><span class="nav-ic">🧾</span> 외주 발주관리<span id="nav-badge-outpo"></span></a>
-    <a data-p="outrecv"><span class="nav-ic">📥</span> 외주 입고등록</a>
-    <a data-p="out"><span class="nav-ic">🔧</span> 외주생산 입고 진행현황</a>
-    <a data-p="outclosing"><span class="nav-ic">🔒</span> 외주 입고 마감</a>
-    <a data-p="miscpo"><span class="nav-ic">🧾</span> 기타구매 발주관리<span id="nav-badge-miscpo"></span></a>
+    <div class="nav-subgrp" data-subhdr="matpurchase" onclick="toggleNavSub('matpurchase')"><span class="nav-ic">🧪</span> 원재료 구매<span class="nav-sub-arrow" id="arrow-matpurchase">▸</span></div>
+    <a data-p="matpo" data-sub="matpurchase" style="display:none"><span class="nav-ic">🧾</span> 원재료 발주관리<span id="nav-badge-matpo"></span></a>
+    <a data-p="matrecv" data-sub="matpurchase" style="display:none"><span class="nav-ic">📥</span> 원재료 입고등록</a>
+    <a data-p="mat" data-sub="matpurchase" style="display:none"><span class="nav-ic">📦</span> 원재료 입고 진행현황</a>
+    <a data-p="matclosing" data-sub="matpurchase" style="display:none"><span class="nav-ic">🔒</span> 원재료 입고 마감</a>
+    <div class="nav-subgrp" data-subhdr="outpurchase" onclick="toggleNavSub('outpurchase')"><span class="nav-ic">🔧</span> 외주 구매<span class="nav-sub-arrow" id="arrow-outpurchase">▸</span></div>
+    <a data-p="outpo" data-sub="outpurchase" style="display:none"><span class="nav-ic">🧾</span> 외주 발주관리<span id="nav-badge-outpo"></span></a>
+    <a data-p="outrecv" data-sub="outpurchase" style="display:none"><span class="nav-ic">📥</span> 외주 입고등록</a>
+    <a data-p="out" data-sub="outpurchase" style="display:none"><span class="nav-ic">🔧</span> 외주생산 입고 진행현황</a>
+    <a data-p="outclosing" data-sub="outpurchase" style="display:none"><span class="nav-ic">🔒</span> 외주 입고 마감</a>
+    <a data-p="miscpo"><span class="nav-ic">🧾</span> 기타 구매<span id="nav-badge-miscpo"></span></a>
     <div class="grp">품질</div>
     <a data-p="qualitycheck"><span class="nav-ic">📋</span> 공정검사일보</a>
     <div class="grp">납품,마감</div>
@@ -1692,16 +1702,17 @@ table.mr-table input.form-control.ro{background:var(--bg);color:var(--muted)}
     <div style="margin-bottom:13px"><button class="btn sm" onclick="addOutsourcePO()">+ 발주 등록</button></div>
     <div style="overflow-x:auto"><table class="th-center" style="table-layout:fixed">
       <thead><tr>
-        <th style="width:98px">발주일</th><th style="width:100px">수주번호</th><th style="width:100px">매입처</th><th style="width:95px">공정명</th>
-        <th style="width:120px">품목명</th><th style="width:110px">규격명</th>
-        <th class="num" style="width:70px">발주수량</th><th class="num" style="width:80px">단가</th><th class="num" style="width:95px">발주금액</th>
-        <th style="width:134px">입고예정일</th><th style="width:82px">상태</th><th style="width:78px">작업</th>
+        <th style="width:84px">발주일</th><th style="width:82px">수주번호</th><th style="width:84px">매입처</th><th style="width:80px">공정명</th>
+        <th style="width:190px">품목명</th><th style="width:150px">규격명</th>
+        <th class="num" style="width:62px">발주수량</th><th class="num" style="width:72px">단가</th><th class="num" style="width:86px">발주금액</th>
+        <th style="width:116px">입고예정일</th><th style="width:76px">상태</th><th style="width:108px">작업</th>
       </tr></thead>
       <tbody id="t-outpo"></tbody>
     </table></div>
     <div style="margin-top:13px"><button class="btn gh sm" onclick="addOutsourcePO()">+ 발주 등록</button></div>
     <datalist id="dl-customers-outpo"></datalist>
     <datalist id="dl-orders-outpo"></datalist>
+    <datalist id="dl-process-outpo"></datalist>
   </div>
 </section>
 
@@ -1719,10 +1730,10 @@ table.mr-table input.form-control.ro{background:var(--bg);color:var(--muted)}
     <div style="margin-bottom:13px"><button class="btn sm" onclick="completeSelectedOutReceipts()">✔ 선택 항목 입고완료 처리 (<span id="outrecv-selected-count">0</span>건)</button></div>
     <div style="overflow-x:auto"><table class="th-center" style="table-layout:fixed">
       <thead><tr>
-        <th style="width:28px"></th><th style="width:72px">발주일</th><th style="width:80px">수주번호</th><th style="width:72px">매입처</th><th style="width:68px">공정명</th>
-        <th style="width:90px">품목명</th><th style="width:80px">규격명</th>
-        <th class="num" style="width:55px">발주수량</th><th class="num" style="width:62px">단가</th><th class="num" style="width:78px">발주금액</th>
-        <th style="width:78px">입고예정일</th><th style="width:140px">작업</th>
+        <th style="width:28px"></th><th style="width:68px">발주일</th><th style="width:70px">수주번호</th><th style="width:64px">매입처</th><th style="width:60px">공정명</th>
+        <th style="width:120px">품목명</th><th style="width:107px">규격명</th>
+        <th class="num" style="width:52px">발주수량</th><th class="num" style="width:58px">단가</th><th class="num" style="width:74px">발주금액</th>
+        <th style="width:72px">입고예정일</th><th style="width:130px">작업</th>
       </tr></thead>
       <tbody id="t-outrecv"></tbody>
     </table></div>
@@ -1783,7 +1794,7 @@ table.mr-table input.form-control.ro{background:var(--bg);color:var(--muted)}
     </div>
     <div class="card" style="margin-top:16px">
       <h2 style="margin-top:0">⚠️ 귀책업체 비용청구 현황 <span style="font-size:11px;font-weight:400;color:var(--muted)">— 연쇄불량(예: 코팅불량으로 인한 추가사출) 재작업 발주</span></h2>
-      <div class="note">외주 발주관리에서 재작업 발주를 <b>"연쇄불량 태깅"</b>하면, 입고완료 시 원인을 제공한 업체 앞으로 이 청구 내역이 자동 등록됩니다. 재작업을 실제로 수행한 업체에 대한 결제(위 매입처별 집계)는 그대로 정상 진행되며, 이 표는 별도의 청구·추적용입니다 — 업체 간 직접 정산 기능은 없어 회사가 매개해 투명하게 기록합니다.</div>
+      <div class="note">외주 발주관리에서 재작업 발주를 <b>"연쇄불량 태깅"</b>하면, 입고완료 시 원인을 제공한 업체 앞으로 이 청구 내역이 발주금액 기본값으로 자동 등록됩니다. <b>청구금액은 협의에 따라 "정산완료 처리"를 누르기 전까지 아래 표에서 직접 수정</b>할 수 있고, 정산완료 처리하는 순간 그 금액으로 확정됩니다(2026-08-10 개선). 재작업을 실제로 수행한 업체에 대한 결제(위 매입처별 집계)는 그대로 정상 진행되며, 이 표는 별도의 청구·추적용입니다 — 업체 간 직접 정산 기능은 없어 회사가 매개해 투명하게 기록합니다.</div>
       <table>
         <thead><tr><th style="width:14%">일자</th><th style="width:20%">귀책업체</th><th style="width:20%">품목</th><th style="width:22%">재작업 내역</th><th class="num" style="width:14%">청구금액</th><th style="width:10%">처리</th></tr></thead>
         <tbody id="t-vendor-claims"></tbody>
@@ -1827,7 +1838,7 @@ table.mr-table input.form-control.ro{background:var(--bg);color:var(--muted)}
     </div>
     <div style="overflow-x:auto"><table class="th-center" style="table-layout:fixed">
       <thead><tr>
-        <th style="width:30px"><input type="checkbox" id="outclosing-all" onchange="toggleAllClosingCandidates('out',this.checked)"></th><th style="width:78px">입고일</th><th style="width:88px">매입처</th><th style="width:96px">수주번호</th><th style="width:138px">품목명</th><th style="width:120px">규격명</th>
+        <th style="width:30px"><input type="checkbox" id="outclosing-all" onchange="toggleAllClosingCandidates('out',this.checked)"></th><th style="width:78px">입고일</th><th style="width:88px">매입처</th><th style="width:76px">수주번호</th><th style="width:148px">품목명</th><th style="width:130px">규격명</th>
         <th class="num" style="width:70px">마감수량</th><th class="num" style="width:72px">단가</th><th class="num" style="width:92px">금액</th>
       </tr></thead>
       <tbody id="t-outclosing-candidates"></tbody>
@@ -2632,6 +2643,7 @@ BEP 매출  = 월 고정비 ÷ 공헌이익률
         <tr><td>기타구매 발주 결재 신설 + 웹 결재함 3분할 (2026-08-09, v0.65)</td><td>상현님 지시: "발주 결재함 화면에서 원재료와 외주발주 외에 추가로 기타구매(소모품, 설비 등)에 대한 결재가 추가로 필요할거같아... 사장님 입장에서는 지출에 대한건 모두 확인하고 싶을테니까." <b>①기타구매 발주관리 신설</b> — 원재료·외주와 달리 입고 추적이 불필요하다는 지시에 따라 발주관리 화면만 신설(입고등록·진행현황 화면 없음), 상태모델도 3단계(작성중→결재대기→결재완료, <code>MISC_PO_STAGES</code>)로 기존 5단계 <code>PO_STAGES</code>와 구분했습니다. 표 컬럼은 지시하신 대로 발주일·구매품명·규격·발주처·단가·수량·발주금액·상태·작업 9열로 구성(발주번호 G-000001~, 조달구분 없음 — 소모품·설비는 전부 자가구매라 원재료의 유상/무상사급 구분이 필요 없다고 판단). 등록→저장→결재상신→승인/반려→취소/복원, 결재완료 후 PDF 발주서 출력까지 원재료·외주와 동일한 흐름을 재사용했습니다(<code>S.miscPOs</code>, <code>canApprovePO()</code> 등 기존 함수 그대로 공유). <b>②발주 결재함 웹 3분할</b> — "웹에서는 너무 가로로 길어"라는 지적에 따라, 그동안 데스크톱(#p-poapproval)이 모바일과 동일한 세로 스택형 카드(<code>poApprovalMobileBody()</code>)를 그대로 쓰고 있던 것을 발견 — 웹 전용 <code>poApprovalWebBody()</code>를 신설해 원재료·외주·기타구매 결재대기 목록을 3열(<code>.row3</code>)로 나란히 배치했습니다. 승인/반려는 기존 함수를 그대로 호출해 로직 중복이 없고, 모바일 앱 3화면은 기존 <code>poApprovalMobileBody()</code>에 기타구매 섹션만 추가해 그대로 재사용했습니다("앱에서는 화면 폭이 좁기 때문에 괜찮을거 같다"는 말씀대로 구조는 유지). <b>③결재 생략(회사 규모별 분기)</b> — "소기업·중소기업은 결재 사용이 가능해 보이는데 영세기업은 어려울 수 있다, 이 과정을 둘로 나눌 수 있는 방법이 있을까?"라는 질문에는 이미 구축되어 있던 <code>S.poApprovalSkip</code>(환경설정 &gt; 구매 결재 설정, 기업 규모를 영세기업으로 바꾸면 자동 ON) 토글을 그대로 활용하도록 안내 — 기타구매도 원재료·외주와 동일하게 이 플래그를 참조해 결재상신 즉시 결재완료로 처리되므로, 회사 규모 하나의 설정으로 3개 발주유형이 함께 분기됩니다(별도 신규 메커니즘을 만들지 않음). node --check 구문 검증과 jsdom 기반 검증(기타구매 등록·저장·결재상신·승인·영세기업 결재생략 자동전환, 웹 결재함 3열 렌더 및 각 열 데이터 노출, 앱 결재화면 기타구매 섹션 포함, 64개 전 화면 순회)을 통과해 실제 오류 0건을 확인했습니다.</td></tr>
         <tr><td>34차 라운드 — 구매/입고 화면 UX 개선 8건 (2026-08-09, v0.66)</td><td>상현님이 원재료·외주·기타구매 발주/입고/마감 화면 전반에 걸쳐 8가지를 지적하셨습니다. <b>①구매사유 드롭다운 좌측정렬</b> — 원재료 발주관리의 구매사유 select가 전역 select 스타일(<code>text-align:right</code>, 숫자입력 위주로 설계된 기본값)을 그대로 물려받아 오른쪽으로 쏠려 있던 것을 해당 select 2개(사유구분·연결수주)에만 <code>text-align:left</code>를 지정해 바로잡았습니다. <b>②원재료 입고마감 표 재편</b> — 폭 미지정 열 2개(품목명·구분) 때문에 <code>table-layout:fixed</code>가 남는 공간을 나눠 배분하며 표가 늘어지던 것을, 외주 입고마감과 동일하게 전 열에 명시적 폭을 줘 한 줄에 들어오도록 했고, "품목명"을 "원재료명"으로 개칭, "입고처"(매입처) 열을 입고일 우측에 신설했습니다. <b>③외주 발주관리에 수주번호 입력</b> — 수주번호를 입력(자동완성 목록 제공)하면 <code>S.orderItems</code>에서 일치하는 건을 찾아 품목명·규격명을 자동으로 채웁니다(일치하는 건이 없으면 입력한 텍스트만 저장 — 임의 외주는 계속 자유 입력 가능). 발주서 PDF에는 수주번호를 넣지 않았는데, 이는 외부 매입처에게 발송하는 문서에 내부 수주·고객 정보가 노출되지 않게 하기 위한 판단입니다. <b>④수주번호 열 3화면 확산</b> — 외주 입고등록·외주생산 입고 진행현황(입고 진행현황 탭)·외주 입고마감 세 화면 모두에 수주번호 열을 추가하고 엑셀 다운로드에도 반영했습니다. <b>⑤외주 발주관리 조회조건</b> — 수주번호(부분일치)·상태(작성중/결재대기/결재완료/입고대기/입고완료/취소됨) 조회를 신설했습니다(취소됨은 <code>stage</code>와 별도인 <code>cancelled</code> 플래그라 조회조건에서 따로 분기 처리). <b>⑥외주 입고등록 조회조건</b> — 수주번호·매입처 조회를 신설했습니다(진행현황 탭의 기존 조회조건 <code>lv('outrecv')</code>와 이름이 겹치지 않도록 입고등록 화면은 별도 리스트뷰 키 <code>outrecv2</code>로 분리). <b>⑦마감 후보 표 일괄선택 체크박스</b> — 원재료·외주 입고마감 표의 헤더에 마스터 체크박스를 추가해 현재 검색조건에 걸린 후보 전체를 한 번에 선택/해제할 수 있게 했습니다(기존 "전체 선택"/"선택 해제" 버튼과 동일 동작을 체크박스로도 제공, 선택 상태가 바뀌면 헤더 체크박스 표시도 자동 동기화). <b>⑧기타구매 발주관리</b> — 단가 입력칸을 콤마 단위 구분 표시로 바꾸고(입력 시 콤마를 뗀 숫자로 파싱해 저장), 구매품명·발주처·상태 조회조건을 신설했습니다. 외주단가를 "직전 발주단가 자동 기본값"과 "품목별 단가 변동이력(구매부 절감실적 근거)" 중 어느 방식으로 관리할지는 상현님께 별도로 제안드리고 컨펌받은 뒤 다음 라운드에서 진행하기로 했고, 입고마감 수량을 매입량 기본값의 수정 가능한 입력으로 바꾸는 건도 부분마감 시 잔여수량 처리방식을 확인받은 뒤 진행하기로 남겨뒀습니다(각각 별도 제안 전달). node --check 구문 검증과 jsdom 기반 검증(구매사유 select 정렬값, 원재료입고마감 8열 헤더·마스터체크박스, 외주발주 수주번호 자동채움 실값 확인, 수주번호+상태 조회 필터링 결과건수, 외주입고등록/진행현황/입고마감 수주번호 열 노출, 기타구매 콤마 표시 왕복 확인 및 조회 필터링, 마감 표 일괄선택/해제 후 선택건수 반영, 64개 전 화면 순회)을 통과해 실제 오류 0건을 확인했습니다.</td></tr>
         <tr><td>35차 라운드 — 외주단가 관리 + 마감 부분마감(이월) (2026-08-10, v0.67)</td><td>34차에서 제안드리고 컨펌받은 두 가지 설계를 구현했습니다. <b>①외주단가 자동 기본값</b> — "매입처+품목 조합의 최근 발주단가"를 기준으로 확정(품목 단독이 아닌 이유는 매입처마다 협상단가가 다를 수 있어서). <code>lastOutsourcePrice(vendor,item)</code>이 <code>S.outsourcePOs</code> 이력에서 취소되지 않고 단가가 등록된(0원 초과) 가장 최근 건을 찾고, <code>setOutsourcePOField()</code>에서 매입처·품목·수주번호 중 하나가 채워질 때 매입처+품목이 모두 있고 <b>단가가 아직 0원(미입력)일 때만</b> 자동 제안합니다 — 이미 입력한 단가를 덮어쓰지 않습니다. <b>②외주단가 변동 추이 탭</b> — 원재료 화면과 동일한 3탭 구조로 "외주생산 입고 진행현황"에 새 탭을 추가했습니다(새 마스터 데이터를 만들지 않고 기존 발주이력을 매입처+품목 조합으로 집계·파생 — 외주는 원재료의 <code>priceHistory</code>와 달리 매 발주가 이미 단가를 남기고 있어 별도 이력 필드가 필요 없었습니다). 최초단가→최근단가 절감액·절감률을 조합별로 보여주고, 행을 클릭하면 해당 조합의 전체 발주 이력(건별 전건 대비 등락)이 펼쳐집니다 — 구매부 단가 절감 실적 보고 근거로 쓸 수 있습니다. <b>③마감 부분마감(이월)</b> — "매입량보다 줄여서 등록하면 남은 수량을 어떻게 할까"라는 질문에 상현님이 "잔여수량은 다음 마감 대상으로 이월"을 선택하셔서, 기존 <code>closedStmtNo</code>(마감 즉시 완전 제외) 방식을 <code>closedQty</code>(누적 마감수량 차감) 방식으로 전환했습니다. 원재료·외주 입고마감의 마감수량 칸이 잔여수량(입고량−이미 마감된 수량) 기본값의 편집 가능한 입력으로 바뀌었고, 잔여수량보다 적게 등록하면 남은 수량은 마감되지 않은 채 다음 조회에 다시 후보로 나타납니다(<code>S.closingQtyOverride</code>로 입력값을 관리하다 등록 시 초기화). 마감내역서에 저장되는 <code>rows[].qty</code>도 실제 마감수량으로 기록되므로 엑셀 다운로드도 자동으로 정확한 값을 반영합니다. 매출 마감(cust)은 이번 컨펌 범위 밖이라 기존 완전마감 방식을 그대로 유지했습니다. node --check 구문 검증과 jsdom 기반 검증(외주단가 자동 제안값 실측, 단가이력 탭 절감액·절감률 계산, 원재료 3000kg 중 1000kg 부분마감 후 잔여 2000kg 재조회 확인, 나머지 2000kg 마감 후 후보 소멸 확인, 마감내역서 2건 발행 확인, 64개 전 화면 순회)을 통과해 실제 오류 0건을 확인했습니다.</td></tr>
+        <tr><td>36차 라운드 — 외주 화면 UX 정리 6건 + 구매 사이드바 재구성 (2026-08-10, v0.68)</td><td>상현님이 원재료·외주 입고마감과 외주 발주/입고 화면들에 대해 6가지를 지적하셨습니다. <b>①마감수량 한 줄 표시</b> — 35차에서 추가한 마감수량 입력+잔여수량 캡션이 세로 2줄로 표시되던 것을 한 줄(input+작은 "/전체수량" 텍스트)로 붙였습니다(mat/out 공용 헬퍼라 양쪽에 함께 반영). <b>②외주 발주관리 자동완성</b> — 매입처는 거래처마스터(S.customers)에 실제 발주 이력(S.outsourcePOs.vendor)까지 합쳐 자동완성 후보로 쓰고, 공정명은 마스터데이터가 없어 전적으로 입력 이력 기반 신규 datalist를 만들었습니다 — 신규 값도 저장되는 즉시 다음 렌더부터 자동완성 후보에 들어가므로 "처음엔 타이핑, 두 번째부터는 자동완성" 요건을 별도 이력 테이블 없이 만족합니다. <b>③외주 발주관리 정렬·폭 재조정</b> — 입고예정일·상태·수주번호 열을 가운데정렬하고(poDateFieldHTML에 정렬 옵션 인자 추가), 12개 열 전체 폭을 재검토해 품목명(120→190px)·규격명(110→150px)에 가장 많은 여유를 배분했습니다. 버튼이 좁은 열에서 줄바꿈되던 문제는 <code>.btn{white-space:nowrap}</code>을 전역 추가해 해결했고, 결재대기 상태에서 상태 배지와 중복 표시되던 "결재대기중" 텍스트는 삭제했습니다. <b>④상태 드롭박스 조사</b> — 결재완료/입고대기/입고완료 3단 드롭박스가 정말 다른 화면 액션으로만 바뀌는지 조사한 결과, 결재완료(발주 결재함 승인)·입고완료(외주 입고등록 처리)는 실제로 외부 트리거가 있지만 <b>입고대기는 외주에서 이 드롭박스 말고는 어디서도 자동 전환되지 않고</b>(원재료의 무상사급 같은 자동 경로가 외주엔 없음), <code>matReceiveStatusLabel()</code>이 결재완료·입고대기를 이미 동일하게 표시하고 있어 사실상 무의미했습니다 — 상현님 추측이 맞아 읽기전용 배지로 전환했습니다(원재료는 무상사급 자동경로가 실재해 그대로 유지). <b>⑤외주 입고등록 폭 재조정</b> — 같은 원칙으로 품목명(90→120px)·규격명(80→107px)에 여유를 더 줬습니다. <b>⑥외주생산 입고 진행현황 정리</b> — "입고등록으로" 버튼명을 "입고등록"으로 줄이고, 외주 발주관리에서 이미 출력 가능한 PDF 발주서 버튼을 여기서는 제거해 중복을 없앴습니다. <b>⑦외주 입고마감 정리</b> — 규격명 셀의 별도 폰트축소(11.5px)를 없애 품목명과 같은 크기로 통일하고, 수주번호 열 폭(96→76px)을 줄여 품목명(138→148px)·규격명(120→130px)에 재배분했습니다. <b>⑧연쇄불량 청구금액 확정시점</b> — "무조건 100% 청구가 아니다"라는 지적에 컨펌받은 대로, 입고완료 시 발주금액을 <b>제안 기본값</b>으로 청구내역을 자동생성하되 <b>"정산완료 처리"를 누르기 전까지</b> 청구금액을 협의 결과에 맞춰 직접 수정할 수 있게 했습니다(이미 있던 정산완료 액션이 사실상 확정 시점이라는 점에 착안해 새 화면 없이 기존 흐름에 편집 가능한 입력만 추가). <b>⑨구매 사이드바 4분류</b> — "발주 결재함·원재료 구매·외주 구매·기타 구매"로 하위카테고리를 나눠 필요한 것만 펼쳐보게 했습니다. 신규 <code>.nav-subgrp</code> 헤더를 클릭하면 그 아래 화면들이 펼쳐지고(<code>toggleNavSub()</code>), 특정 화면으로 직접 이동(<code>navTo()</code>)하면 소속 카테고리가 자동으로 펼쳐져 사이드바에서 현재 위치를 항상 찾을 수 있습니다. 링크는 여전히 <code>.nav</code>의 직계 자식으로 남겨(<code>navGroupMap()</code>이 그룹 판별에 전제하는 DOM 구조를 보존) 권한 매트릭스(RBAC)·배지 로직을 전혀 건드리지 않았고, 권한이 없는 역할로 전환하면 카테고리 헤더까지 함께 숨겨지는지 확인했습니다. node --check 구문 검증과 jsdom 기반 검증(자동완성 이력 반영, 열 정렬·헤더 폭, 상태 배지 전환, 결재대기중 텍스트 제거, 사이드바 접힘/펼침·자동펼침·권한별 숨김, 연쇄불량 청구금액 수정→정산완료 잠금 전체 흐름, 64개 전 화면 순회)을 통과해 실제 오류 0건을 확인했습니다.</td></tr>
       </tbody>
     </table>
   </div>
@@ -8113,9 +8125,9 @@ function renderClosingSection(kind){
     // 2026-08-09(34차): mat도 동일하게 "입고처" 열을 입고일 우측에 추가하고, out은 수주번호 열을 추가.
     // 2026-08-10(35차): mat/out은 마감수량을 잔여수량(r.qty) 기본값의 편집 가능한 입력으로 바꿨습니다
     // — 그보다 적게 입력하면 부분마감되고 남은 잔여분은 다음 조회에 다시 나타납니다(setClosingQty).
-    const closeQtyCell = r => `<td class="num">
-        <input type="number" value="${r.closeQty}" min="0" max="${r.qty}" onchange="setClosingQty('${kind}','${r.id}',this.value)" style="width:62px;text-align:right;font-size:12px">
-        <div style="font-size:9px;color:var(--muted);text-align:right;margin-top:1px">/${(r.qty||0).toLocaleString()}</div>
+    const closeQtyCell = r => `<td class="num" style="white-space:nowrap">
+        <input type="number" value="${r.closeQty}" min="0" max="${r.qty}" onchange="setClosingQty('${kind}','${r.id}',this.value)" style="width:52px;text-align:right;font-size:11.5px;display:inline-block">
+        <span style="font-size:9px;color:var(--muted)">/${(r.qty||0).toLocaleString()}</span>
       </td>`;
     tbl.innerHTML = rows.length ? rows.map(r=>{
       const checked = sel.includes(r.id);
@@ -8126,7 +8138,7 @@ function renderClosingSection(kind){
           <td>${r.partner}</td>
           <td style="text-align:center;font-size:11.5px;color:var(--ink-soft)">${r.orderNo||'—'}</td>
           <td>${r.name}</td>
-          <td style="text-align:center;font-size:11.5px;color:var(--ink-soft)">${r.spec||'—'}</td>
+          <td style="text-align:center">${r.spec||'—'}</td>
           ${closeQtyCell(r)}
           <td class="num">${(r.unitPrice||0).toLocaleString()}</td>
           <td class="num">${W((r.closeQty||0)*(r.unitPrice||0))}</td>
@@ -11467,10 +11479,10 @@ function yymmddToISO(yymmdd){
   return '20'+parts[0]+'-'+parts[1]+'-'+parts[2];
 }
 // 2026-07-31(27차 보완): 텍스트 입력창 폭을 60px→70px로 넓혀 "26-07-31" 형식이 잘리지 않게 했습니다.
-function poDateFieldHTML(uid, value, onchangeTemplate, locked){
+function poDateFieldHTML(uid, value, onchangeTemplate, locked, center){
   const iso = yymmddToISO(value);
   const onchangeText = onchangeTemplate.replace('__V__', 'normalizeYYMMDD(this.value)');
-  return `<span style="display:inline-flex;gap:2px;align-items:center;width:100%">
+  return `<span style="display:inline-flex;gap:2px;align-items:center;${center?'justify-content:center;':''}width:100%">
     <input type="text" id="txt-${uid}" value="${value||''}" placeholder="YY-MM-DD" ${locked?'disabled':''} style="width:70px;font-size:10.5px" onchange="${onchangeText}">
     <input type="date" id="pick-${uid}" value="${iso}" ${locked?'disabled':''} style="position:absolute;opacity:0;width:1px;height:1px;pointer-events:none" onchange="document.getElementById('txt-${uid}').value=normalizeYYMMDD(this.value);${onchangeText}">
     <button type="button" class="btn gh sm" ${locked?'disabled':''} style="padding:2px 5px;font-size:9px" onclick="try{document.getElementById('pick-${uid}').showPicker()}catch(e){document.getElementById('pick-${uid}').focus()}">📅</button>
@@ -11929,7 +11941,6 @@ function outPOActionsHTML(p){
       ${chainDefectBtnHTML(p)}
     </div>`;
   if(p.stage==='결재대기') return `<div style="display:flex;flex-direction:column;gap:4px">
-      <span style="font-size:10.5px;color:var(--muted)">결재대기중</span>
       <button class="btn gh sm" onclick="navTo('poapproval')">▸ 발주 결재함</button>
       <button class="btn del sm" onclick="cancelOutsourcePO('${p.no}')">발주 취소</button>
       ${chainDefectBtnHTML(p)}
@@ -11943,9 +11954,17 @@ function outPOActionsHTML(p){
 function renderOutsourcePOs(){
   const tbl = $('t-outpo');
   if(!tbl) return;
-  const vendorOpts = S.customers.map(c=>`<option value="${c.name}">`).join('');
+  // 2026-08-10(36차): 매입처는 거래처마스터(S.customers)뿐 아니라 실제로 한 번이라도 입력했던
+  // 값(S.outsourcePOs.vendor)도 자동완성 후보에 포함합니다 — "신규는 타이핑, 두 번째부터는 자동완성"
+  // 요건에 따라 신규 입력값도 저장되는 즉시(다음 렌더부터) 자동완성 목록에 자동으로 들어옵니다.
+  const usedVendors = [...new Set(S.outsourcePOs.map(p=>p.vendor).filter(Boolean))];
+  const masterVendors = S.customers.map(c=>c.name);
+  const vendorOpts = [...new Set([...masterVendors, ...usedVendors])].map(v=>`<option value="${v}">`).join('');
   const vdl = $('dl-customers-outpo'); if(vdl) vdl.innerHTML = vendorOpts;
   const odl = $('dl-orders-outpo'); if(odl) odl.innerHTML = S.orderItems.map(o=>`<option value="${o.orderNo}">${o.orderNo} · ${o.cust} · ${o.item}</option>`).join('');
+  // 공정명은 마스터데이터가 없어 전적으로 실제 입력 이력 기반 자동완성입니다.
+  const usedProcesses = [...new Set(S.outsourcePOs.map(p=>p.process).filter(Boolean))];
+  const pdl = $('dl-process-outpo'); if(pdl) pdl.innerHTML = usedProcesses.map(v=>`<option value="${v}">`).join('');
   // 2026-08-09(34차): 수주번호·상태 조회조건 추가(취소됨은 stage와 별도인 cancelled 플래그이므로 따로 처리)
   const q = lv('outpo').search || {};
   const filtered = S.outsourcePOs.filter(p=>{
@@ -11959,24 +11978,25 @@ function renderOutsourcePOs(){
     const editable = p.stage==='작성중' && !p.cancelled;
     const locked = !editable;
     const rowStyle = p.cancelled ? 'opacity:.55;text-decoration:line-through' : '';
-    const isReceiveStage = ['결재완료','입고대기','입고완료'].includes(p.stage);
+    // 2026-08-10(36차): 결재완료/입고완료는 다른 화면(발주 결재함 승인, 외주 입고등록 처리)의 액션으로만
+    // 자동 전환되고, 입고대기는 외주에서는 이 드롭박스 말고 다른 어떤 화면에서도 트리거되지 않는데다
+    // matReceiveStatusLabel()이 결재완료·입고대기를 이미 동일하게 "입고대기"로 통합 표시하고 있어(원재료
+    // 무상사급처럼 입고대기로 자동 직행하는 경로가 외주엔 없음) 3단 수동전환 드롭박스가 실질적으로
+    // 기능하지 않는다고 판단해 읽기전용 배지로 바꿨습니다(상현님 질문에 대한 조사 결과 반영).
     const statusCell = p.cancelled ? '<span class="tag" style="background:#FDEAEA;color:#C0392B">취소됨</span>'
-      : isReceiveStage ? `<select onchange="setOutsourcePOReceiveStage('${p.no}',this.value)" style="${poStatusBadge(p.stage)};width:100%;font-weight:700;border-radius:6px">
-          ${['결재완료','입고대기','입고완료'].map(s=>`<option ${p.stage===s?'selected':''}>${s}</option>`).join('')}
-        </select>`
       : `<span class="tag" style="${poStatusBadge(p.stage)}">${p.stage}</span>`;
     return `<tr style="${rowStyle}">
         <td>${poDateFieldHTML('opo-date-'+p.no, p.date, `setOutsourcePOField('${p.no}','date',__V__)`, locked)}</td>
-        <td><input type="text" list="dl-orders-outpo" value="${p.orderNo||''}" placeholder="수주번호(선택)" ${locked?'disabled':''} onchange="setOutsourcePOField('${p.no}','orderNo',this.value)" style="width:100%;font-size:11px"></td>
+        <td><input type="text" list="dl-orders-outpo" value="${p.orderNo||''}" placeholder="수주번호(선택)" ${locked?'disabled':''} onchange="setOutsourcePOField('${p.no}','orderNo',this.value)" style="width:100%;font-size:11px;text-align:center"></td>
         <td><input type="text" list="dl-customers-outpo" value="${p.vendor}" placeholder="매입처" ${locked?'disabled':''} onchange="setOutsourcePOField('${p.no}','vendor',this.value)" style="width:100%"></td>
-        <td><input type="text" value="${p.process||''}" placeholder="공정명" ${locked?'disabled':''} onchange="setOutsourcePOField('${p.no}','process',this.value)" style="width:100%"></td>
+        <td><input type="text" list="dl-process-outpo" value="${p.process||''}" placeholder="공정명" ${locked?'disabled':''} onchange="setOutsourcePOField('${p.no}','process',this.value)" style="width:100%"></td>
         <td><input type="text" value="${p.item||''}" placeholder="품목" ${locked?'disabled':''} onchange="setOutsourcePOField('${p.no}','item',this.value)" style="width:100%">${p.chainDefect?`<div style="font-size:9.5px;color:#7B3FA0;margin-top:2px">⚠️연쇄불량(${p.liableVendor})</div>`:''}</td>
         <td><input type="text" value="${p.specName||''}" placeholder="규격" ${locked?'disabled':''} onchange="setOutsourcePOField('${p.no}','specName',this.value)" style="width:100%"></td>
         <td class="num"><input type="number" value="${p.qty||0}" ${locked?'disabled':''} onchange="setOutsourcePOField('${p.no}','qty',this.value)" style="width:100%"></td>
         <td class="num"><input type="number" value="${p.unitPrice||0}" ${locked?'disabled':''} onchange="setOutsourcePOField('${p.no}','unitPrice',this.value)" style="width:100%"></td>
         <td class="num">${W((p.qty||0)*(p.unitPrice||0))}</td>
-        <td>${poDateFieldHTML('opo-edate-'+p.no, p.expectedDate, `setOutsourcePOField('${p.no}','expectedDate',__V__)`, locked)}</td>
-        <td>${statusCell}</td>
+        <td style="text-align:center">${poDateFieldHTML('opo-edate-'+p.no, p.expectedDate, `setOutsourcePOField('${p.no}','expectedDate',__V__)`, locked, true)}</td>
+        <td style="text-align:center">${statusCell}</td>
         <td>${outPOActionsHTML(p)}</td></tr>`;
   }).join('')
     : '<tr><td colspan="12" style="color:var(--muted)">등록된 발주가 없습니다</td></tr>';
@@ -12619,7 +12639,7 @@ function chainDefectModalHTML(){
       <div class="qform-grid" style="grid-template-columns:1fr;margin-top:12px">
         <label>귀책업체(원인 제공 업체)<input type="text" list="dl-customers-outpo" value="${cm.liableVendor}" placeholder="예: G 협력사(코팅)" onchange="updateChainDefectField('liableVendor',this.value)"></label>
         <label>사유<textarea rows="3" placeholder="예: 코팅 불량으로 인해 사출 재작업 발생">${cm.causeNote}</textarea></label>
-        <p class="qnote" style="margin-top:-6px">이 발주가 <b>입고완료</b> 처리되면, 재작업 비용(${((p.qty||0)*(p.unitPrice||0)).toLocaleString()}원)이 귀책업체 앞 비용청구 내역으로 자동 등록됩니다. 재작업 업체(${p.vendor})에 대한 실제 결제는 그대로 정상 진행됩니다 — 이 시스템은 업체 간 직접 정산 기능이 없어, 회사가 매개해 청구 내역을 추적하는 방식입니다.</p>
+        <p class="qnote" style="margin-top:-6px">이 발주가 <b>입고완료</b> 처리되면, 재작업 비용(${((p.qty||0)*(p.unitPrice||0)).toLocaleString()}원)을 <b>제안금액 기본값</b>으로 귀책업체 앞 비용청구 내역이 자동 등록됩니다. 실제 청구금액은 협의 결과에 따라 <b>정산완료 처리 전까지</b> 비용청구 현황 표에서 자유롭게 수정할 수 있습니다(2026-08-10 개선 — 무조건 100% 청구가 아닌 협의 가능). 재작업 업체(${p.vendor})에 대한 실제 결제는 그대로 정상 진행됩니다 — 이 시스템은 업체 간 직접 정산 기능이 없어, 회사가 매개해 청구 내역을 추적하는 방식입니다.</p>
       </div>
       <div style="display:flex;gap:8px;margin-top:16px">
         <button class="btn gh" style="flex:1" onclick="closeChainDefectModal()">취소</button>
@@ -12662,18 +12682,33 @@ function settleVendorClaim(id){
   c.settledDate = todayMD();
   recalc();
 }
+// 2026-08-10(36차): 상현님 컨펌 — 청구금액을 "정산완료 처리" 시점에 확정하는 방식으로 정했습니다.
+// 입고완료 즉시 발주금액 100%로 자동 확정하던 것을, 이제는 발주금액을 기본 제안값으로 걸어두되
+// 정산완료 처리를 누르기 전까지는 협의 결과에 따라 자유롭게 수정할 수 있게 했습니다(마이너스 조정
+// 취소분·이미 정산완료된 건은 시스템이 관리하는 값이라 수정 대상에서 제외).
+function setVendorClaimAmount(id, val){
+  const c = S.vendorClaims.find(x=>x.id===id);
+  if(!c || c.settled || c.isReversal) return;
+  const n = +String(val).replace(/,/g,'');
+  c.amount = isNaN(n) ? 0 : Math.max(0, n);
+  recalc();
+}
 function renderVendorClaims(){
   const tbl = $('t-vendor-claims');
   if(!tbl) return;
   const rows = S.vendorClaims;
   tbl.innerHTML = rows.length ? rows.slice().reverse().map(c=>{
     const neg = c.amount < 0;
+    const editable = !c.settled && !c.isReversal;
+    const amountCell = editable
+      ? `<input type="text" inputmode="numeric" value="${c.amount.toLocaleString()}" onchange="setVendorClaimAmount(${c.id},this.value)" style="width:90px;text-align:right;font-size:12px">`
+      : `${neg?'-':''}${W(Math.abs(c.amount))}`;
     return `<tr>
       <td style="text-align:center">2026-${c.date}</td>
       <td>${c.liableVendor}${c.isReversal?' <span class="tag" style="background:#F1E6FA;color:#7B3FA0;font-size:9.5px">취소분</span>':''}</td>
       <td>${c.item}</td>
       <td style="font-size:11px;color:var(--muted)">${c.reworkVendor} 재작업 · ${c.poNo}</td>
-      <td class="num" style="${neg?'color:#C0392B':''}">${neg?'-':''}${W(Math.abs(c.amount))}</td>
+      <td class="num" style="${neg?'color:#C0392B':''}">${amountCell}</td>
       <td style="text-align:center">${c.settled?`<span class="tag" style="background:#E6F4EC;color:#1E8449">정산완료(${c.settledDate})</span>`:(neg?'—':`<button class="btn gh sm" onclick="settleVendorClaim(${c.id})">정산완료 처리</button>`)}</td>
     </tr>`;
   }).join('') : '<tr><td colspan="6" style="color:var(--muted)">등록된 연쇄불량 비용청구 건이 없습니다</td></tr>';
@@ -12825,7 +12860,7 @@ function renderOutsourcePOReceiveTable(){
       <td class="num">${W(p.qty*p.unitPrice)}</td>
       <td style="text-align:center">${p.expectedDate||'—'}</td>
       <td style="text-align:center"><span class="tag" style="${matReceiveStatusStyle(label)}" title="${p.returned?(p.returnReason||''):''}">${label}</span></td>
-      <td>${label==='입고완료'?`<span style="display:flex;gap:4px;flex-wrap:wrap"><button class="btn gh sm" onclick="exportOutsourcePOPDF('${p.no}')">📄 PDF</button><button class="btn gh sm" onclick="openReturnModal('out','${p.no}')">🔙 반출</button></span>`:(label==='입고대기'?`<button class="btn gh sm" onclick="navTo('outrecv')">📥 입고등록으로</button>`:'—')}</td>
+      <td>${label==='입고완료'?`<button class="btn gh sm" onclick="openReturnModal('out','${p.no}')">🔙 반출</button>`:(label==='입고대기'?`<button class="btn gh sm" onclick="navTo('outrecv')">📥 입고등록</button>`:'—')}</td>
     </tr>`;
   }).join('')
     : '<tr><td colspan="12" style="color:var(--muted)">조건에 맞는 발주 건이 없습니다</td></tr>';
@@ -15905,14 +15940,39 @@ function applyCompanyScaleChange(scale){
     if(firstVisible) navTo(firstVisible.dataset.p);
   }
 }
+// 2026-08-10(36차 신설): 구매 그룹처럼 항목이 많은 경우 세부 화면을 하위카테고리로 접어둡니다.
+// data-sub 속성을 가진 <a>는 permission(canView) AND 해당 하위카테고리가 펼쳐져 있을 때만 보입니다
+// — nav 링크는 여전히 .nav의 직계 자식(navGroupMap()이 그룹을 판별하는 전제)이라 권한 로직은 손대지
+// 않고, 표시 여부 계산에 "펼침 상태" 조건만 하나 더 얹었습니다.
+function toggleNavSub(key){
+  if(!S.navSubOpen) S.navSubOpen = {};
+  S.navSubOpen[key] = !S.navSubOpen[key];
+  applyNavSubVisibility();
+}
+function applyNavSubVisibility(){
+  if(!S.navSubOpen) S.navSubOpen = {};
+  document.querySelectorAll('.nav-subgrp[data-subhdr]').forEach(hdr=>{
+    const key = hdr.dataset.subhdr;
+    const open = !!S.navSubOpen[key];
+    hdr.classList.toggle('open', open);
+    document.querySelectorAll(`.nav a[data-sub="${key}"]`).forEach(a=>{
+      a.style.display = (canView(a.dataset.p) && open) ? '' : 'none';
+    });
+    // 이 하위카테고리에 권한상 보이는 화면이 하나도 없으면 헤더 자체도 숨깁니다.
+    const anyPermitted = [...document.querySelectorAll(`.nav a[data-sub="${key}"]`)].some(a=>canView(a.dataset.p));
+    hdr.style.display = anyPermitted ? '' : 'none';
+  });
+}
 function renderNavPermissions(){
   const map = navGroupMap();
   document.querySelectorAll('.nav a').forEach(a=>{
+    if(a.dataset.sub) return; // 하위카테고리 소속 링크는 applyNavSubVisibility()가 펼침 상태까지 감안해 따로 처리
     a.style.display = canView(a.dataset.p) ? '' : 'none';
   });
+  applyNavSubVisibility();
   document.querySelectorAll('.nav .grp').forEach(g=>{
     const label = g.textContent.trim();
-    const anyVisible = [...document.querySelectorAll('.nav a')].some(a=>map[a.dataset.p]===label && a.style.display!=='none');
+    const anyVisible = [...document.querySelectorAll('.nav a')].some(a=>map[a.dataset.p]===label && canView(a.dataset.p));
     g.style.display = anyVisible ? '' : 'none';
   });
 }
@@ -15921,7 +15981,16 @@ function navTo(page){
   document.querySelectorAll('.nav a').forEach(x=>x.classList.remove('on'));
   document.querySelectorAll('.page').forEach(x=>x.classList.remove('on'));
   const link = document.querySelector(`.nav a[data-p="${page}"]`);
-  if(link) link.classList.add('on');
+  if(link){
+    link.classList.add('on');
+    // 하위카테고리에 속한 화면으로 이동하면 해당 카테고리를 자동으로 펼쳐서 사이드바에서 현재 위치가
+    // 항상 보이게 합니다(접힌 채로 숨겨진 링크에 class="on"만 붙으면 사용자가 못 찾는 문제 방지).
+    if(link.dataset.sub){
+      if(!S.navSubOpen) S.navSubOpen = {};
+      S.navSubOpen[link.dataset.sub] = true;
+      applyNavSubVisibility();
+    }
+  }
   const sec = $('p-'+page);
   if(sec) sec.classList.add('on');
   window.scrollTo(0,0);
