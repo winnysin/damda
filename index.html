@@ -539,7 +539,7 @@ table.mr-table input.form-control.ro{background:var(--bg);color:var(--muted)}
 <body>
 <div class="wrap">
 <aside class="side">
-  <div class="brand"><div class="brand-row"><img src="/icon-192.png" alt="DAMDA" class="brand-logo"><span class="brand-word">DAMDA</span></div><small>프로토타입 v0.65 · 기타구매 결재 신설 + 결재함 웹 3분할 — 33차 라운드</small></div>
+  <div class="brand"><div class="brand-row"><img src="/icon-192.png" alt="DAMDA" class="brand-logo"><span class="brand-word">DAMDA</span></div><small>프로토타입 v0.66 · 구매/입고 화면 UX 개선 8건 — 34차 라운드</small></div>
   <nav class="nav">
     <!-- 2026-07-21(항목11) 대분류 재구성: 운영 모니터링-기본정보-영업,수주-구매-생산-납품,마감-자재-인사,급여-품질-원가관리-가이드-환경설정 (12개, 상현님 지시안) -->
     <div class="grp">운영 모니터링</div>
@@ -1677,12 +1677,22 @@ table.mr-table input.form-control.ro{background:var(--bg);color:var(--muted)}
 <section class="page" id="p-outpo">
   <h1>외주 발주관리</h1>
   <div class="sub">도금·인쇄·열처리 등 외주 가공을 <b>의뢰하는 시점</b>부터 결재·입고까지의 진행상태를 추적하는 화면입니다. 발주 프로세스: <b>작성중 → 결재상신 → 결재대기 → 결재완료 → 입고대기 → 입고완료</b>. 결재완료 건은 <a href="#" onclick="event.preventDefault();navTo('out')" style="color:var(--blue-d)">외주생산 입고 진행현황</a>에서 진행상태를 확인할 수 있습니다.</div>
-  <div class="note">입력 후 <b>결재상신</b>을 누르면 결재 대기 상태가 됩니다 — 승인·반려는 이 화면이 아니라 <a href="#" onclick="event.preventDefault();navTo('poapproval')" style="color:var(--blue-d)">발주 결재함</a>에서 사장님 또는 지정된 결재 대리인이 처리합니다. 결재완료 이후에는 PDF 발주서를 출력할 수 있습니다. 발주번호는 등록 즉시 OPO-00001부터 순차 부여됩니다.</div>
+  <div class="note">입력 후 <b>결재상신</b>을 누르면 결재 대기 상태가 됩니다 — 승인·반려는 이 화면이 아니라 <a href="#" onclick="event.preventDefault();navTo('poapproval')" style="color:var(--blue-d)">발주 결재함</a>에서 사장님 또는 지정된 결재 대리인이 처리합니다. 결재완료 이후에는 PDF 발주서를 출력할 수 있습니다. 발주번호는 등록 즉시 OPO-00001부터 순차 부여됩니다. <b>수주번호</b>를 입력하면 해당 수주의 품목명·규격명이 자동으로 채워집니다(선택 입력 — 특정 수주 대응이 아닌 일반 외주는 비워두세요).</div>
   <div class="card">
+    <div class="lv-search">
+      <div><label>수주번호</label><input type="text" placeholder="수주번호" oninput="lvSetSearch('outpo','orderNo',this.value)"></div>
+      <div><label>상태</label><select onchange="lvSetSearch('outpo','stage',this.value)">
+        <option value="">전체</option>
+        <option value="작성중">작성중</option><option value="결재대기">결재대기</option><option value="결재완료">결재완료</option>
+        <option value="입고대기">입고대기</option><option value="입고완료">입고완료</option><option value="취소됨">취소됨</option>
+      </select></div>
+      <button class="btn gh sm" onclick="lvResetSearch('outpo');document.querySelectorAll('#p-outpo .lv-search input').forEach(i=>i.value='');document.querySelectorAll('#p-outpo .lv-search select').forEach(s=>s.value='')">검색 초기화</button>
+      <span class="lv-count" id="outpo-count"></span>
+    </div>
     <div style="margin-bottom:13px"><button class="btn sm" onclick="addOutsourcePO()">+ 발주 등록</button></div>
     <div style="overflow-x:auto"><table class="th-center" style="table-layout:fixed">
       <thead><tr>
-        <th style="width:98px">발주일</th><th style="width:100px">매입처</th><th style="width:95px">공정명</th>
+        <th style="width:98px">발주일</th><th style="width:100px">수주번호</th><th style="width:100px">매입처</th><th style="width:95px">공정명</th>
         <th style="width:120px">품목명</th><th style="width:110px">규격명</th>
         <th class="num" style="width:70px">발주수량</th><th class="num" style="width:80px">단가</th><th class="num" style="width:95px">발주금액</th>
         <th style="width:134px">입고예정일</th><th style="width:82px">상태</th><th style="width:78px">작업</th>
@@ -1691,6 +1701,7 @@ table.mr-table input.form-control.ro{background:var(--bg);color:var(--muted)}
     </table></div>
     <div style="margin-top:13px"><button class="btn gh sm" onclick="addOutsourcePO()">+ 발주 등록</button></div>
     <datalist id="dl-customers-outpo"></datalist>
+    <datalist id="dl-orders-outpo"></datalist>
   </div>
 </section>
 
@@ -1699,10 +1710,16 @@ table.mr-table input.form-control.ro{background:var(--bg);color:var(--muted)}
   <h1>외주 입고등록</h1>
   <div class="sub">결재완료 이후 아직 입고되지 않은(입고대기) 외주비 발주 건만 표시됩니다. 실제로 가공이 완료돼 물건이 도착하면 선택해서 <b>입고완료 처리</b>하세요 — 처리한 순간부터 <a href="#" onclick="event.preventDefault();navTo('out')" style="color:var(--blue-d)">외주생산 입고 진행현황</a>의 상태가 자동으로 "입고완료"로 바뀝니다. 발주 등록·결재상신은 <a href="#" onclick="event.preventDefault();navTo('outpo')" style="color:var(--blue-d)">외주 발주관리</a>에서 합니다.</div>
   <div class="card">
+    <div class="lv-search">
+      <div><label>수주번호</label><input type="text" placeholder="수주번호" oninput="lvSetSearch('outrecv2','orderNo',this.value)"></div>
+      <div><label>매입처</label><input type="text" placeholder="매입처명" oninput="lvSetSearch('outrecv2','vendor',this.value)"></div>
+      <button class="btn gh sm" onclick="lvResetSearch('outrecv2');document.querySelectorAll('#p-outrecv .lv-search input').forEach(i=>i.value='')">검색 초기화</button>
+      <span class="lv-count" id="outrecv-reg-count"></span>
+    </div>
     <div style="margin-bottom:13px"><button class="btn sm" onclick="completeSelectedOutReceipts()">✔ 선택 항목 입고완료 처리 (<span id="outrecv-selected-count">0</span>건)</button></div>
     <div style="overflow-x:auto"><table class="th-center" style="table-layout:fixed">
       <thead><tr>
-        <th style="width:28px"></th><th style="width:72px">발주일</th><th style="width:72px">매입처</th><th style="width:68px">공정명</th>
+        <th style="width:28px"></th><th style="width:72px">발주일</th><th style="width:80px">수주번호</th><th style="width:72px">매입처</th><th style="width:68px">공정명</th>
         <th style="width:90px">품목명</th><th style="width:80px">규격명</th>
         <th class="num" style="width:55px">발주수량</th><th class="num" style="width:62px">단가</th><th class="num" style="width:78px">발주금액</th>
         <th style="width:78px">입고예정일</th><th style="width:140px">작업</th>
@@ -1726,6 +1743,7 @@ table.mr-table input.form-control.ro{background:var(--bg);color:var(--muted)}
       <div class="lv-search">
         <div><label>기간(시작)</label><input type="date" oninput="lvSetSearch('outrecv','dateStart',this.value)"></div>
         <div><label>기간(종료)</label><input type="date" oninput="lvSetSearch('outrecv','dateEnd',this.value)"></div>
+        <div><label>수주번호</label><input type="text" placeholder="수주번호" oninput="lvSetSearch('outrecv','orderNo',this.value)"></div>
         <div><label>품목명</label><input type="text" placeholder="품목명" oninput="lvSetSearch('outrecv','item',this.value)"></div>
         <div><label>매입처</label><input type="text" placeholder="매입처명" oninput="lvSetSearch('outrecv','vendor',this.value)"></div>
         <button class="btn gh sm" onclick="lvResetSearch('outrecv');document.querySelectorAll('#p-out .lv-search input').forEach(i=>i.value='')">검색 초기화</button>
@@ -1734,7 +1752,7 @@ table.mr-table input.form-control.ro{background:var(--bg);color:var(--muted)}
       </div>
       <div style="overflow-x:auto"><table class="th-center" style="table-layout:fixed">
         <thead><tr>
-          <th style="width:80px">발주일</th><th style="width:90px">매입처</th><th style="width:80px">공정명</th>
+          <th style="width:80px">발주일</th><th style="width:88px">수주번호</th><th style="width:90px">매입처</th><th style="width:80px">공정명</th>
           <th style="width:120px">품목명</th><th style="width:100px">규격명</th>
           <th class="num" style="width:65px">발주수량</th><th class="num" style="width:75px">단가</th><th class="num" style="width:90px">발주금액</th>
           <th style="width:90px">입고예정일</th><th style="width:82px">상태</th><th style="width:78px">작업</th>
@@ -1779,6 +1797,7 @@ table.mr-table input.form-control.ro{background:var(--bg);color:var(--muted)}
   <div class="card">
     <div class="lv-search">
       <div><label>매입처</label><input type="text" placeholder="매입처명" oninput="setClosingSearchField('out','vendor',this.value)"></div>
+      <div><label>수주번호</label><input type="text" placeholder="수주번호" oninput="setClosingSearchField('out','orderNo',this.value)"></div>
       <div><label>기간(시작)</label><input type="date" oninput="setClosingSearchField('out','from',this.value)"></div>
       <div><label>기간(종료)</label><input type="date" oninput="setClosingSearchField('out','to',this.value)"></div>
       <button class="btn gh sm" onclick="selectAllClosingCandidates('out')">전체 선택</button>
@@ -1787,8 +1806,8 @@ table.mr-table input.form-control.ro{background:var(--bg);color:var(--muted)}
     </div>
     <div style="overflow-x:auto"><table class="th-center" style="table-layout:fixed">
       <thead><tr>
-        <th style="width:32px"></th><th style="width:80px">입고일</th><th style="width:95px">매입처</th><th style="width:170px">품목명</th><th style="width:140px">규격명</th>
-        <th class="num" style="width:70px">수량</th><th class="num" style="width:80px">단가</th><th class="num" style="width:95px">금액</th>
+        <th style="width:30px"><input type="checkbox" id="outclosing-all" onchange="toggleAllClosingCandidates('out',this.checked)"></th><th style="width:78px">입고일</th><th style="width:88px">매입처</th><th style="width:96px">수주번호</th><th style="width:138px">품목명</th><th style="width:120px">규격명</th>
+        <th class="num" style="width:66px">수량</th><th class="num" style="width:76px">단가</th><th class="num" style="width:92px">금액</th>
       </tr></thead>
       <tbody id="t-outclosing-candidates"></tbody>
     </table></div>
@@ -1813,6 +1832,16 @@ table.mr-table input.form-control.ro{background:var(--bg);color:var(--muted)}
   <div class="sub">소모품·설비 수리 등 원재료·외주에 속하지 않는 지출도 사장님(또는 지정 결재 대리인)의 결재를 거치도록 하는 화면입니다. 원재료·외주와 달리 입고 추적이 필요 없어 <b>작성중 → 결재상신 → 결재대기 → 결재완료</b> 3단계로 끝납니다(결재완료가 최종 상태).</div>
   <div class="note">입력 후 <b>결재상신</b>을 누르면 결재 대기 상태가 됩니다 — 승인·반려는 이 화면이 아니라 <a href="#" onclick="event.preventDefault();navTo('poapproval')" style="color:var(--blue-d)">발주 결재함</a>에서 처리합니다. 결재완료 이후에는 PDF 발주서를 출력할 수 있습니다. 발주번호는 등록 즉시 G-000001부터 순차 부여됩니다.</div>
   <div class="card">
+    <div class="lv-search">
+      <div><label>구매품명</label><input type="text" placeholder="구매품명" oninput="lvSetSearch('miscpo','item',this.value)"></div>
+      <div><label>발주처</label><input type="text" placeholder="발주처" oninput="lvSetSearch('miscpo','vendor',this.value)"></div>
+      <div><label>상태</label><select onchange="lvSetSearch('miscpo','stage',this.value)">
+        <option value="">전체</option>
+        <option value="작성중">작성중</option><option value="결재대기">결재대기</option><option value="결재완료">결재완료</option><option value="취소됨">취소됨</option>
+      </select></div>
+      <button class="btn gh sm" onclick="lvResetSearch('miscpo');document.querySelectorAll('#p-miscpo .lv-search input').forEach(i=>i.value='');document.querySelectorAll('#p-miscpo .lv-search select').forEach(s=>s.value='')">검색 초기화</button>
+      <span class="lv-count" id="miscpo-count"></span>
+    </div>
     <div style="margin-bottom:13px"><button class="btn sm" onclick="addMiscPO()">+ 발주 등록</button></div>
     <div style="overflow-x:auto"><table class="th-center" style="table-layout:fixed">
       <thead><tr>
@@ -1912,8 +1941,8 @@ table.mr-table input.form-control.ro{background:var(--bg);color:var(--muted)}
     </div>
     <div style="overflow-x:auto"><table class="th-center" style="table-layout:fixed">
       <thead><tr>
-        <th style="width:32px"></th><th style="width:80px">입고일</th><th>품목명</th><th style="width:110px">구분</th>
-        <th class="num" style="width:90px">수량(kg)</th><th class="num" style="width:90px">단가</th><th class="num" style="width:100px">금액</th>
+        <th style="width:30px"><input type="checkbox" id="matclosing-all" onchange="toggleAllClosingCandidates('mat',this.checked)"></th><th style="width:76px">입고일</th><th style="width:92px">입고처</th><th style="width:142px">원재료명</th><th style="width:86px">구분</th>
+        <th class="num" style="width:78px">수량(kg)</th><th class="num" style="width:82px">단가</th><th class="num" style="width:96px">금액</th>
       </tr></thead>
       <tbody id="t-matclosing-candidates"></tbody>
     </table></div>
@@ -2579,6 +2608,7 @@ BEP 매출  = 월 고정비 ÷ 공헌이익률
         <tr><td>⏰ 4차 라운드 확정 착수 항목 — 손익(견적vs실제) Variance 모듈 (2026-07-22 메모)</td><td>상현님 확인: 손익분석 가이드가 요구하는 "수주 건 단위 견적목표 vs 당월실측 1:1 대조"는 생산일보에 실측 C/T(또는 Shot수+가동시간) 필드가 없어 구현 불가능했던 항목으로, <b>다음 라운드(4차) 최우선 착수 확정</b>. 프로세스맵 STAGE3 공백(실측 사이클타임 미기록)과 손익분석 가이드 미보유 문제를 동시에 해소함. 착수 시 남은 P1/P2 백로그 우선순위도 함께 재확인할 것 — P1: ⑤포장비 분리(§3-1, packagingCostPer 신설) ⑥원재료 매입단가 이력(시계열화) ⑦분쇄재(Regrind) 재고 카테고리 ⑧포장박스 자산 분리(무상/유상). P2(Variance 모듈 다음 순번): ⑩품질 자주검사일보(초/중/종물) ⑪금형/Try-out 관리 모듈(moldNo→마스터 승격) ⑫창고 입고마감 갭 추적. 상세는 <code>몰디온_가이드분석_및_업그레이드기획안.md/.pdf</code> 참고</td></tr>
         <tr><td>브랜드 리뉴얼 — 몰디온(MOLD:ON) → 담다 (2026-08-08, v0.63)</td><td>상현님 지시: "몰디온을 이제 담다로 바꾸기로 했으니 담다 디자인으로 전면 교체하자. 빠진곳 없이 구석구석 확인해서 디자인 교체 해줘." <b>①브랜드명 교체</b> — 타이틀바·PWA 매니페스트/서비스워커·사이드바 워드마크·조직도/근태집계표/발주서/재고현황 엑셀·PDF 출력 크레딧·운영모니터링 연동률 배지 등 화면에 실제로 노출되는 브랜드 표기 지점을 전수 확인해 "담다"로 교체했습니다 (단, 이 변경이력 표의 과거 라운드 기록은 당시 실제 사용하던 이름 그대로 보존 — 상현님 지시 "이 내용은 저장해두고"에 따라 역사적 기록을 임의로 고치지 않았습니다). <b>②컬러 팔레트</b> — 기존에 확정돼 있던 라이트 테마 구조(카드·여백·그림자)는 그대로 유지하되, 포인트 브랜드컬러만 인디고블루(#3D6FE0 계열)에서 담다 틸(#0F7A72 계열, "담다"의 담아냄·깊이감을 표현)로 교체했습니다. CSS 변수(--blue/--blue-d/--blue-l) 값만 바꿔 전 화면에 일괄 적용되는 기존 설계(2026-07-19 개편 당시 확립된 방식)를 그대로 활용했고, 변수를 안 쓰고 하드코딩돼 있던 동일 헥스값(폰 목업 상단바 그라디언트 등)도 함께 찾아 교체했습니다. <b>③표(그리드) 스타일 개편</b> — 상현님 요청("엑셀 표에 가까운 형태로 격자이지만 너무 딱딱하지 않은 느낌")에 따라 리스트뷰 계열 표(생산현황판·수주현황·재고관리 등, qdoc-table/mr-table/근태집계표류는 이미 자체 스타일이 있어 제외)의 기본 th/td에 옅은 세로 격자선과 짝수행 은은한 지브라 스트라이프를 추가하고, 헤더 배경을 브랜드 틸 톤(var(--blue-l))으로 물들여 스프레드시트에 더 가까운 느낌을 주되 격자선 색은 회색조를 옅게 유지해 딱딱해 보이지 않도록 했습니다. <b>④로고/아이콘</b> — "담다"(담아내다)의 의미를 살려 그릇(용기) 실루엣 안에 내용물을 뜻하는 원(담다 웜톤 액센트 #C1652F)을 담은 추상 마크로 앱 아이콘을 새로 제작했습니다 (icon-192/512.png, PWA 매니페스트·서비스워커 알림 아이콘에도 동일 적용). node --check 구문 검증과 jsdom 기반 검증(주요 화면 순회, 표/사이드바/타이틀 텍스트 확인)을 통과했습니다.</td></tr>
         <tr><td>기타구매 발주 결재 신설 + 웹 결재함 3분할 (2026-08-09, v0.65)</td><td>상현님 지시: "발주 결재함 화면에서 원재료와 외주발주 외에 추가로 기타구매(소모품, 설비 등)에 대한 결재가 추가로 필요할거같아... 사장님 입장에서는 지출에 대한건 모두 확인하고 싶을테니까." <b>①기타구매 발주관리 신설</b> — 원재료·외주와 달리 입고 추적이 불필요하다는 지시에 따라 발주관리 화면만 신설(입고등록·진행현황 화면 없음), 상태모델도 3단계(작성중→결재대기→결재완료, <code>MISC_PO_STAGES</code>)로 기존 5단계 <code>PO_STAGES</code>와 구분했습니다. 표 컬럼은 지시하신 대로 발주일·구매품명·규격·발주처·단가·수량·발주금액·상태·작업 9열로 구성(발주번호 G-000001~, 조달구분 없음 — 소모품·설비는 전부 자가구매라 원재료의 유상/무상사급 구분이 필요 없다고 판단). 등록→저장→결재상신→승인/반려→취소/복원, 결재완료 후 PDF 발주서 출력까지 원재료·외주와 동일한 흐름을 재사용했습니다(<code>S.miscPOs</code>, <code>canApprovePO()</code> 등 기존 함수 그대로 공유). <b>②발주 결재함 웹 3분할</b> — "웹에서는 너무 가로로 길어"라는 지적에 따라, 그동안 데스크톱(#p-poapproval)이 모바일과 동일한 세로 스택형 카드(<code>poApprovalMobileBody()</code>)를 그대로 쓰고 있던 것을 발견 — 웹 전용 <code>poApprovalWebBody()</code>를 신설해 원재료·외주·기타구매 결재대기 목록을 3열(<code>.row3</code>)로 나란히 배치했습니다. 승인/반려는 기존 함수를 그대로 호출해 로직 중복이 없고, 모바일 앱 3화면은 기존 <code>poApprovalMobileBody()</code>에 기타구매 섹션만 추가해 그대로 재사용했습니다("앱에서는 화면 폭이 좁기 때문에 괜찮을거 같다"는 말씀대로 구조는 유지). <b>③결재 생략(회사 규모별 분기)</b> — "소기업·중소기업은 결재 사용이 가능해 보이는데 영세기업은 어려울 수 있다, 이 과정을 둘로 나눌 수 있는 방법이 있을까?"라는 질문에는 이미 구축되어 있던 <code>S.poApprovalSkip</code>(환경설정 &gt; 구매 결재 설정, 기업 규모를 영세기업으로 바꾸면 자동 ON) 토글을 그대로 활용하도록 안내 — 기타구매도 원재료·외주와 동일하게 이 플래그를 참조해 결재상신 즉시 결재완료로 처리되므로, 회사 규모 하나의 설정으로 3개 발주유형이 함께 분기됩니다(별도 신규 메커니즘을 만들지 않음). node --check 구문 검증과 jsdom 기반 검증(기타구매 등록·저장·결재상신·승인·영세기업 결재생략 자동전환, 웹 결재함 3열 렌더 및 각 열 데이터 노출, 앱 결재화면 기타구매 섹션 포함, 64개 전 화면 순회)을 통과해 실제 오류 0건을 확인했습니다.</td></tr>
+        <tr><td>34차 라운드 — 구매/입고 화면 UX 개선 8건 (2026-08-09, v0.66)</td><td>상현님이 원재료·외주·기타구매 발주/입고/마감 화면 전반에 걸쳐 8가지를 지적하셨습니다. <b>①구매사유 드롭다운 좌측정렬</b> — 원재료 발주관리의 구매사유 select가 전역 select 스타일(<code>text-align:right</code>, 숫자입력 위주로 설계된 기본값)을 그대로 물려받아 오른쪽으로 쏠려 있던 것을 해당 select 2개(사유구분·연결수주)에만 <code>text-align:left</code>를 지정해 바로잡았습니다. <b>②원재료 입고마감 표 재편</b> — 폭 미지정 열 2개(품목명·구분) 때문에 <code>table-layout:fixed</code>가 남는 공간을 나눠 배분하며 표가 늘어지던 것을, 외주 입고마감과 동일하게 전 열에 명시적 폭을 줘 한 줄에 들어오도록 했고, "품목명"을 "원재료명"으로 개칭, "입고처"(매입처) 열을 입고일 우측에 신설했습니다. <b>③외주 발주관리에 수주번호 입력</b> — 수주번호를 입력(자동완성 목록 제공)하면 <code>S.orderItems</code>에서 일치하는 건을 찾아 품목명·규격명을 자동으로 채웁니다(일치하는 건이 없으면 입력한 텍스트만 저장 — 임의 외주는 계속 자유 입력 가능). 발주서 PDF에는 수주번호를 넣지 않았는데, 이는 외부 매입처에게 발송하는 문서에 내부 수주·고객 정보가 노출되지 않게 하기 위한 판단입니다. <b>④수주번호 열 3화면 확산</b> — 외주 입고등록·외주생산 입고 진행현황(입고 진행현황 탭)·외주 입고마감 세 화면 모두에 수주번호 열을 추가하고 엑셀 다운로드에도 반영했습니다. <b>⑤외주 발주관리 조회조건</b> — 수주번호(부분일치)·상태(작성중/결재대기/결재완료/입고대기/입고완료/취소됨) 조회를 신설했습니다(취소됨은 <code>stage</code>와 별도인 <code>cancelled</code> 플래그라 조회조건에서 따로 분기 처리). <b>⑥외주 입고등록 조회조건</b> — 수주번호·매입처 조회를 신설했습니다(진행현황 탭의 기존 조회조건 <code>lv('outrecv')</code>와 이름이 겹치지 않도록 입고등록 화면은 별도 리스트뷰 키 <code>outrecv2</code>로 분리). <b>⑦마감 후보 표 일괄선택 체크박스</b> — 원재료·외주 입고마감 표의 헤더에 마스터 체크박스를 추가해 현재 검색조건에 걸린 후보 전체를 한 번에 선택/해제할 수 있게 했습니다(기존 "전체 선택"/"선택 해제" 버튼과 동일 동작을 체크박스로도 제공, 선택 상태가 바뀌면 헤더 체크박스 표시도 자동 동기화). <b>⑧기타구매 발주관리</b> — 단가 입력칸을 콤마 단위 구분 표시로 바꾸고(입력 시 콤마를 뗀 숫자로 파싱해 저장), 구매품명·발주처·상태 조회조건을 신설했습니다. 외주단가를 "직전 발주단가 자동 기본값"과 "품목별 단가 변동이력(구매부 절감실적 근거)" 중 어느 방식으로 관리할지는 상현님께 별도로 제안드리고 컨펌받은 뒤 다음 라운드에서 진행하기로 했고, 입고마감 수량을 매입량 기본값의 수정 가능한 입력으로 바꾸는 건도 부분마감 시 잔여수량 처리방식을 확인받은 뒤 진행하기로 남겨뒀습니다(각각 별도 제안 전달). node --check 구문 검증과 jsdom 기반 검증(구매사유 select 정렬값, 원재료입고마감 8열 헤더·마스터체크박스, 외주발주 수주번호 자동채움 실값 확인, 수주번호+상태 조회 필터링 결과건수, 외주입고등록/진행현황/입고마감 수주번호 열 노출, 기타구매 콤마 표시 왕복 확인 및 조회 필터링, 마감 표 일괄선택/해제 후 선택건수 반영, 64개 전 화면 순회)을 통과해 실제 오류 0건을 확인했습니다.</td></tr>
       </tbody>
     </table>
   </div>
@@ -7860,9 +7890,15 @@ function closingCandidateRows(kind){
       .sort((a,b)=>a.date<b.date?1:-1);
   }
   const list = kind==='mat' ? S.materialPOs : S.outsourcePOs;
-  return list.filter(p=>!p.closedStmtNo && matReceiveStatusLabel(p)==='입고완료' && lvMatch(p.vendor,q.vendor) && (!q.from||('2026-'+p.date)>=q.from) && (!q.to||('2026-'+p.date)<=q.to))
-    .map(p=>({id:p.no, date:p.date, partner:p.vendor, name: kind==='mat'?p.matName:p.item, spec: kind==='mat'?p.procureType:(p.specName||'—'), qty: kind==='mat'?p.qtyKg:p.qty, unitPrice:p.unitPrice}))
+  // 2026-08-09(34차): out(외주)은 수주번호 검색조건도 지원 — 발주 시 입력한 orderNo 기준 부분일치.
+  return list.filter(p=>!p.closedStmtNo && matReceiveStatusLabel(p)==='입고완료' && lvMatch(p.vendor,q.vendor) && (!q.orderNo||lvMatch(p.orderNo,q.orderNo)) && (!q.from||('2026-'+p.date)>=q.from) && (!q.to||('2026-'+p.date)<=q.to))
+    .map(p=>({id:p.no, date:p.date, partner:p.vendor, orderNo:p.orderNo||'', name: kind==='mat'?p.matName:p.item, spec: kind==='mat'?p.procureType:(p.specName||'—'), qty: kind==='mat'?p.qtyKg:p.qty, unitPrice:p.unitPrice}))
     .sort((a,b)=>a.date<b.date?1:-1);
+}
+// 2026-08-09(34차 신설): 마감 후보 표의 헤더 체크박스 — 현재 검색조건에 맞는 후보 전체를 한 번에
+// 선택/해제합니다(기존 "전체 선택"/"선택 해제" 버튼과 동일 동작을 체크박스로도 제공).
+function toggleAllClosingCandidates(kind, checked){
+  if(checked) selectAllClosingCandidates(kind); else clearClosingSelection(kind);
 }
 function selectAllClosingCandidates(kind){
   S.closingSelected[kind] = closingCandidateRows(kind).map(r=>r.id);
@@ -8011,9 +8047,23 @@ function renderClosingSection(kind){
     // 2026-08-04(30차): 외주 입고 마감(out)은 매입처별로 검색은 되지만 정작 표에 매입처 열이 없어
     // 어느 업체 건인지 한눈에 안 보이던 문제를 지적받아, out만 매입처 열을 넣고 순서를
     // 입고일/매입처/품목/규격/수량/단가/금액으로 재배열했습니다(다른 kind는 기존 표 구조 유지).
+    // 2026-08-09(34차): mat도 동일하게 "입고처" 열을 입고일 우측에 추가하고, out은 수주번호 열을 추가.
     tbl.innerHTML = rows.length ? rows.map(r=>{
       const checked = sel.includes(r.id);
       if(kind==='out'){
+        return `<tr>
+          <td style="text-align:center"><input type="checkbox" ${checked?'checked':''} onchange="toggleClosingSelect('${kind}','${r.id}')"></td>
+          <td style="text-align:center">${r.date}</td>
+          <td>${r.partner}</td>
+          <td style="text-align:center;font-size:11.5px;color:var(--ink-soft)">${r.orderNo||'—'}</td>
+          <td>${r.name}</td>
+          <td style="text-align:center;font-size:11.5px;color:var(--ink-soft)">${r.spec||'—'}</td>
+          <td class="num">${(r.qty||0).toLocaleString()}</td>
+          <td class="num">${(r.unitPrice||0).toLocaleString()}</td>
+          <td class="num">${W((r.qty||0)*(r.unitPrice||0))}</td>
+        </tr>`;
+      }
+      if(kind==='mat'){
         return `<tr>
           <td style="text-align:center"><input type="checkbox" ${checked?'checked':''} onchange="toggleClosingSelect('${kind}','${r.id}')"></td>
           <td style="text-align:center">${r.date}</td>
@@ -8034,7 +8084,7 @@ function renderClosingSection(kind){
         <td class="num">${(r.unitPrice||0).toLocaleString()}</td>
         <td class="num">${W((r.qty||0)*(r.unitPrice||0))}</td>
       </tr>`;
-    }).join('') : `<tr><td colspan="${kind==='out'?8:7}" style="color:var(--muted)">조건에 맞는 ${kind==='cust'?'미마감 납품':'입고완료'} 건이 없습니다</td></tr>`;
+    }).join('') : `<tr><td colspan="${kind==='out'?9:(kind==='mat'?8:7)}" style="color:var(--muted)">조건에 맞는 ${kind==='cust'?'미마감 납품':'입고완료'} 건이 없습니다</td></tr>`;
   }
   const cntEl = $(kind==='cust' ? 'custclosing-count' : `${kind}closing-count`);
   if(cntEl) cntEl.textContent = `${rows.length}건`;
@@ -8043,6 +8093,9 @@ function renderClosingSection(kind){
   if(selCntEl) selCntEl.textContent = selRows.length;
   const selSumEl = $(kind==='cust' ? 'custclosing-selsum' : `${kind}closing-selsum`);
   if(selSumEl) selSumEl.textContent = W(selRows.reduce((s,r)=>s+(r.qty||0)*(r.unitPrice||0),0)) + '원';
+  // 2026-08-09(34차): 헤더 마스터 체크박스 상태를 현재 후보/선택 상태와 동기화(전체선택이면 체크, 아니면 해제)
+  const allBox = $(`${kind}closing-all`);
+  if(allBox) allBox.checked = rows.length>0 && selRows.length===rows.length;
   const listMap = {cust:S.custClosings, mat:S.matClosings, out:S.outClosings};
   const histTblId = kind==='cust' ? 't-custclosing-hist' : `t-${kind}closing-hist`;
   const histTbl = $(histTblId);
@@ -11605,12 +11658,12 @@ function renderMaterialPOs(){
         </select>`
       : `<span class="tag" style="${poStatusBadge(p.stage)}">${p.stage}</span>`;
     const orderOpts = S.orderItems.map(o=>`<option value="${o.id}" ${String(p.linkedOrderId)===String(o.id)?'selected':''}>${o.orderNo} · ${o.cust} · ${o.item}</option>`).join('');
-    const reasonCell = `<select onchange="setMaterialPOField('${p.no}','reasonType',this.value)" ${locked?'disabled':''} style="width:100%;font-size:10.5px">
+    const reasonCell = `<select onchange="setMaterialPOField('${p.no}','reasonType',this.value)" ${locked?'disabled':''} style="width:100%;font-size:10.5px;text-align:left">
         <option value="" ${!p.reasonType?'selected':''}>선택안함</option>
         <option value="수주대응" ${p.reasonType==='수주대응'?'selected':''}>특정 수주 대응</option>
         <option value="안전재고" ${p.reasonType==='안전재고'?'selected':''}>안전재고 확보</option>
       </select>
-      ${p.reasonType==='수주대응' ? `<select onchange="setMaterialPOField('${p.no}','linkedOrderId',this.value)" ${locked?'disabled':''} style="width:100%;font-size:10px;margin-top:3px">
+      ${p.reasonType==='수주대응' ? `<select onchange="setMaterialPOField('${p.no}','linkedOrderId',this.value)" ${locked?'disabled':''} style="width:100%;font-size:10px;margin-top:3px;text-align:left">
         <option value="">수주 선택…</option>${orderOpts}
       </select>` : ''}`;
     return `<tr style="${rowStyle}">
@@ -11692,7 +11745,7 @@ async function exportMaterialPOPDF(no){
 function addOutsourcePO(){
   const no = 'OPO-' + String(S.outsourcePONextNo).padStart(5,'0');
   S.outsourcePONextNo++;
-  S.outsourcePOs.push({no, date:'26-07-28', vendor:S.selectedVendor||'', process:'', item:'', specName:'', qty:0, unitPrice:0, expectedDate:'', stage:'작성중', note:'', cancelled:false, saved:false,
+  S.outsourcePOs.push({no, date:'26-07-28', orderNo:'', vendor:S.selectedVendor||'', process:'', item:'', specName:'', qty:0, unitPrice:0, expectedDate:'', stage:'작성중', note:'', cancelled:false, saved:false,
     chainDefect:false, liableVendor:'', chainCauseNote:'', claimCreated:false}); // 2026-08-03(T8)
   recalc();
 }
@@ -11700,11 +11753,19 @@ function removeOutsourcePO(no){ S.outsourcePOs = S.outsourcePOs.filter(p=>p.no!=
 // 2026-07-31(27차): 표를 발주일/매입처/공정명/품목/규격/발주수량/단가/발주금액/입고예정일/상태/작업으로
 // 전면 재설계했습니다(상현님 지시) — 기존 자유입력 "가공 내용"+"금액" 2칸을 공정명/품목/규격/수량/단가
 // 5칸으로 세분화해 원재료 발주관리와 동일한 수준의 정보를 남깁니다. 발주금액은 수량×단가 자동계산입니다.
+// 2026-08-09(34차): 수주번호를 입력하면 S.orderItems에서 일치하는 건을 찾아 품목명·규격명을 자동으로
+// 채웁니다(일치하는 건이 없으면 입력한 텍스트만 저장하고 품목명·규격명은 그대로 둡니다 — 임의 문자열
+// 입력 자체는 막지 않되, 실제 수주와 연결되면 편의를 제공하는 방식). 이후에도 자동채움된 값은 계속
+// 수정 가능한 일반 입력칸입니다.
 function setOutsourcePOField(no, field, val){
   const p = S.outsourcePOs.find(x=>x.no===no);
   if(!p) return;
   if(p.stage!=='작성중') return;
   p[field] = (field==='qty'||field==='unitPrice') ? +val : val;
+  if(field==='orderNo' && val){
+    const o = S.orderItems.find(x=>x.orderNo===val);
+    if(o){ p.item = o.item; p.specName = o.specName; }
+  }
   if(p.saved) p.saved = false;
   recalc();
 }
@@ -11801,7 +11862,17 @@ function renderOutsourcePOs(){
   if(!tbl) return;
   const vendorOpts = S.customers.map(c=>`<option value="${c.name}">`).join('');
   const vdl = $('dl-customers-outpo'); if(vdl) vdl.innerHTML = vendorOpts;
-  tbl.innerHTML = S.outsourcePOs.length ? S.outsourcePOs.slice().sort((a,b)=>a.date<b.date?1:-1).map(p=>{
+  const odl = $('dl-orders-outpo'); if(odl) odl.innerHTML = S.orderItems.map(o=>`<option value="${o.orderNo}">${o.orderNo} · ${o.cust} · ${o.item}</option>`).join('');
+  // 2026-08-09(34차): 수주번호·상태 조회조건 추가(취소됨은 stage와 별도인 cancelled 플래그이므로 따로 처리)
+  const q = lv('outpo').search || {};
+  const filtered = S.outsourcePOs.filter(p=>{
+    if(!lvMatch(p.orderNo, q.orderNo)) return false;
+    if(q.stage==='취소됨') return p.cancelled;
+    if(q.stage) return !p.cancelled && p.stage===q.stage;
+    return true;
+  });
+  const cntEl = $('outpo-count'); if(cntEl) cntEl.textContent = `${filtered.length}건`;
+  tbl.innerHTML = filtered.length ? filtered.slice().sort((a,b)=>a.date<b.date?1:-1).map(p=>{
     const editable = p.stage==='작성중' && !p.cancelled;
     const locked = !editable;
     const rowStyle = p.cancelled ? 'opacity:.55;text-decoration:line-through' : '';
@@ -11813,6 +11884,7 @@ function renderOutsourcePOs(){
       : `<span class="tag" style="${poStatusBadge(p.stage)}">${p.stage}</span>`;
     return `<tr style="${rowStyle}">
         <td>${poDateFieldHTML('opo-date-'+p.no, p.date, `setOutsourcePOField('${p.no}','date',__V__)`, locked)}</td>
+        <td><input type="text" list="dl-orders-outpo" value="${p.orderNo||''}" placeholder="수주번호(선택)" ${locked?'disabled':''} onchange="setOutsourcePOField('${p.no}','orderNo',this.value)" style="width:100%;font-size:11px"></td>
         <td><input type="text" list="dl-customers-outpo" value="${p.vendor}" placeholder="매입처" ${locked?'disabled':''} onchange="setOutsourcePOField('${p.no}','vendor',this.value)" style="width:100%"></td>
         <td><input type="text" value="${p.process||''}" placeholder="공정명" ${locked?'disabled':''} onchange="setOutsourcePOField('${p.no}','process',this.value)" style="width:100%"></td>
         <td><input type="text" value="${p.item||''}" placeholder="품목" ${locked?'disabled':''} onchange="setOutsourcePOField('${p.no}','item',this.value)" style="width:100%">${p.chainDefect?`<div style="font-size:9.5px;color:#7B3FA0;margin-top:2px">⚠️연쇄불량(${p.liableVendor})</div>`:''}</td>
@@ -11824,7 +11896,7 @@ function renderOutsourcePOs(){
         <td>${statusCell}</td>
         <td>${outPOActionsHTML(p)}</td></tr>`;
   }).join('')
-    : '<tr><td colspan="11" style="color:var(--muted)">등록된 발주가 없습니다</td></tr>';
+    : '<tr><td colspan="12" style="color:var(--muted)">등록된 발주가 없습니다</td></tr>';
 }
 function buildOutsourcePODocHTML(p){
   const c = S.company;
@@ -11978,7 +12050,17 @@ function renderMiscPOs(){
   if(!tbl) return;
   const vendorOpts = S.customers.map(c=>`<option value="${c.name}">`).join('');
   const vdl = $('dl-customers-miscpo'); if(vdl) vdl.innerHTML = vendorOpts;
-  tbl.innerHTML = S.miscPOs.length ? S.miscPOs.slice().sort((a,b)=>a.date<b.date?1:-1).map(p=>{
+  // 2026-08-09(34차): 구매품명·발주처·상태값 조회조건 추가 + 단가 콤마 표시(입력은 콤마를 뗀 숫자로 파싱)
+  const q = lv('miscpo').search || {};
+  const filtered = S.miscPOs.filter(p=>{
+    if(!lvMatch(p.item, q.item)) return false;
+    if(!lvMatch(p.vendor, q.vendor)) return false;
+    if(q.stage==='취소됨') return p.cancelled;
+    if(q.stage) return !p.cancelled && p.stage===q.stage;
+    return true;
+  });
+  const cntEl = $('miscpo-count'); if(cntEl) cntEl.textContent = `${filtered.length}건`;
+  tbl.innerHTML = filtered.length ? filtered.slice().sort((a,b)=>a.date<b.date?1:-1).map(p=>{
     const editable = p.stage==='작성중' && !p.cancelled;
     const locked = !editable;
     const rowStyle = p.cancelled ? 'opacity:.55;text-decoration:line-through' : '';
@@ -11990,7 +12072,7 @@ function renderMiscPOs(){
         <td><input type="text" value="${p.spec||''}" placeholder="규격" ${locked?'disabled':''} onchange="setMiscPOField('${p.no}','spec',this.value)" style="width:100%"></td>
         <td><input type="text" list="dl-customers-miscpo" value="${p.vendor||''}" placeholder="발주처" ${locked?'disabled':''} onchange="setMiscPOField('${p.no}','vendor',this.value)" style="width:100%"></td>
         <td><input type="text" value="${p.reason||''}" placeholder="사유(선택)" ${locked?'disabled':''} onchange="setMiscPOField('${p.no}','reason',this.value)" style="width:100%;font-size:11px"></td>
-        <td class="num"><input type="number" value="${p.unitPrice||0}" ${locked?'disabled':''} onchange="setMiscPOField('${p.no}','unitPrice',this.value)" style="width:100%"></td>
+        <td class="num"><input type="text" inputmode="numeric" value="${(p.unitPrice||0).toLocaleString()}" ${locked?'disabled':''} onchange="setMiscPOField('${p.no}','unitPrice',this.value.replace(/,/g,''))" style="width:100%;text-align:right"></td>
         <td class="num"><input type="number" value="${p.qty||0}" ${locked?'disabled':''} onchange="setMiscPOField('${p.no}','qty',this.value)" style="width:100%"></td>
         <td class="num">${W((p.unitPrice||0)*(p.qty||0))}</td>
         <td>${statusCell}</td>
@@ -12574,6 +12656,7 @@ function outRecvSearchRows(){
     if(!(p.cancelled || ['결재완료','입고대기','입고완료'].includes(p.stage))) return false;
     if(q.dateStart && p.date < q.dateStart) return false;
     if(q.dateEnd && p.date > q.dateEnd) return false;
+    if(!lvMatch(p.orderNo, q.orderNo)) return false;
     if(!lvMatch(p.item, q.item)) return false;
     if(!lvMatch(p.vendor, q.vendor)) return false;
     return true;
@@ -12587,6 +12670,7 @@ function renderOutsourcePOReceiveTable(){
     const label = matReceiveStatusLabel(p);
     return `<tr style="${p.cancelled?'opacity:.6;text-decoration:line-through':''}">
       <td style="text-align:center">${p.date}</td>
+      <td style="text-align:center;font-size:11.5px;color:var(--ink-soft)">${p.orderNo||'—'}</td>
       <td>${p.vendor}</td>
       <td>${p.process}</td>
       <td>${p.item}</td>
@@ -12599,18 +12683,18 @@ function renderOutsourcePOReceiveTable(){
       <td>${label==='입고완료'?`<span style="display:flex;gap:4px;flex-wrap:wrap"><button class="btn gh sm" onclick="exportOutsourcePOPDF('${p.no}')">📄 PDF</button><button class="btn gh sm" onclick="openReturnModal('out','${p.no}')">🔙 반출</button></span>`:(label==='입고대기'?`<button class="btn gh sm" onclick="navTo('outrecv')">📥 입고등록으로</button>`:'—')}</td>
     </tr>`;
   }).join('')
-    : '<tr><td colspan="11" style="color:var(--muted)">조건에 맞는 발주 건이 없습니다</td></tr>';
+    : '<tr><td colspan="12" style="color:var(--muted)">조건에 맞는 발주 건이 없습니다</td></tr>';
   const cntEl = $('out-receive-count'); if(cntEl) cntEl.textContent = rows.length + '건';
 }
 function exportOutsourceReceiveExcel(){
   const rows = outRecvSearchRows();
   if(!rows.length){ alert('내려받을 데이터가 없습니다. 검색조건을 확인해 주세요.'); return; }
-  const aoa = [['발주일','매입처','공정명','품목','규격','발주수량','단가','발주금액','입고예정일','상태']];
+  const aoa = [['발주일','수주번호','매입처','공정명','품목','규격','발주수량','단가','발주금액','입고예정일','상태']];
   rows.forEach(p=>{
-    aoa.push([p.date, p.vendor, p.process, p.item, p.specName||'', p.qty, p.unitPrice, p.qty*p.unitPrice, p.expectedDate||'', matReceiveStatusLabel(p)]);
+    aoa.push([p.date, p.orderNo||'', p.vendor, p.process, p.item, p.specName||'', p.qty, p.unitPrice, p.qty*p.unitPrice, p.expectedDate||'', matReceiveStatusLabel(p)]);
   });
   const ws = XLSX.utils.aoa_to_sheet(aoa);
-  ws['!cols'] = [{wch:11},{wch:14},{wch:12},{wch:16},{wch:14},{wch:10},{wch:10},{wch:12},{wch:11},{wch:9}];
+  ws['!cols'] = [{wch:11},{wch:12},{wch:14},{wch:12},{wch:16},{wch:14},{wch:10},{wch:10},{wch:12},{wch:11},{wch:9}];
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, '외주입고현황');
   XLSX.writeFile(wb, `외주생산_입고현황_${todayMD()}.xlsx`);
@@ -12673,12 +12757,15 @@ function renderOutReceiptRegister(){
   const tbl = $('t-outrecv');
   if(!tbl) return;
   if(!S.outRecvSelected) S.outRecvSelected = [];
-  const rows = S.outsourcePOs.filter(p=>!p.cancelled && !p.returned && ['결재완료','입고대기'].includes(p.stage));
+  const q = lv('outrecv2').search || {};
+  const rows = S.outsourcePOs.filter(p=>!p.cancelled && !p.returned && ['결재완료','입고대기'].includes(p.stage) && lvMatch(p.orderNo,q.orderNo) && lvMatch(p.vendor,q.vendor));
+  const rcEl = $('outrecv-reg-count'); if(rcEl) rcEl.textContent = `${rows.length}건`;
   tbl.innerHTML = rows.length ? rows.slice().sort((a,b)=>a.date<b.date?1:-1).map(p=>{
     const checked = S.outRecvSelected.includes(p.no);
     return `<tr>
       <td style="text-align:center"><input type="checkbox" ${checked?'checked':''} onchange="toggleOutRecvSelect('${p.no}')"></td>
       <td style="text-align:center">${p.date}</td>
+      <td style="text-align:center;font-size:11.5px;color:var(--ink-soft)">${p.orderNo||'—'}</td>
       <td>${p.vendor}</td>
       <td>${p.process}</td>
       <td>${p.item}</td>
@@ -12689,7 +12776,7 @@ function renderOutReceiptRegister(){
       <td style="text-align:center">${p.expectedDate||'—'}</td>
       <td><span style="display:flex;gap:4px;flex-wrap:wrap"><button class="btn sm" onclick="completeSingleOutReceipt('${p.no}')">입고완료</button><button class="btn gh sm" onclick="openReturnModal('out','${p.no}')">🔙 반출</button></span></td>
     </tr>`;
-  }).join('') : '<tr><td colspan="11" style="color:var(--muted)">입고 대기중인 발주가 없습니다(결재완료 이후 아직 입고되지 않은 건만 표시)</td></tr>';
+  }).join('') : '<tr><td colspan="12" style="color:var(--muted)">입고 대기중인 발주가 없습니다(결재완료 이후 아직 입고되지 않은 건만 표시)</td></tr>';
   const cntEl = $('outrecv-selected-count'); if(cntEl) cntEl.textContent = S.outRecvSelected.length;
 }
 function renderStaffTabBar(){
