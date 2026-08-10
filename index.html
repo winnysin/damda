@@ -550,7 +550,7 @@ table.mr-table input.form-control.ro{background:var(--bg);color:var(--muted)}
 <body>
 <div class="wrap">
 <aside class="side">
-  <div class="brand"><div class="brand-row"><img src="/icon-192.png" alt="DAMDA" class="brand-logo"><span class="brand-word">DAMDA</span></div><small>프로토타입 v0.71 · 외주마감 귀책업체 청구금액 자동 상계차감 — 39차 라운드</small></div>
+  <div class="brand"><div class="brand-row"><img src="/icon-192.png" alt="DAMDA" class="brand-logo"><span class="brand-word">DAMDA</span></div><small>프로토타입 v0.72 · 품질검사 3화면 분할(수입/공정/출하) — 40차 라운드</small></div>
   <nav class="nav">
     <!-- 2026-07-21(항목11) 대분류 재구성: 운영 모니터링-기본정보-영업,수주-구매-생산-납품,마감-자재-인사,급여-품질-원가관리-가이드-환경설정 (12개, 상현님 지시안) -->
     <div class="grp">운영 모니터링</div>
@@ -596,7 +596,9 @@ table.mr-table input.form-control.ro{background:var(--bg);color:var(--muted)}
     <a data-p="outclosing" data-sub="outpurchase" style="display:none"><span class="nav-ic">🔒</span> 외주 입고 마감</a>
     <a data-p="miscpo"><span class="nav-ic">🧾</span> 기타 구매<span id="nav-badge-miscpo"></span></a>
     <div class="grp">품질</div>
-    <a data-p="qualitycheck"><span class="nav-ic">📋</span> 공정검사일보</a>
+    <a data-p="qcincoming"><span class="nav-ic">📥</span> 수입검사</a>
+    <a data-p="qualitycheck"><span class="nav-ic">📋</span> 공정검사</a>
+    <a data-p="qcship"><span class="nav-ic">🚚</span> 출하검사</a>
     <div class="grp">납품,마감</div>
     <a data-p="delivery"><span class="nav-ic">📦</span> 납품관리</a>
     <a data-p="closing"><span class="nav-ic">🔒</span> 마감관리</a>
@@ -871,7 +873,7 @@ table.mr-table input.form-control.ro{background:var(--bg);color:var(--muted)}
 <section class="page" id="p-orders">
   <h1>수주관리</h1>
   <div class="sub">수주 라인(<code>OrderItem</code>)이 상태의 유일한 저장소입니다(SSOT, 원칙3). 견적을 거치지 않은 수주는 "+ 수주 등록"으로 직접 등록할 수 있습니다(2026-07-20 신설, 제품정보 연결 시 규격·원재료·CT 자동 입력).</div>
-  <div class="note">상태 흐름: <b>계획대기 → 생산대기 → 생산중 → 생산완료 → 검사대기 → 출하대기 → 납품완료</b>. 계획대기→생산대기는 <a href="#" onclick="event.preventDefault();navTo(&#39;prodplan&#39;)" style="color:var(--blue-d)">생산계획</a>에서 설비 배정 시, 생산대기→생산중은 <a href="#" onclick="event.preventDefault();navTo(&#39;prodboard&#39;)" style="color:var(--blue-d)">생산현황판</a>에서 가동 시작 시 자동으로 전환됩니다(2026-07-28, 22차 라운드). 생산중→생산완료는 완료수량 열의 "생산완료 확정" 버튼, 생산완료→검사대기는 같은 자리의 "검사 시작" 버튼으로 각각 사람이 직접 확정합니다(2026-08, 초과생산이 다음날로 이어지는 경우를 자동화가 앞질러 끊지 않도록 한 안전장치). 품질검사(공정검사일보)에서 합격 판정을 받으면 검사대기 → 출하대기로 자동 전환됩니다(영세·소기업은 공정검사 합격 시, 중소기업은 출하검사 탭 합격 등록 시). 출하대기→납품완료는 <a href="#" onclick="event.preventDefault();navTo(&#39;delivery&#39;)" style="color:var(--blue-d)">납품관리</a>에서 잔량을 전량 등록하면 자동 전환됩니다. 상태 칸은 이제 조회 전용 표시이며(2026-08, 전부 자동/버튼 전환 지점이 있어 직접 선택하는 드롭다운을 없앴습니다), 각 칸 아래에 다음 단계로 넘어가는 방법이 함께 표시됩니다. 수주번호는 등록 순번을 매칭하는 기준정보일 뿐 업무적 의미는 없습니다.</div>
+  <div class="note">상태 흐름: <b>계획대기 → 생산대기 → 생산중 → 생산완료 → 검사대기 → 출하대기 → 납품완료</b>. 계획대기→생산대기는 <a href="#" onclick="event.preventDefault();navTo(&#39;prodplan&#39;)" style="color:var(--blue-d)">생산계획</a>에서 설비 배정 시, 생산대기→생산중은 <a href="#" onclick="event.preventDefault();navTo(&#39;prodboard&#39;)" style="color:var(--blue-d)">생산현황판</a>에서 가동 시작 시 자동으로 전환됩니다(2026-07-28, 22차 라운드). 생산중→생산완료는 완료수량 열의 "생산완료 확정" 버튼, 생산완료→검사대기는 같은 자리의 "검사 시작" 버튼으로 각각 사람이 직접 확정합니다(2026-08, 초과생산이 다음날로 이어지는 경우를 자동화가 앞질러 끊지 않도록 한 안전장치). 출하검사에서 합격 판정을 받으면 검사대기 → 출하대기로 자동 전환됩니다(2026-08-11부터 검사대기→출하대기 전환은 출하검사가 전담 — 출하검사를 사용하지 않는 회사는 검사대기 도달 즉시 자동 전환됩니다). 출하대기→납품완료는 <a href="#" onclick="event.preventDefault();navTo(&#39;delivery&#39;)" style="color:var(--blue-d)">납품관리</a>에서 잔량을 전량 등록하면 자동 전환됩니다. 상태 칸은 이제 조회 전용 표시이며(2026-08, 전부 자동/버튼 전환 지점이 있어 직접 선택하는 드롭다운을 없앴습니다), 각 칸 아래에 다음 단계로 넘어가는 방법이 함께 표시됩니다. 수주번호는 등록 순번을 매칭하는 기준정보일 뿐 업무적 의미는 없습니다.</div>
   <div class="card">
     <div class="lv-toolbar">
       <button class="btn sm" onclick="openOrderModal()">+ 수주 등록</button>
@@ -1349,7 +1351,7 @@ table.mr-table input.form-control.ro{background:var(--bg);color:var(--muted)}
 <!-- ══════════ 납품관리 ══════════ -->
 <section class="page" id="p-delivery">
   <h1>납품관리</h1>
-  <div class="sub">수주 상태가 "출하대기"인 라인을 등록하면 "납품완료"로 넘어갑니다(상태는 OrderItem에만 존재, 원칙3). 거래명세서 출력은 Phase 2 문서양식엔진(엑셀 템플릿)에서 제공됩니다. "출하대기"는 <b>생산이 지시수량만큼 끝났다는 뜻이 아니라, 품질검사에서 합격 판정을 받은 시점</b>에 자동 전환됩니다(검사대기→출하대기, <a href="#" onclick="event.preventDefault();navTo('qualitycheck')" style="color:var(--blue-d)">공정검사일보</a>에서 처리).</div>
+  <div class="sub">수주 상태가 "출하대기"인 라인을 등록하면 "납품완료"로 넘어갑니다(상태는 OrderItem에만 존재, 원칙3). 거래명세서 출력은 Phase 2 문서양식엔진(엑셀 템플릿)에서 제공됩니다. "출하대기"는 <b>생산이 지시수량만큼 끝났다는 뜻이 아니라, 출하검사에서 합격 판정을 받은 시점</b>에 자동 전환됩니다(검사대기→출하대기, <a href="#" onclick="event.preventDefault();navTo('qcship')" style="color:var(--blue-d)">출하검사</a>에서 처리 — 출하검사를 사용하지 않는 회사는 검사대기 도달 즉시 자동 전환됩니다).</div>
   <div class="note">2026-08-01(28차 보완): <b>분할납품을 지원합니다</b> — 이전에는 등록 버튼 한 번으로 수주수량 전체가 즉시 납품완료 처리됐는데, 완박스 단위 등으로 일부만 먼저 출고해야 하는 경우 대응이 안 됐습니다. 이제 "납품 등록"을 누르면 팝업에서 <b>납품수량을 직접 입력</b>할 수 있고(기본값은 잔량), 잔량이 남으면 수주는 계속 "출하대기"에 남아 다음 분할건을 등록할 수 있으며, 잔량이 0이 되는 시점에만 "납품완료"로 전환됩니다. 아래 표의 "잔량"이 이번에 등록 가능한 최대 수량입니다.</div>
   <div class="card">
     <h2 style="margin-top:0">출하대기 — 납품 등록 대상</h2>
@@ -2338,7 +2340,7 @@ table.mr-table input.form-control.ro{background:var(--bg);color:var(--muted)}
     <h2 style="margin-top:0">기능 모듈</h2>
     <div class="sub" style="margin:-4px 0 12px">업체 규모에 따라 필요하지 않은 기능은 꺼둘 수 있습니다. 향후 요금제(구독 단계)에 연동해 자동으로 켜고 꺼지는 방향으로 확장할 예정이며, 지금은 이 화면에서 수동으로 켜고 끕니다.</div>
     <label style="display:block;font-size:12.5px;margin-bottom:14px">
-      <b>기업 규모</b> — <a href="#" onclick="event.preventDefault();navTo('qualitycheck')" style="color:var(--blue-d)">공정검사일보</a> 화면의 표·입력항목과 <a href="#" onclick="event.preventDefault();navTo('mr-lite')" style="color:var(--blue-d)">월간 보고</a> 화면 구성이 이 값에 따라 자동으로 바뀝니다. 영세기업으로 바꾸면 <a href="#" onclick="event.preventDefault();navTo('settings')" style="color:var(--blue-d)">구매 결재</a>도 기본적으로 생략 모드로 전환됩니다(2026-08-08).<br>
+      <b>기업 규모</b> — <a href="#" onclick="event.preventDefault();navTo('mr-lite')" style="color:var(--blue-d)">월간 보고</a> 화면 구성이 이 값에 따라 자동으로 바뀝니다(2026-08-11부터 품질검사 3화면은 규모와 무관하게 항상 동일하며, 대신 아래 "품질검사 사용 설정"에서 화면별로 켜고 끌 수 있습니다). 영세기업으로 바꾸면 <a href="#" onclick="event.preventDefault();navTo('settings')" style="color:var(--blue-d)">구매 결재</a>도 기본적으로 생략 모드로 전환됩니다(2026-08-08).<br>
       <select id="cfg-company-scale" style="margin-top:6px;width:160px" onchange="applyCompanyScaleChange(this.value)">
         <option>영세기업</option><option>소기업</option><option>중소기업</option>
       </select>
@@ -2424,6 +2426,23 @@ table.mr-table input.form-control.ro{background:var(--bg);color:var(--muted)}
     <div class="sub" style="margin:-4px 0 12px">여기서 체크한 직원은 사장님 대신 구매 발주 결재(승인/반려)를 처리할 수 있습니다. 사장님(OWNER)은 항상 결재 권한을 가지므로 목록에 없습니다.</div>
     <table><thead><tr><th>지정</th><th>이름</th><th>직책</th><th>권한(role)</th></tr></thead><tbody id="t-po-approval-delegate"></tbody></table>
     <p style="font-size:11px;color:var(--muted);margin-top:10px" id="po-approval-delegate-summary"></p>
+  </div>
+
+  <div class="card">
+    <h2 style="margin-top:0">품질검사 사용 설정 (2026-08-11 신설)</h2>
+    <div class="sub" style="margin:-4px 0 12px">수입검사·공정검사·출하검사 3개 메뉴는 회사 규모와 무관하게 항상 노출됩니다. 다만 규모가 작아 특정 검사를 정식으로 운영하기 어려운 경우, 아래에서 꺼두면 해당 검사 없이 다음 단계로 자동 진행됩니다.</div>
+    <label style="display:flex;align-items:flex-start;gap:8px;font-size:12.5px;margin-bottom:10px">
+      <input type="checkbox" id="cfg-qc-incoming-use" onchange="S.qcModules.incoming=this.checked;recalc()" style="margin-top:2px">
+      <span><b>수입검사 사용</b> — 끄면 외주 발주가 검사 없이 외주 입고등록 화면에서 바로 입고완료 처리됩니다.</span>
+    </label>
+    <label style="display:flex;align-items:flex-start;gap:8px;font-size:12.5px;margin-bottom:10px">
+      <input type="checkbox" id="cfg-qc-process-use" onchange="S.qcModules.process=this.checked;recalc()" style="margin-top:2px">
+      <span><b>공정검사 사용</b> — 공정검사는 원래도 다른 화면 상태를 바꾸지 않는 순수 이력 기록이라, 꺼도 막히는 업무는 없습니다(화면에 "미사용" 안내만 표시).</span>
+    </label>
+    <label style="display:flex;align-items:flex-start;gap:8px;font-size:12.5px">
+      <input type="checkbox" id="cfg-qc-ship-use" onchange="S.qcModules.ship=this.checked;recalc()" style="margin-top:2px">
+      <span><b>출하검사 사용</b> — 끄면 수주 건이 "검사대기" 상태가 되는 즉시 검사 없이 자동으로 "출하대기"로 전환됩니다(검사대기→출하대기 전환의 유일한 게이트가 출하검사이므로, 꺼두면 이 관문 자체가 사라집니다).</span>
+    </label>
   </div>
 </section>
 
@@ -2652,6 +2671,7 @@ BEP 매출  = 월 고정비 ÷ 공헌이익률
         <tr><td>37차 라운드 — 구매화면 UI 정리 9건 + 외주 분할입고 + 귀책업체 청구 상계안내 (2026-08-11, v0.69)</td><td>상현님이 구매 화면 전반에 대해 9가지를 지적하셨습니다. <b>①마감수량 입력창 확대</b> — 숫자가 잘린다는 지적에 원재료·외주 입고마감의 마감수량 입력창 폭을 1.5배(52→78px)로 넓혔습니다. <b>②외주발주관리 입고예정일 폭 축소</b> — 발주일 열과 같은 폭(116→84px)으로 줄여 남는 공간을 확보했습니다. <b>③원재료발주관리 작업열 정리</b> — 어차피 발주 결재함에서 처리하는 "▸ 발주 결재함" 버튼을 제거했습니다(결재권자는 결재함 화면만 보면 됨). <b>④수량/단가 입력창 스피너 제거</b> — 화살표로 숫자를 조정하는 기본 UI가 오히려 오조작 위험이 있다는 지적에, 원재료·외주·기타구매 3개 화면의 수량·단가 입력창에 <code>.no-spin</code> CSS를 적용해 스피너를 없애고, 입력창 폭도 수주번호 입력창과 같은 크기로 통일했습니다. <b>⑤원재료발주관리 상태 드롭박스 제거</b> — 외주와 동일한 논리로 조사한 결과, 결재완료→입고대기 전환에 무상사급 자동경로 외에는 트리거가 없다는 점에 착안해 <code>approveMaterialPO()</code>가 승인 즉시 입고대기로 넘어가도록 바꾸고(결재완료는 더 이상 별도로 노출되는 상태가 아님), 드롭박스를 읽기전용 배지로 전환했습니다. 남아있던 "결재대기중" 중복 텍스트도 제거하고, 예상입고일·발주일 열을 가운데정렬 + 폭을 다른 구매화면 수준으로 최적화했습니다. <b>⑥원재료 입고 진행현황 작업열 정리</b> — 반출·입고등록 버튼 모두 원재료 입고등록 화면에서 처리하는 업무라 중복이라는 지적에, 작업 열을 입고완료 건의 PDF 발주서 출력 기능만 남기고 정리했습니다. <b>⑦외주 입고등록 분할입고 팝업</b> — 발주수량이 한 번에 입고되지 않는 경우를 위해, "입고완료" 버튼을 누르면 입고수량 입력 팝업이 뜨도록 바꿨습니다(기본값=잔여수량, 수정 가능). 발주 건에 <code>receivedQty</code>(누적 입고수량) 필드를 신설해 잔여수량이 남아있는 한 발주가 입고등록 목록에 계속 남고, 전량 입고되는 순간 자동으로 입고완료 처리·연쇄불량 청구가 생성됩니다. 이 과정에서 발주 하나에 여러 회차의 외주비 반영 내역이 쌓일 수 있게 되어, 반출 시 첫 건만 되돌리던 <code>reverseOutPOAutoLink()</code>의 기존 버그도 함께 고쳐 전체 회차를 정확히 되돌리도록 했습니다. 선택 항목 일괄 입고완료는 팝업 없이 잔여수량 전량을 그대로 반영합니다(개별 처리와 같은 내부 로직 공유). <b>⑧귀책업체 재작업비 청구 — 명칭 변경 및 상계처리 방안</b> — "연쇄불량 태깅"이라는 이름이 실제 기능(귀책업체를 지정해 재작업비를 청구하는 것)을 드러내지 못한다는 지적에 버튼·모달·알림 라벨을 "귀책업체 재작업비 청구"로 통일했습니다(내부 데이터 키는 호환을 위해 유지). 더 근본적으로, 이 청구금액을 귀책업체의 실제 외주 매입대금 지급(외주입고마감)과 어떻게 상계할지 상현님께 여쭤 <b>수동 확인 방식</b>으로 컨펌받았습니다 — 시스템이 마감 금액을 자동으로 차감하면 마감내역서와 실제 지급액이 어긋날 위험이 있어, 외주 입고 마감 화면에서 매입처를 조회하면 그 업체 앞 정산완료·미상계 청구금액을 경고 배너로 안내만 하고, 실제 반영 여부는 담당자가 청구 현황 표의 "상계/회수 완료 처리" 버튼으로 직접 표시하도록 설계했습니다(신규 <code>collected</code> 필드 + <code>markVendorClaimCollected()</code>). <b>⑨기타구매 발주관리 정리</b> — 발주 결재함으로 이동하는 작업열 버튼을 삭제하고, 발주일·상태 열을 가운데정렬했습니다. <b>⑩외주생산 입고 진행현황 작업열 삭제</b> — 이미 다른 화면(외주 입고등록·외주 발주관리)에 있는 기능이라는 지적에 작업 열 자체를 없애고 나머지 열(품목명·규격명)에 폭을 재배분했습니다. node --check 구문 검증과 jsdom 기반 검증(분할입고 2회차 시나리오 — 팝업 기본값·잔여수량 표시·전량입고 시 목록 제거, 귀책업체 청구 등록→정산완료→마감화면 경고배너 노출→상계완료 처리 후 배너 소거, 버튼 명칭 전환, 34~36차 회귀 스위트 재실행, 64개 전 화면 순회)을 통과해 실제 오류 0건을 확인했습니다.</td></tr>
         <tr><td>38차 라운드 — 마감수량 콤마표시 + 외주발주관리 열 폭 조정 (2026-08-11, v0.70)</td><td>37차에서 1.5배로 넓혔던 원재료·외주 입고마감의 마감수량 입력창이 오히려 너무 넓다는 지적을 받아, 숫자를 <b>콤마로 구분 표시</b>(type=number → text+inputmode 전환)하는 방식으로 바꿨습니다 — 자릿수를 한눈에 읽을 수 있어 폭이 좁아도 잘림 걱정이 줄어듭니다(78px→64px). 원재료 입고마감 화면은 확보된 여유를 원재료명 열(110→148px)에 재배분하고, 마감수량(kg) 열 자체도 108px로 줄였습니다(외주 입고마감은 이번 요청 범위 밖이라 열 폭은 그대로 두고 콤마 표시만 공용으로 적용). 외주 발주관리 화면은 "귀책업체 재작업비 청구" 버튼명이 좁은 작업 열에서 길다는 지적에 <b>"재작업비 청구"</b>로 줄였고(모달·카드 제목 등 문맥이 있는 다른 곳은 원래 이름 유지), 수주번호 입력창이 브라우저 기본 datalist 드롭다운 화살표 아이콘에 값이 가려 잘려 보이던 문제를 열 폭 확대(82→96px, 공정명·상태·작업 열에서 재배분)와 입력창 우측 여백(padding-right:13px) 추가로 해결했습니다. node --check 구문 검증과 jsdom 기반 검증(마감수량 콤마 입력→재저장 라운드트립, 열 폭 확인, 버튼 라벨 전환 확인, 64개 전 화면 순회)을 통과해 실제 오류 0건을 확인했습니다.</td></tr>
         <tr><td>39차 라운드 — 외주마감 귀책업체 청구금액 자동 상계차감 (2026-08-11, v0.71)</td><td>지난 라운드에서 만든 "정산완료된 청구금액을 경고만 하고 실제로는 차감하지 않는" 상계 방식이, 상현님이 처음 의도하신 "재작업으로 발생한 추가 매입 비용을 귀책업체 마감 지급액에서 실제로 반영"하는 것과는 다르다는 걸 대화 중에 확인해, 실제로 차감하는 기능으로 다시 설계했습니다. 외주 입고 마감에서 매입처를 조회해 발주 건을 <b>전체 선택하면</b>(등록 자체가 매입처 1곳 단위로만 가능하므로 선택된 건이 모두 같은 업체일 때), 그 업체 앞 정산완료·미상계 귀책업체 재작업비 청구금액과 선택 건 총액 중 작은 값이 <b>"상계차감액" 입력창에 자동 제안</b>되고(상현님 컨펌 — 자동 제안 + 수정가능 방식), 담당자가 필요하면 직접 줄이거나 늘릴 수 있습니다(총액 초과는 불가). <b>마감등록을 누르면 실제로 그 금액만큼 마감 총액에서 차감</b>되어 마감내역서에 총액·상계차감·실지급액이 함께 기록되고(<code>netDeduction</code>·<code>payableAmount</code> 필드 신설), 상계에 쓰인 청구 건들은 오래된 순서로 자동 "상계완료(마감번호)"로 표시됩니다(건을 쪼개지 않고 통째로만 상계에 포함해 어느 건이 상계됐는지 항상 명확하게 유지). 마감내역서 발행 이력 표에도 상계차감이 있는 건만 합계금액 아래에 차감 내역을 함께 보여줍니다. node --check 구문 검증과 jsdom 기반 검증(재작업 발주→귀책 태깅→입고완료→청구생성→정산완료 → 같은 업체 앞 별도 정상 발주 입고완료 → 외주마감에서 전체선택 시 상계차감 자동제안(40,000원) 확인 → 마감등록 후 총액 100,000원에서 실지급 60,000원 계산 확인 → 청구 현황에 상계완료(마감번호) 표시 확인, 34~38차 회귀 스위트 재실행, 64개 전 화면 순회)을 통과해 실제 오류 0건을 확인했습니다.</td></tr>
+        <tr><td>40차 라운드 — 품질검사 3화면 분할 개편 (2026-08-11, v0.72)</td><td>품질 카테고리를 <b>수입검사·공정검사·출하검사 3개의 독립된 메뉴</b>로 분할했습니다. ①수입검사(신설): 원재료는 대상에서 제외하고 외주발주 중 미입고(결재완료·입고대기) 건만 후보로 삼습니다. 매입처명·수주번호·품목명으로 조회하며, 합격이면 즉시 잔여수량 전량 입고완료 처리(기존 입고등록 로직 재사용), 불합격이면 <code>inspectFail</code> 플래그를 세워 외주생산 입고 진행현황에 "입고불합격" 배지로 표시됩니다. ②공정검사(개편): 상현님 지시대로 "다른 화면에 영향을 주지 않는 순수 이력" 화면으로 재설계 — 기업규모별(영세/소기업 등) 분기 로직을 전부 제거하고, 당일 생산중이거나 당일 생산일보가 있는 모든 수주 건을 기본 노출합니다(도중에 완료된 건도 포함). 저장해도 수주 상태는 전혀 바뀌지 않습니다. ③출하검사: 검사대기→출하대기 전환을 전담하는 유일한 게이트로 통일했습니다(수주관리에서 "검사 시작"을 누르면 검사대기로 전환). 세 화면 모두 환경설정에 사용여부 토글을 추가해(<code>S.qcModules</code>) 항상 메뉴는 노출하되, 미사용 설정 시 수입검사는 자동 입고완료, 출하검사는 검사 시작 즉시 자동으로 출하대기까지 전환되는 "검사생략" 동작을 하도록 만들었습니다(영세·소기업처럼 일부 검사 단계를 생략하는 회사도 메뉴 구조를 바꾸지 않고 대응). 구현 중 출하검사 자동생략이 상태는 정상 전환되는데 화면이 중간 상태(검사대기)에 멈춰 보이는 버그를 발견해, <code>passShipInspectionAuto()</code> 끝에 <code>recalc()</code> 호출을 추가해 해결했습니다. 마지막으로 수주→생산/외주→품질검사로 이어지는 연결 데모 데이터를 화면당 10건씩(공정검사 10·수입검사 10·출하검사 10, 합격/조건부합격/불합격 결과 혼합) 생성해 반영했습니다. node --check 구문 검증과 jsdom 기반 검증(3화면 후보/이력 렌더링, 수입검사 합격→자동입고 확인, 공정검사 저장 후 수주 상태 불변 확인, 출하검사 자동생략 전체 플로우 재현 및 버그 재현·수정 확인, 신규 시드데이터 프레시 로드 검증, 34~39차 회귀 스위트 재실행, 66개 전 화면 순회)을 통과해 실제 오류 0건을 확인했습니다.</td></tr>
       </tbody>
     </table>
   </div>
@@ -2705,9 +2725,11 @@ BEP 매출  = 월 고정비 ÷ 공헌이익률
       </div>
       <div style="flex:1;min-width:190px;border:1px solid var(--line);border-radius:10px;padding:12px">
         <div style="font-weight:800;font-size:12.5px;margin-bottom:4px">STAGE 4 · 포장&amp;출하검사&amp;적재</div>
-        <div style="font-size:11px;color:var(--muted);margin-bottom:8px">공정검사일보(기업 규모별 3단, 중소기업은 수입·공정·출하검사 탭)로 품질 전 구간 관리, "창고 입고마감 갭 추적"으로 생산완료↔창고입고 차이 관리</div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:8px">수입검사·공정검사·출하검사 3개 화면(2026-08-11 개편)으로 품질 전 구간 관리, "창고 입고마감 갭 추적"으로 생산완료↔창고입고 차이 관리</div>
         <div style="display:flex;flex-wrap:wrap;gap:4px">
-          <button class="btn gh sm" onclick="navTo('qualitycheck')">공정검사일보</button>
+          <button class="btn gh sm" onclick="navTo('qcincoming')">수입검사</button>
+          <button class="btn gh sm" onclick="navTo('qualitycheck')">공정검사</button>
+          <button class="btn gh sm" onclick="navTo('qcship')">출하검사</button>
           <button class="btn gh sm" onclick="navTo('inventory')">재고관리</button>
         </div>
       </div>
@@ -2743,9 +2765,11 @@ BEP 매출  = 월 고정비 ÷ 공헌이익률
       </div>
       <div style="flex:1;min-width:190px;border:1px solid var(--line);border-radius:10px;padding:12px">
         <div style="font-weight:800;font-size:12.5px;margin-bottom:4px">Sub C · 품질&amp;공정손실</div>
-        <div style="font-size:11px;color:var(--muted);margin-bottom:8px">공정검사일보(기업 규모별 3단)로 공정 중 점검부터 납품 직전 출하검사까지 일원화 관리(2026-08-07 개편)</div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:8px">수입검사·공정검사·출하검사 3개 화면으로 분리 관리(2026-08-11 개편) — 공정검사는 순수 이력, 출하검사가 검사대기→출하대기 전환을 전담</div>
         <div style="display:flex;flex-wrap:wrap;gap:4px">
-          <button class="btn gh sm" onclick="navTo('qualitycheck')">공정검사일보</button>
+          <button class="btn gh sm" onclick="navTo('qcincoming')">수입검사</button>
+          <button class="btn gh sm" onclick="navTo('qualitycheck')">공정검사</button>
+          <button class="btn gh sm" onclick="navTo('qcship')">출하검사</button>
         </div>
       </div>
       <div style="flex:1;min-width:190px;border:1px solid var(--line);border-radius:10px;padding:12px">
@@ -3112,12 +3136,94 @@ BEP 매출  = 월 고정비 ÷ 공헌이익률
   </div>
 </section>
 
-<!-- ══════════ 공정검사일보 — 2026-07-22 신설(P2-10, 구 자주검사일보), 2026-08-07 기업 규모별 3단 표로 개편 ══════════ -->
-<section class="page" id="p-qualitycheck">
-  <h1>공정검사일보</h1>
-  <div class="sub" id="qc-scale-sub">사출 작업 중 자체 점검(공정검사) 결과를 기록합니다. 중소기업 모드에서는 수입검사·출하검사 탭도 함께 제공됩니다. 표·입력항목은 <a href="#" onclick="event.preventDefault();navTo('settings')" style="color:var(--blue-d)">환경설정 &gt; 기업 규모</a> 설정에 따라 자동으로 바뀝니다.</div>
+<!-- ══════════ 수입검사 — 2026-08-11(40차) 신설(외주 발주 미입고 기준, 원재료 제외) ══════════ -->
+<section class="page" id="p-qcincoming">
+  <h1>수입검사</h1>
+  <div class="sub">외주 발주 중 아직 입고되지 않은 건을 대상으로 합니다(원재료는 대상에서 제외). <b>합격</b>으로 등록하면 그 즉시 외주 입고가 완료 처리되고, <b>불합격</b>으로 등록하면 <a href="#" onclick="event.preventDefault();navTo('out')" style="color:var(--blue-d)">외주생산 입고 진행현황</a>에 "입고불합격"으로 표시되며 입고는 보류됩니다.</div>
+  <div id="qc-incoming-offnote" style="display:none" class="note">이 회사는 수입검사를 사용하지 않도록 설정되어 있습니다(<a href="#" onclick="event.preventDefault();navTo('settings')" style="color:var(--blue-d)">환경설정 &gt; 품질검사 사용 설정</a>) — 외주 발주는 검사 없이 <a href="#" onclick="event.preventDefault();navTo('outrecv')" style="color:var(--blue-d)">외주 입고등록</a> 화면에서 바로 입고완료 처리하시면 됩니다.</div>
   <div class="card">
-    <div id="qc-card-body"></div>
+    <h2 style="margin-top:0">미입고 목록</h2>
+    <div class="lv-search">
+      <div><label>매입처명</label><input type="text" placeholder="매입처명" oninput="lvSetSearch('qcincoming','vendor',this.value)"></div>
+      <div><label>수주번호</label><input type="text" placeholder="수주번호" oninput="lvSetSearch('qcincoming','orderNo',this.value)"></div>
+      <div><label>품목명</label><input type="text" placeholder="품목명" oninput="lvSetSearch('qcincoming','item',this.value)"></div>
+      <button class="btn gh sm" onclick="lvResetSearch('qcincoming');document.querySelectorAll('#p-qcincoming .lv-search input').forEach(i=>i.value='')">검색 초기화</button>
+      <span class="lv-count" id="qcincoming-count"></span>
+    </div>
+    <div style="overflow-x:auto"><table class="th-center" style="table-layout:fixed">
+      <thead><tr>
+        <th style="width:70px">수주번호</th><th style="width:90px">매입처명</th><th>품목명</th><th>규격명</th>
+        <th class="num" style="width:64px">입고수량</th><th style="width:80px">판정</th><th style="width:90px">검사자</th><th style="width:130px">비고</th><th style="width:56px">저장</th>
+      </tr></thead>
+      <tbody id="t-qcincoming-candidates"></tbody>
+    </table></div>
+  </div>
+  <div class="card">
+    <h2 style="margin-top:0">검사 이력</h2>
+    <div style="overflow-x:auto"><table class="th-center" style="table-layout:fixed">
+      <thead><tr>
+        <th style="width:64px">검사일</th><th style="width:70px">수주번호</th><th style="width:90px">매입처명</th><th>품목명</th><th>규격명</th>
+        <th class="num" style="width:64px">입고수량</th><th style="width:80px">판정</th><th style="width:90px">검사자</th><th style="width:130px">비고</th><th style="width:100px">작업</th>
+      </tr></thead>
+      <tbody id="t-qcincoming-history"></tbody>
+    </table></div>
+  </div>
+</section>
+
+<!-- ══════════ 공정검사 — 2026-07-22 신설(P2-10, 구 자주검사일보), 2026-08-11(40차) 당일생산 체크리스트형 순수로그로 전면 개편 ══════════ -->
+<section class="page" id="p-qualitycheck">
+  <h1>공정검사</h1>
+  <div class="sub">당일 생산일보 기록이 있거나 현재 생산중인 수주 건을 자동으로 모아 보여줍니다(도중에 생산완료·검사대기로 넘어간 건도 계속 대상입니다). 판정을 등록하면 이력에 누적될 뿐, <b>다른 화면 상태에는 전혀 영향을 주지 않는 순수 기록</b>입니다.</div>
+  <div id="qc-process-offnote" style="display:none" class="note">이 회사는 공정검사를 사용하지 않도록 설정되어 있습니다(<a href="#" onclick="event.preventDefault();navTo('settings')" style="color:var(--blue-d)">환경설정 &gt; 품질검사 사용 설정</a>) — 원래도 다른 업무를 막지 않는 이력 기록이라, 필요하면 계속 기록만 남기시면 됩니다.</div>
+  <div class="card">
+    <h2 style="margin-top:0">오늘 생산 목록</h2>
+    <div style="overflow-x:auto"><table class="th-center" style="table-layout:fixed">
+      <thead><tr>
+        <th style="width:70px">수주번호</th><th>품목명</th><th>규격명</th><th style="width:56px">단계</th>
+        <th class="num" style="width:66px">검사수량</th><th class="num" style="width:66px">불량수량</th><th style="width:74px">판정</th><th style="width:66px">검사자</th><th>비고</th><th style="width:56px">저장</th>
+      </tr></thead>
+      <tbody id="t-qc-process-candidates"></tbody>
+    </table></div>
+  </div>
+  <div class="card">
+    <h2 style="margin-top:0">검사 이력</h2>
+    <div style="overflow-x:auto"><table class="th-center" style="table-layout:fixed">
+      <thead><tr>
+        <th style="width:56px">일자</th><th style="width:70px">수주번호</th><th>품목명</th><th>규격명</th><th style="width:56px">단계</th>
+        <th class="num" style="width:66px">검사수량</th><th class="num" style="width:66px">불량수량</th><th class="num" style="width:60px">불량률</th>
+        <th style="width:74px">판정</th><th style="width:66px">검사자</th><th>비고</th><th style="width:100px">작업</th>
+      </tr></thead>
+      <tbody id="t-qualitycheck"></tbody>
+    </table></div>
+  </div>
+</section>
+
+<!-- ══════════ 출하검사 — 2026-08-11(40차) 신설(검사대기→출하대기 전환의 유일한 게이트) ══════════ -->
+<section class="page" id="p-qcship">
+  <h1>출하검사</h1>
+  <div class="sub">검사대기 상태의 수주 건을 대상으로 하며, <b>합격</b>으로 등록하면 즉시 출하대기로 전환됩니다 — 이 화면이 검사대기→출하대기 전환의 유일한 게이트입니다.</div>
+  <div id="qc-ship-offnote" style="display:none" class="note">이 회사는 출하검사를 사용하지 않도록 설정되어 있습니다(<a href="#" onclick="event.preventDefault();navTo('settings')" style="color:var(--blue-d)">환경설정 &gt; 품질검사 사용 설정</a>) — 수주 건이 검사대기 상태가 되는 즉시 검사 없이 자동으로 출하대기로 전환됩니다.</div>
+  <div class="card">
+    <h2 style="margin-top:0">검사대기 목록</h2>
+    <div style="overflow-x:auto"><table class="th-center" style="table-layout:fixed">
+      <thead><tr>
+        <th style="width:80px">수주번호</th><th>품목명</th><th>규격명</th>
+        <th class="num" style="width:70px">검사수량</th><th class="num" style="width:70px">불량수량</th>
+        <th style="width:80px">판정</th><th style="width:90px">검사자</th><th style="width:140px">비고</th><th style="width:56px">저장</th>
+      </tr></thead>
+      <tbody id="t-qcship-candidates"></tbody>
+    </table></div>
+  </div>
+  <div class="card">
+    <h2 style="margin-top:0">검사 이력</h2>
+    <div style="overflow-x:auto"><table class="th-center" style="table-layout:fixed">
+      <thead><tr>
+        <th style="width:60px">일자</th><th style="width:80px">수주번호</th><th>품목명</th><th>규격명</th>
+        <th class="num" style="width:70px">검사수량</th><th class="num" style="width:70px">불량수량</th><th class="num" style="width:60px">불량률</th>
+        <th style="width:80px">판정</th><th style="width:90px">검사자</th><th style="width:140px">비고</th><th style="width:100px">작업</th>
+      </tr></thead>
+      <tbody id="t-qc-ship"></tbody>
+    </table></div>
   </div>
 </section>
 
@@ -3343,6 +3449,12 @@ const S = {
   // 구매 발주 결재(2026-07-28, 21차 라운드 신설) — 정식 그룹웨어 전자결재가 아니라 약식 절차입니다.
   poApprovalDelegateEmpIds:[], // 사장님이 지정한 결재 대리인(인원 제한 없음, OWNER 본인은 항상 결재 가능)
   poApprovalSkip:false, // true면 결재 단계 없이 결재상신 즉시 결재완료 처리(사장님이 매번 결재하기 번거로울 때)
+  // 2026-08-11(40차 신설): 품질검사 3화면(수입/공정/출하) 각각 사용 여부 — 상현님 컨펌(항상 3개 메뉴는
+  // 노출하되, 규모가 작아 특정 검사를 안 하는 회사는 환경설정에서 꺼두면 자동으로 넘어가는 방식).
+  // incoming(수입검사) 끄면 외주 입고가 검사 없이 기존처럼 바로 처리되고, ship(출하검사) 끄면 검사대기에
+  // 도달하는 즉시 자동으로 출하대기 전환됩니다. process(공정검사)는 애초에 다른 화면에 영향을 주지 않는
+  // 순수 이력이라 꺼도 막히는 동작은 없고, 화면에 "미사용" 안내만 표시됩니다.
+  qcModules:{incoming:true, process:true, ship:true},
   permRoleLabels:{OWNER:'사장', EXEC:'임원', ACCOUNT:'경리(직원)', FACTORY:'공장장(직원)', OPERATION:'생산·품질(직원)', DRIVER:'납품기사(직원)', WORKER:'생산직(직원)', PRODMGR:'생산관리자(직원)'},
   // 2026-07-21(항목11) 대분류 재구성에 맞춰 permGroups/permMatrix도 새 12개 그룹 기준으로 다시 정의합니다.
   // 여러 기존 그룹이 하나로 합쳐진 곳(예: 운영 모니터링=사장화면+알림, 원가관리=원가분석+월고정비+전력비 등)은
@@ -9773,12 +9885,16 @@ function confirmProductionComplete(id){
   setOrderStatus(id, '생산완료');
   pushNotification('생산완료', `${o.cust} ${o.item} 생산이 완료되었습니다(${o.doneQty.toLocaleString()}/${o.qty.toLocaleString()}). 품질검사를 시작해 주세요.`);
 }
-// 2026-08(3차 보완 신설): 생산완료 → 검사대기 전환. 품질검사(공정검사일보) 담당자가 실제로 검사에 착수하는
-// 시점을 수주관리에서 눌러 표시합니다. 이 상태부터는 공정검사일보/출하검사 화면의 "검사대기" 필터에 잡힙니다.
+// 2026-08(3차 보완 신설): 생산완료 → 검사대기 전환. 품질 담당자가 실제로 검사에 착수하는
+// 시점을 수주관리에서 눌러 표시합니다. 이 상태부터는 출하검사 화면의 검사대기 목록에 잡힙니다
+// (2026-08-11부터 공정검사는 이 상태와 무관하게 항상 당일 생산 건을 대상으로 함).
 function startQualityInspection(id){
   const o = S.orderItems.find(x=>x.id===id);
   if(!o || o.status!=='생산완료') return;
   setOrderStatus(id, '검사대기');
+  // 2026-08-11(40차): 출하검사 미사용 설정이면 검사대기 도달 즉시 자동으로 출하대기까지 넘어갑니다
+  // (검사대기→출하대기 전환은 출하검사가 전담하는 유일한 게이트이므로, 꺼두면 이 관문 자체가 사라집니다).
+  if(!S.qcModules.ship) passShipInspectionAuto(o);
 }
 function setOrderStatus(id, val){
   const o = S.orderItems.find(x=>x.id===id);
@@ -9939,6 +10055,9 @@ function togglePOApprovalDelegate(empId, checked){
 }
 function renderPOApprovalSettings(){
   if($('cfg-po-approval-skip')) $('cfg-po-approval-skip').checked = !!S.poApprovalSkip;
+  if($('cfg-qc-incoming-use')) $('cfg-qc-incoming-use').checked = !!S.qcModules.incoming;
+  if($('cfg-qc-process-use')) $('cfg-qc-process-use').checked = !!S.qcModules.process;
+  if($('cfg-qc-ship-use')) $('cfg-qc-ship-use').checked = !!S.qcModules.ship;
   const tbl = $('t-po-approval-delegate');
   if(tbl){
     const designated = S.poApprovalDelegateEmpIds || [];
@@ -11468,6 +11587,8 @@ function recalc(){
   renderMatHistoryModal();
   renderFgHistoryModal();
   renderQualityCheck();
+  renderQcIncoming();
+  renderQcShip();
 
   $('pw-out').textContent = r.power===null ? '미사용' : W(r.power);
   renderEquipment();
@@ -11932,7 +12053,7 @@ function addOutsourcePO(){
   const no = 'OPO-' + String(S.outsourcePONextNo).padStart(5,'0');
   S.outsourcePONextNo++;
   S.outsourcePOs.push({no, date:'26-07-28', orderNo:'', vendor:S.selectedVendor||'', process:'', item:'', specName:'', qty:0, unitPrice:0, expectedDate:'', stage:'작성중', note:'', cancelled:false, saved:false,
-    chainDefect:false, liableVendor:'', chainCauseNote:'', claimCreated:false, receivedQty:0}); // 2026-08-03(T8), receivedQty: 2026-08-11(37차) 분할입고 누적수량
+    chainDefect:false, liableVendor:'', chainCauseNote:'', claimCreated:false, receivedQty:0, inspectFail:false}); // 2026-08-03(T8), receivedQty: 2026-08-11(37차) 분할입고 누적수량, inspectFail: 2026-08-11(40차) 수입검사 불합격 플래그
   recalc();
 }
 function removeOutsourcePO(no){ S.outsourcePOs = S.outsourcePOs.filter(p=>p.no!==no); recalc(); }
@@ -12974,7 +13095,13 @@ function renderOutsourcePOReceiveTable(){
   if(!tbl) return;
   const rows = outRecvSearchRows();
   tbl.innerHTML = rows.length ? rows.map(p=>{
-    const label = matReceiveStatusLabel(p);
+    // 2026-08-11(40차): 수입검사에서 불합격 판정을 받은 건은 다른 상태보다 우선해서 "입고불합격"으로 표시합니다.
+    let label = matReceiveStatusLabel(p);
+    let styleOverride = '';
+    if(p.inspectFail && label==='입고대기'){
+      label = '입고불합격';
+      styleOverride = 'background:#FDEAEA;color:#C0392B';
+    }
     return `<tr style="${p.cancelled?'opacity:.6;text-decoration:line-through':''}">
       <td style="text-align:center">${p.date}</td>
       <td style="text-align:center;font-size:11.5px;color:var(--ink-soft)">${p.orderNo||'—'}</td>
@@ -12986,7 +13113,7 @@ function renderOutsourcePOReceiveTable(){
       <td class="num">${p.unitPrice.toLocaleString()}</td>
       <td class="num">${W(p.qty*p.unitPrice)}</td>
       <td style="text-align:center">${p.expectedDate||'—'}</td>
-      <td style="text-align:center"><span class="tag" style="${matReceiveStatusStyle(label)}" title="${p.returned?(p.returnReason||''):''}">${label}</span></td>
+      <td style="text-align:center"><span class="tag" style="${styleOverride||matReceiveStatusStyle(label)}" title="${p.returned?(p.returnReason||''):(p.inspectFail?'수입검사 불합격':'')}">${label}</span></td>
     </tr>`;
   }).join('')
     : '<tr><td colspan="11" style="color:var(--muted)">조건에 맞는 발주 건이 없습니다</td></tr>';
@@ -13528,359 +13655,323 @@ function matAdjustmentCostTotal(){
   });
   return sum;
 }
-// 공정검사일보(2026-07-22 신설 P2-10, 구 자주검사일보 — 2026-08-07 상현님 지시로 기업 규모별 3단 표로 개편) —
-// 출하검사성적서와 달리 저장형 이력입니다(원칙9 예외: 공정 이상 조기 발견이 목적이라 그때그때 값이 아니라
-// 누적 기록이 필요). S.company.scale(영세/소기업/중소기업)에 따라 등록 폼·표 구성이 통째로 바뀝니다:
-//  - 영세기업: 판정(합격/불합격)만 — 검사단계·검사수량·불량수량 개념 자체를 없앴습니다.
-//  - 소기업: 검사단계(초/중/종물)는 유지하되 외관/치수/형합 3항목 각각 합격/불합격을 받아 종합판정을
-//    자동계산합니다(3항목 전부 합격이어야 종합 합격). 하나라도 불합격이면 표에 경고 배지만 띄우고
-//    실제 출고(상태 전환)를 막지는 않습니다 — 이번 라운드는 안내까지만(상현님 확인).
-//  - 중소기업: 기존 구조(검사단계·검사수량·불량수량·불량률·판정 3단계)를 그대로 쓰되, "수주번호·품목"으로
-//    합쳐져 있던 열을 수주번호/품목명 2열로 분리하고 규격명 열을 추가했습니다.
-// 세 모드 모두 내부적으로는 같은 S.qualityChecks 배열 하나를 씁니다(appearance/dimension/fitting 필드는
-// 소기업 등록분에만 채워짐) — 월간보고의 "공정 부적합 현황"(qty/defectQty 기준 집계)이 계속 동작하도록,
-// 영세/소기업 등록분도 qty:1, defectQty:(불합격이면 1 아니면 0)을 내부적으로 함께 저장합니다(화면에는
-// 노출하지 않음 — 원칙10과 배치되지 않도록, 사용자에게 보여주는 값이 아니라 집계용 내부 파생값입니다).
+// ══════════ 품질검사 3화면 — 2026-08-11(40차) 상현님 지시로 전면 재설계 ══════════
+// 기존에는 "공정검사일보" 화면 하나에 기업 규모(영세/소기업/중소기업)에 따라 폼·표가 통째로 바뀌고,
+// 중소기업 규모에서만 수입검사·출하검사 탭이 추가로 나타나는 구조였습니다. 이번 라운드부터는:
+//  ① 수입검사/공정검사/출하검사를 별도 메뉴 3개로 분리(기업 규모와 무관하게 항상 노출)
+//  ② 수입검사는 원재료가 아니라 "외주 발주 중 미입고 건"을 대상으로 하고, 합격 시 그 자리에서
+//     외주 입고를 자동으로 완료 처리합니다(상현님 컨펌 — 검사가 입고를 게이트).
+//  ③ 공정검사는 어떤 화면 상태도 바꾸지 않는 순수 이력입니다. 기본 목록은 "당일 생산일보 기록이
+//     있거나 현재 생산중인 수주 건"으로, 도중에 생산완료·검사대기로 넘어가도 계속 대상에 남습니다.
+//  ④ 검사대기→출하대기 전환은 출하검사가 전담하는 유일한 게이트로 통일됩니다.
+//  ⑤ 환경설정 > 품질검사 사용 설정(S.qcModules)에서 화면별로 껐다 켤 수 있고, 끄면 그 검사 없이
+//     다음 단계로 자동 진행됩니다(수입검사 끔→자동 입고완료, 출하검사 끔→검사대기 도달 즉시 자동 출하대기).
 const QC_RESULT_COLOR = {'합격':'var(--green)', '조건부합격':'var(--amber)', '불합격':'var(--red)'};
-function qcScale(){ return (S.company && S.company.scale) || '중소기업'; }
-function submitQualityCheck(){
-  const scale = qcScale();
-  const orderItemId = +$('qc-order').value;
-  if(!orderItemId){ alert('수주 건을 선택하세요.'); return; }
-  const inspector = $('qc-inspector').value, note = $('qc-note').value;
-  const today = `07-${String(S.elapsed).padStart(2,'0')}`;
-  let rec;
-  if(scale==='영세기업'){
-    const result = $('qc-result').value;
-    rec = {id:S.qcNextId++, date:today, orderItemId, stage:null, qty:1, defectQty: result==='불합격'?1:0, result, inspector, note};
-  } else if(scale==='소기업'){
-    const stage = $('qc-stage').value;
-    const appearance = $('qc-appearance').value, dimension = $('qc-dimension').value, fitting = $('qc-fitting').value;
-    const result = (appearance==='합격' && dimension==='합격' && fitting==='합격') ? '합격' : '불합격';
-    rec = {id:S.qcNextId++, date:today, orderItemId, stage, qty:1, defectQty: result==='불합격'?1:0, result, appearance, dimension, fitting, inspector, note};
-  } else {
-    const stage = $('qc-stage').value, qty = +$('qc-qty').value, defectQty = +$('qc-defect').value, result = $('qc-result').value;
-    if(!qty){ alert('검사수량을 입력하세요.'); return; }
-    rec = {id:S.qcNextId++, date:today, orderItemId, stage, qty, defectQty, result, inspector, note};
-  }
+function qcInspectorOptionsHTML(selected){
+  return S.employees.filter(e=>e.active).map(e=>`<option ${selected===e.name?'selected':''}>${e.name}</option>`).join('');
+}
+
+// ── 공정검사(순수 이력) ──
+function qcProcessTodayCandidates(){
+  const today = todayMD();
+  const idsWithLogToday = new Set(S.prodLog.filter(l=>l.date===today && l.orderItemId!=null).map(l=>l.orderItemId));
+  return S.orderItems.filter(o=>!o.cancelled && (o.status==='생산중' || idsWithLogToday.has(o.id)));
+}
+function qcProcessCandidateRowHTML(o){
+  const uid = o.id;
+  return `<tr>
+    <td style="text-align:center;font-size:11.5px;color:var(--ink-soft)">${o.orderNo}</td>
+    <td>${o.item}</td>
+    <td style="font-size:11.5px">${o.specName||'—'}</td>
+    <td style="text-align:center"><select id="qc-stage-${uid}" style="width:100%;font-size:11px"><option>초물</option><option>중물</option><option>종물</option></select></td>
+    <td class="num"><input type="number" id="qc-qty-${uid}" value="5" class="no-spin" style="width:100%;text-align:right"></td>
+    <td class="num"><input type="number" id="qc-defect-${uid}" value="0" class="no-spin" style="width:100%;text-align:right"></td>
+    <td style="text-align:center"><select id="qc-result-${uid}" style="width:100%;font-size:11px"><option>합격</option><option>조건부합격</option><option>불합격</option></select></td>
+    <td style="text-align:center"><select id="qc-inspector-${uid}" style="width:100%;font-size:11px">${qcInspectorOptionsHTML()}</select></td>
+    <td><input type="text" id="qc-note-${uid}" style="width:100%;font-size:11px" placeholder="예: 게이트부 크랙 등"></td>
+    <td style="text-align:center"><button class="btn sm" onclick="saveQcProcessInspection(${uid})">저장</button></td>
+  </tr>`;
+}
+function saveQcProcessInspection(orderItemId){
+  const stageEl = $(`qc-stage-${orderItemId}`);
+  if(!stageEl) return;
+  const stage = stageEl.value;
+  const qty = +$(`qc-qty-${orderItemId}`).value;
+  const defectQty = +$(`qc-defect-${orderItemId}`).value;
+  const result = $(`qc-result-${orderItemId}`).value;
+  const inspector = $(`qc-inspector-${orderItemId}`).value;
+  const note = $(`qc-note-${orderItemId}`).value;
+  if(!qty){ alert('검사수량을 입력하세요.'); return; }
+  const rec = {id:S.qcNextId++, date:todayMD(), orderItemId, stage, qty, defectQty, result, inspector, note};
   S.qualityChecks.push(rec);
-  // 2026-08-07(29차): 영세·소기업은 별도 "출하검사" 단계를 두지 않으므로, 공정검사 합격 시점에
-  // 검사대기→출하대기 자동 전환 + 창고입고도 함께 자동확정합니다(구 출하검사성적서 발행 화면의 역할 대체,
-  // 상현님 지시: "창고입고는 너의 의견대로"). 중소기업은 별도 출하검사 탭(submitShipInspection)에서 처리합니다.
-  if(scale==='영세기업' || scale==='소기업'){
-    const oi = S.orderItems.find(o=>o.id===orderItemId);
-    if(oi && rec.result==='합격' && oi.status==='검사대기'){
-      oi.status = '출하대기';
-      oi.warehouseInQty = oi.doneQty;
-      pushNotification('출하전환', `${oi.cust} ${oi.item} 검사 합격으로 출하대기 전환 + 창고입고 자동확정되었습니다.`);
-    }
-  }
-  if($('qc-note')) $('qc-note').value = '';
-  if($('qc-defect')) $('qc-defect').value = 0;
-  // 2026-08-07(30차): 합격/불합격을 하나의 '공정검사' 타입으로 뭉쳐 보내던 것을 분리
-  // (알림트리거 마스터리스트 v1.2) — 불합격은 생산관리자·생산품질에게 danger로 강조됩니다.
-  if(rec.result==='합격'){
-    pushNotification('공정검사합격', `검사 결과(합격)가 등록되었습니다.`);
-  } else {
+  // 2026-08-11(40차): 공정검사는 순수 이력입니다 — 더 이상 다른 화면 상태(출하대기 전환·창고입고 등)를
+  // 건드리지 않습니다(상현님 컨펌). 검사대기→출하대기 전환은 이제 출하검사가 전담합니다.
+  if(rec.result==='불합격'){
     pushNotification('공정검사불합격', `검사 결과(불합격)가 등록되었습니다 — 재작업/원인 확인이 필요합니다.`, null, 'danger');
+  } else {
+    pushNotification('공정검사합격', `검사 결과(${rec.result})가 등록되었습니다.`);
   }
   recalc();
 }
-function removeQualityCheck(id){
-  S.qualityChecks = S.qualityChecks.filter(q=>q.id!==id);
+function removeQualityCheck(id){ S.qualityChecks = S.qualityChecks.filter(q=>q.id!==id); recalc(); }
+function editQualityCheck(id){ S.qcEditId = id; recalc(); }
+function cancelEditQualityCheck(){ S.qcEditId = null; recalc(); }
+function saveEditQualityCheck(id){
+  const q = S.qualityChecks.find(x=>x.id===id);
+  if(!q) return;
+  q.stage = $(`qce-stage-${id}`).value;
+  q.qty = +$(`qce-qty-${id}`).value;
+  q.defectQty = +$(`qce-defect-${id}`).value;
+  q.result = $(`qce-result-${id}`).value;
+  q.inspector = $(`qce-inspector-${id}`).value;
+  q.note = $(`qce-note-${id}`).value;
+  S.qcEditId = null;
   recalc();
 }
-// 2026-08-03(T4): 아직 생산도 시작 안 한 주문(계획대기 등)이 후보로 뜨던 버그 수정 —
-// 생산이 진행 중이거나 이미 검사대기 상태인 건만 공정검사 등록 후보로 노출합니다.
-function qcOrderOptionsHTML(){
-  return S.orderItems.filter(o=>!o.cancelled && ['생산중','검사대기'].includes(o.status))
-    .map(o=>`<option value="${o.id}">${o.orderNo} · ${o.item}</option>`).join('');
-}
-// 2026-08-03(T4): 품질 담당자용 검사대기/검사완료 필터 바 — 열 추가 없이 표 위에 토글 버튼으로 제공합니다.
-function qcHistoryFilterBarHTML(){
-  const opts = [['all','전체'],['pending','검사대기 건만'],['done','검사완료(출하 이후) 건만']];
-  return `<div style="display:flex;gap:6px;margin-bottom:8px">${opts.map(([v,label])=>
-    `<button class="btn ${S.qcHistoryFilter===v?'':'gh'} sm" onclick="switchQcHistoryFilter('${v}')">${label}</button>`
-  ).join('')}</div>`;
-}
-function switchQcHistoryFilter(v){
-  S.qcHistoryFilter = v;
-  recalc();
-}
-function qcHistoryFilterRows(rows){
-  if(S.qcHistoryFilter==='all') return rows;
-  return rows.filter(q=>{
-    const o = S.orderItems.find(x=>x.id===q.orderItemId);
-    const isPending = o && o.status==='검사대기';
-    return S.qcHistoryFilter==='pending' ? isPending : !isPending;
-  });
-}
-function qcInspectorOptionsHTML(){
-  return S.employees.filter(e=>e.active).map(e=>`<option>${e.name}</option>`).join('');
-}
-// ── 중소기업 tier 전용: 수입검사(구매 연동) / 출하검사(구 출하검사성적서 발행 대체) ──
-// 2026-08-07(30차): "중소기업 화면은 수입, 공정, 출하를 모두 구현" 지시 반영.
-function switchQcSubTab(tab){
-  S.qcSubTab = tab;
-  recalc();
-}
-function incomingInspCandidates(){
-  return S.materialPOs.filter(p => p.stage==='입고완료' && !p.cancelled);
-}
-function submitIncomingInspection(){
-  const poNo = $('qc-in-po').value;
-  if(!poNo){ alert('입고완료된 발주 건을 선택하세요.'); return; }
-  const po = S.materialPOs.find(p=>p.no===poNo);
-  if(!po) return;
-  const result = $('qc-in-result').value;
-  const inspector = $('qc-in-inspector').value, note = $('qc-in-note').value;
-  const today = `07-${String(S.elapsed).padStart(2,'0')}`;
-  S.incomingInspections.push({id:S.incomingInspNextId++, date:today, poNo:po.no, matName:po.matName, vendor:po.vendor, qty:po.qtyKg, result, inspector, note});
-  if($('qc-in-note')) $('qc-in-note').value = '';
-  pushNotification('수입검사', `${po.matName}(${po.vendor}) 수입검사 결과(${result})가 등록되었습니다.`);
-  recalc();
-}
-function removeIncomingInspection(id){
-  S.incomingInspections = S.incomingInspections.filter(q=>q.id!==id);
-  recalc();
-}
-function qcIncomingPoOptionsHTML(){
-  return incomingInspCandidates().map(p=>`<option value="${p.no}">${p.no} · ${p.matName} (${p.vendor})</option>`).join('');
-}
-function qcIncomingRowHTML(q){
-  return `<tr><td>7/${q.date.split('-')[1]}</td><td>${q.poNo}</td><td>${q.matName}</td><td>${q.vendor}</td>
+function qcProcessHistRowHTML(q){
+  const o = S.orderItems.find(x=>x.id===q.orderItemId);
+  const orderNo = o ? o.orderNo : '(삭제된 수주)';
+  const item = o ? o.item : '—';
+  const spec = o ? (o.specName||'—') : '—';
+  const defectRate = q.qty>0 ? (q.defectQty/q.qty*100) : 0;
+  if(S.qcEditId===q.id){
+    return `<tr>
+      <td style="text-align:center">${q.date}</td>
+      <td style="text-align:center;font-size:11.5px">${orderNo}</td>
+      <td>${item}</td><td style="font-size:11.5px">${spec}</td>
+      <td style="text-align:center"><select id="qce-stage-${q.id}" style="width:100%;font-size:11px"><option ${q.stage==='초물'?'selected':''}>초물</option><option ${q.stage==='중물'?'selected':''}>중물</option><option ${q.stage==='종물'?'selected':''}>종물</option></select></td>
+      <td class="num"><input type="number" id="qce-qty-${q.id}" value="${q.qty}" class="no-spin" style="width:100%;text-align:right"></td>
+      <td class="num"><input type="number" id="qce-defect-${q.id}" value="${q.defectQty}" class="no-spin" style="width:100%;text-align:right"></td>
+      <td class="num">${defectRate.toFixed(1)}%</td>
+      <td style="text-align:center"><select id="qce-result-${q.id}" style="width:100%;font-size:11px"><option ${q.result==='합격'?'selected':''}>합격</option><option ${q.result==='조건부합격'?'selected':''}>조건부합격</option><option ${q.result==='불합격'?'selected':''}>불합격</option></select></td>
+      <td style="text-align:center"><select id="qce-inspector-${q.id}" style="width:100%;font-size:11px">${qcInspectorOptionsHTML(q.inspector)}</select></td>
+      <td><input type="text" id="qce-note-${q.id}" value="${q.note||''}" style="width:100%;font-size:11px"></td>
+      <td style="text-align:center;white-space:nowrap"><button class="btn sm" onclick="saveEditQualityCheck(${q.id})">저장</button> <button class="btn gh sm" onclick="cancelEditQualityCheck()">취소</button></td>
+    </tr>`;
+  }
+  return `<tr>
+    <td style="text-align:center">7/${q.date.split('-')[1]}</td>
+    <td style="text-align:center;font-size:11.5px;color:var(--ink-soft)">${orderNo}</td>
+    <td>${item}</td><td style="font-size:11.5px">${spec}</td>
+    <td style="text-align:center">${q.stage?`<span class="tag fix">${q.stage}</span>`:'—'}</td>
     <td class="num">${q.qty.toLocaleString()}</td>
-    <td style="color:${QC_RESULT_COLOR[q.result]||'inherit'};font-weight:700">${q.result}</td>
-    <td>${q.inspector}</td><td style="color:var(--muted);font-size:11px">${q.note||'—'}</td>
-    <td><button class="btn del sm" onclick="removeIncomingInspection(${q.id})">×</button></td></tr>`;
+    <td class="num" style="${q.defectQty?'color:var(--red)':''}">${q.defectQty.toLocaleString()}</td>
+    <td class="num">${defectRate.toFixed(1)}%</td>
+    <td style="text-align:center;color:${QC_RESULT_COLOR[q.result]||'inherit'};font-weight:700">${q.result}</td>
+    <td style="text-align:center">${q.inspector}</td>
+    <td style="font-size:11px;color:var(--muted)">${q.note||'—'}</td>
+    <td style="text-align:center;white-space:nowrap"><button class="btn gh sm" onclick="editQualityCheck(${q.id})">수정</button> <button class="btn del sm" onclick="removeQualityCheck(${q.id})">삭제</button></td>
+  </tr>`;
 }
+function renderQualityCheck(){
+  const offNote = $('qc-process-offnote');
+  if(offNote) offNote.style.display = S.qcModules.process ? 'none' : '';
+  const candTbl = $('t-qc-process-candidates');
+  if(candTbl){
+    const rows = qcProcessTodayCandidates();
+    candTbl.innerHTML = rows.length ? rows.map(qcProcessCandidateRowHTML).join('') : '<tr><td colspan="10" style="color:var(--muted)">오늘 생산 이력이 있는 수주 건이 없습니다</td></tr>';
+  }
+  const histTbl = $('t-qualitycheck');
+  if(histTbl){
+    histTbl.innerHTML = S.qualityChecks.length ? S.qualityChecks.slice().reverse().map(qcProcessHistRowHTML).join('') : '<tr><td colspan="12" style="color:var(--muted)">등록된 공정검사 이력이 없습니다</td></tr>';
+  }
+}
+
+// ── 수입검사(외주 발주 미입고 기준) ──
+// 2026-08-11(40차): 원재료는 대상에서 제외하고, 외주 발주 중 아직 입고되지 않은(결재완료·입고대기)
+// 건만 후보로 삼습니다. 합격이면 그 즉시 잔여수량 전량을 입고완료 처리하고(applyOutReceiptQty 재사용),
+// 불합격이면 p.inspectFail 플래그만 세워 외주생산 입고 진행현황에 "입고불합격"으로 표시합니다.
+function incomingInspCandidates(){
+  return S.outsourcePOs.filter(p=>!p.cancelled && !p.returned && ['결재완료','입고대기'].includes(p.stage));
+}
+function qcIncomingSearchRows(){
+  const q = lv('qcincoming').search || {};
+  return incomingInspCandidates().filter(p=>lvMatch(p.vendor,q.vendor) && lvMatch(p.orderNo,q.orderNo) && lvMatch(p.item,q.item));
+}
+function qcIncomingCandidateRowHTML(p){
+  const remaining = (p.qty||0) - (p.receivedQty||0);
+  const failBadge = p.inspectFail ? ` <span class="tag" style="background:#FBE7E7;color:#B03A2E;font-size:9px">이전 판정: 불합격</span>` : '';
+  return `<tr>
+    <td style="text-align:center;font-size:11.5px;color:var(--ink-soft)">${p.orderNo||'—'}</td>
+    <td>${p.vendor}</td>
+    <td>${p.item}${failBadge}</td>
+    <td style="font-size:11.5px">${p.specName||'—'}</td>
+    <td class="num">${remaining.toLocaleString()}</td>
+    <td style="text-align:center"><select id="qcin-result-${p.no}" style="width:100%;font-size:11px"><option>합격</option><option>조건부합격</option><option>불합격</option></select></td>
+    <td style="text-align:center"><select id="qcin-inspector-${p.no}" style="width:100%;font-size:11px">${qcInspectorOptionsHTML()}</select></td>
+    <td><input type="text" id="qcin-note-${p.no}" style="width:100%;font-size:11px" placeholder="판정사유 등"></td>
+    <td style="text-align:center"><button class="btn sm" onclick="saveQcIncomingInspection('${p.no}')">저장</button></td>
+  </tr>`;
+}
+function saveQcIncomingInspection(no){
+  const p = S.outsourcePOs.find(x=>x.no===no);
+  if(!p) return;
+  const result = $(`qcin-result-${no}`).value;
+  const inspector = $(`qcin-inspector-${no}`).value;
+  const note = $(`qcin-note-${no}`).value;
+  const remaining = (p.qty||0) - (p.receivedQty||0);
+  const rec = {id:S.incomingInspNextId++, date:todayMD(), sourcePoNo:p.no, orderNo:p.orderNo||'', vendor:p.vendor, item:p.item, specName:p.specName||'', qty:remaining, result, inspector, note};
+  S.incomingInspections.push(rec);
+  if(result==='불합격'){
+    p.inspectFail = true;
+    pushNotification('수입검사', `${p.item}(${p.vendor}) 수입검사 결과(불합격)가 등록되었습니다 — 외주생산 입고 진행현황에 입고불합격으로 표시됩니다.`, null, 'danger');
+  } else {
+    p.inspectFail = false;
+    applyOutReceiptQty(p, remaining);
+    pushNotification('수입검사', `${p.item}(${p.vendor}) 수입검사 결과(${result})가 등록되어 입고완료 처리되었습니다.`);
+  }
+  recalc();
+}
+function removeIncomingInspection(id){ S.incomingInspections = S.incomingInspections.filter(q=>q.id!==id); recalc(); }
+function editIncomingInspection(id){ S.qcInEditId = id; recalc(); }
+function cancelEditIncomingInspection(){ S.qcInEditId = null; recalc(); }
+function saveEditIncomingInspection(id){
+  const q = S.incomingInspections.find(x=>x.id===id);
+  if(!q) return;
+  q.result = $(`qcine-result-${id}`).value;
+  q.inspector = $(`qcine-inspector-${id}`).value;
+  q.note = $(`qcine-note-${id}`).value;
+  S.qcInEditId = null;
+  recalc();
+}
+function qcIncomingHistRowHTML(q){
+  if(S.qcInEditId===q.id){
+    return `<tr>
+      <td style="text-align:center">${q.date}</td>
+      <td style="text-align:center;font-size:11.5px">${q.orderNo||'—'}</td>
+      <td>${q.vendor}</td><td>${q.item}</td><td style="font-size:11.5px">${q.specName||'—'}</td>
+      <td class="num">${(q.qty||0).toLocaleString()}</td>
+      <td style="text-align:center"><select id="qcine-result-${q.id}" style="width:100%;font-size:11px"><option ${q.result==='합격'?'selected':''}>합격</option><option ${q.result==='조건부합격'?'selected':''}>조건부합격</option><option ${q.result==='불합격'?'selected':''}>불합격</option></select></td>
+      <td style="text-align:center"><select id="qcine-inspector-${q.id}" style="width:100%;font-size:11px">${qcInspectorOptionsHTML(q.inspector)}</select></td>
+      <td><input type="text" id="qcine-note-${q.id}" value="${q.note||''}" style="width:100%;font-size:11px"></td>
+      <td style="text-align:center;white-space:nowrap"><button class="btn sm" onclick="saveEditIncomingInspection(${q.id})">저장</button> <button class="btn gh sm" onclick="cancelEditIncomingInspection()">취소</button></td>
+    </tr>`;
+  }
+  return `<tr>
+    <td style="text-align:center">7/${q.date.split('-')[1]}</td>
+    <td style="text-align:center;font-size:11.5px;color:var(--ink-soft)">${q.orderNo||'—'}</td>
+    <td>${q.vendor}</td><td>${q.item}</td><td style="font-size:11.5px">${q.specName||'—'}</td>
+    <td class="num">${(q.qty||0).toLocaleString()}</td>
+    <td style="text-align:center;color:${QC_RESULT_COLOR[q.result]||'inherit'};font-weight:700">${q.result}</td>
+    <td style="text-align:center">${q.inspector}</td>
+    <td style="font-size:11px;color:var(--muted)">${q.note||'—'}</td>
+    <td style="text-align:center;white-space:nowrap"><button class="btn gh sm" onclick="editIncomingInspection(${q.id})">수정</button> <button class="btn del sm" onclick="removeIncomingInspection(${q.id})">삭제</button></td>
+  </tr>`;
+}
+function renderQcIncoming(){
+  const offNote = $('qc-incoming-offnote');
+  if(offNote) offNote.style.display = S.qcModules.incoming ? 'none' : '';
+  const rows = qcIncomingSearchRows();
+  const cntEl = $('qcincoming-count'); if(cntEl) cntEl.textContent = `${rows.length}건`;
+  const tbl = $('t-qcincoming-candidates');
+  if(tbl) tbl.innerHTML = rows.length ? rows.map(qcIncomingCandidateRowHTML).join('') : '<tr><td colspan="9" style="color:var(--muted)">조건에 맞는 미입고 외주 발주가 없습니다</td></tr>';
+  const histTbl = $('t-qcincoming-history');
+  if(histTbl) histTbl.innerHTML = S.incomingInspections.length ? S.incomingInspections.slice().reverse().map(qcIncomingHistRowHTML).join('') : '<tr><td colspan="10" style="color:var(--muted)">등록된 수입검사 이력이 없습니다</td></tr>';
+}
+
+// ── 출하검사(검사대기→출하대기 유일 게이트) ──
 function shipInspCandidates(){
   return S.orderItems.filter(oi => oi.status === '검사대기');
 }
-function submitShipInspection(){
-  const orderItemId = +$('qc-ship-order').value;
-  if(!orderItemId){ alert('검사대기 상태의 수주 건을 선택하세요.'); return; }
-  const qty = +$('qc-ship-qty').value, defectQty = +$('qc-ship-defect').value, result = $('qc-ship-result').value;
-  if(!qty){ alert('검사수량을 입력하세요.'); return; }
-  const inspector = $('qc-ship-inspector').value, note = $('qc-ship-note').value;
-  const today = `07-${String(S.elapsed).padStart(2,'0')}`;
-  const rec = {id:S.shipInspNextId++, date:today, orderItemId, qty, defectQty, result, inspector, note};
+function qcShipCandidateRowHTML(o){
+  return `<tr>
+    <td style="text-align:center;font-size:11.5px;color:var(--ink-soft)">${o.orderNo}</td>
+    <td>${o.item}</td>
+    <td style="font-size:11.5px">${o.specName||'—'}</td>
+    <td class="num"><input type="number" id="qcship-qty-${o.id}" value="5" class="no-spin" style="width:100%;text-align:right"></td>
+    <td class="num"><input type="number" id="qcship-defect-${o.id}" value="0" class="no-spin" style="width:100%;text-align:right"></td>
+    <td style="text-align:center"><select id="qcship-result-${o.id}" style="width:100%;font-size:11px"><option>합격</option><option>조건부합격</option><option>불합격</option></select></td>
+    <td style="text-align:center"><select id="qcship-inspector-${o.id}" style="width:100%;font-size:11px">${qcInspectorOptionsHTML()}</select></td>
+    <td><input type="text" id="qcship-note-${o.id}" style="width:100%;font-size:11px" placeholder="예: 최종 외관 확인 등"></td>
+    <td style="text-align:center"><button class="btn sm" onclick="submitShipInspection(${o.id})">저장</button></td>
+  </tr>`;
+}
+// 2026-08-11(40차 신설): 출하검사 미사용 설정 시, 검사대기 도달 즉시 자동으로 출하대기 전환합니다.
+// 담당자 입력 없이 처리되지만 추적 가능하도록 최소한의 이력(auto:true)은 남깁니다.
+function passShipInspectionAuto(oi){
+  const rec = {id:S.shipInspNextId++, date:todayMD(), orderItemId:oi.id, qty:oi.doneQty||0, defectQty:0, result:'합격', inspector:'(자동-검사생략)', note:'출하검사 미사용 설정으로 자동 통과', auto:true};
   S.shipInspections.push(rec);
-  if($('qc-ship-note')) $('qc-ship-note').value = '';
-  if($('qc-ship-defect')) $('qc-ship-defect').value = 0;
+  oi.status = '출하대기';
+  oi.warehouseInQty = oi.doneQty;
+  pushNotification('출하전환', `${oi.cust} ${oi.item} 출하검사 미사용 설정으로 자동 출하대기 전환 + 창고입고 자동확정되었습니다.`);
+  // 2026-08-11(40차): setOrderStatus()가 이미 한 차례 recalc()를 호출했지만, 그 뒤 이 함수에서
+  // 상태를 다시 바꾸므로(검사대기→출하대기) 화면이 중간 상태로 멈춰있지 않도록 한 번 더 갱신합니다.
+  recalc();
+}
+function submitShipInspection(orderItemId){
   const oi = S.orderItems.find(o=>o.id===orderItemId);
-  if(oi && result==='합격' && oi.status==='검사대기'){
-    // 출하검사 합격 시 검사대기→출하대기 자동 전환 — 구 출하검사성적서 발행 화면의 유일한 게이트 역할을 대신함(2026-08-07)
-    // 2026-08-03(T3): 완제품재고 자동확정이 영세·소기업(공정검사 경로)에만 있고 중소기업(출하검사 경로)엔
-    // 빠져있던 반쪽 자동화를 여기서 동일하게 맞춥니다 — 규모와 무관하게 데이터 처리 로직은 통일합니다.
+  if(!oi) return;
+  const qtyEl = $(`qcship-qty-${orderItemId}`);
+  if(!qtyEl) return;
+  const qty = +qtyEl.value, defectQty = +$(`qcship-defect-${orderItemId}`).value, result = $(`qcship-result-${orderItemId}`).value;
+  if(!qty){ alert('검사수량을 입력하세요.'); return; }
+  const inspector = $(`qcship-inspector-${orderItemId}`).value, note = $(`qcship-note-${orderItemId}`).value;
+  const rec = {id:S.shipInspNextId++, date:todayMD(), orderItemId, qty, defectQty, result, inspector, note};
+  S.shipInspections.push(rec);
+  if(result==='합격' && oi.status==='검사대기'){
     oi.status = '출하대기';
     oi.warehouseInQty = oi.doneQty;
     pushNotification('출하전환', `${oi.cust} ${oi.item} 출하검사 합격으로 출하대기 전환 + 창고입고 자동확정되었습니다.`);
   } else {
-    pushNotification('출하검사', `${oi ? oi.cust+' '+oi.item : ''} 출하검사 결과(${result})가 등록되었습니다.`);
+    pushNotification('출하검사', `${oi.cust} ${oi.item} 출하검사 결과(${result})가 등록되었습니다.`);
   }
   recalc();
 }
-function removeShipInspection(id){
-  S.shipInspections = S.shipInspections.filter(q=>q.id!==id);
+function removeShipInspection(id){ S.shipInspections = S.shipInspections.filter(q=>q.id!==id); recalc(); }
+function editShipInspection(id){ S.qcShipEditId = id; recalc(); }
+function cancelEditShipInspection(){ S.qcShipEditId = null; recalc(); }
+function saveEditShipInspection(id){
+  const q = S.shipInspections.find(x=>x.id===id);
+  if(!q) return;
+  q.qty = +$(`qcshipe-qty-${id}`).value;
+  q.defectQty = +$(`qcshipe-defect-${id}`).value;
+  q.result = $(`qcshipe-result-${id}`).value;
+  q.inspector = $(`qcshipe-inspector-${id}`).value;
+  q.note = $(`qcshipe-note-${id}`).value;
+  S.qcShipEditId = null;
   recalc();
 }
-function qcShipOrderOptionsHTML(){
-  return shipInspCandidates().map(o=>`<option value="${o.id}">${o.orderNo} · ${o.item}</option>`).join('');
-}
-function qcShipRowHTML(q){
+function qcShipHistRowHTML(q){
   const o = S.orderItems.find(x=>x.id===q.orderItemId);
   const orderNo = o ? o.orderNo : '(삭제된 수주)';
   const item = o ? o.item : '—';
   const spec = o ? (o.specName||'—') : '—';
   const defectRate = q.qty>0 ? (q.defectQty/q.qty*100) : 0;
-  return `<tr><td>7/${q.date.split('-')[1]}</td><td>${orderNo}</td><td>${item}</td><td>${spec}</td>
+  if(S.qcShipEditId===q.id){
+    return `<tr>
+      <td style="text-align:center">${q.date}</td>
+      <td style="text-align:center;font-size:11.5px">${orderNo}</td>
+      <td>${item}</td><td style="font-size:11.5px">${spec}</td>
+      <td class="num"><input type="number" id="qcshipe-qty-${q.id}" value="${q.qty}" class="no-spin" style="width:100%;text-align:right"></td>
+      <td class="num"><input type="number" id="qcshipe-defect-${q.id}" value="${q.defectQty}" class="no-spin" style="width:100%;text-align:right"></td>
+      <td class="num">${defectRate.toFixed(1)}%</td>
+      <td style="text-align:center"><select id="qcshipe-result-${q.id}" style="width:100%;font-size:11px"><option ${q.result==='합격'?'selected':''}>합격</option><option ${q.result==='조건부합격'?'selected':''}>조건부합격</option><option ${q.result==='불합격'?'selected':''}>불합격</option></select></td>
+      <td style="text-align:center"><select id="qcshipe-inspector-${q.id}" style="width:100%;font-size:11px">${qcInspectorOptionsHTML(q.inspector)}</select></td>
+      <td><input type="text" id="qcshipe-note-${q.id}" value="${q.note||''}" style="width:100%;font-size:11px"></td>
+      <td style="text-align:center;white-space:nowrap"><button class="btn sm" onclick="saveEditShipInspection(${q.id})">저장</button> <button class="btn gh sm" onclick="cancelEditShipInspection()">취소</button></td>
+    </tr>`;
+  }
+  return `<tr>
+    <td style="text-align:center">7/${q.date.split('-')[1]}</td>
+    <td style="text-align:center;font-size:11.5px;color:var(--ink-soft)">${orderNo}</td>
+    <td>${item}</td><td style="font-size:11.5px">${spec}</td>
     <td class="num">${q.qty.toLocaleString()}</td>
     <td class="num" style="${q.defectQty?'color:var(--red)':''}">${q.defectQty.toLocaleString()}</td>
     <td class="num">${defectRate.toFixed(1)}%</td>
-    <td style="color:${QC_RESULT_COLOR[q.result]||'inherit'};font-weight:700">${q.result}</td>
-    <td>${q.inspector}</td><td style="color:var(--muted);font-size:11px">${q.note||'—'}</td>
-    <td><button class="btn del sm" onclick="removeShipInspection(${q.id})">×</button></td></tr>`;
+    <td style="text-align:center;color:${QC_RESULT_COLOR[q.result]||'inherit'};font-weight:700">${q.result}${q.auto?' <span class="tag" style="font-size:9px">자동</span>':''}</td>
+    <td style="text-align:center">${q.inspector}</td>
+    <td style="font-size:11px;color:var(--muted)">${q.note||'—'}</td>
+    <td style="text-align:center;white-space:nowrap"><button class="btn gh sm" onclick="editShipInspection(${q.id})">수정</button> <button class="btn del sm" onclick="removeShipInspection(${q.id})">삭제</button></td>
+  </tr>`;
 }
-function qcIncomingFormHTML(){
-  return `<h2 style="margin-top:0">수입검사 등록 <span style="font-size:11px;font-weight:400;color:var(--muted)">— 입고완료된 원자재 발주 건 대상, 구매 업무(구매/발주관리)와 연동</span></h2>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;margin-bottom:14px">
-      <label style="font-size:11.5px">발주 건<select id="qc-in-po" style="width:260px;display:block"></select></label>
-      <label style="font-size:11.5px">판정<select id="qc-in-result" style="width:90px;display:block"><option>합격</option><option>조건부합격</option><option>불합격</option></select></label>
-      <label style="font-size:11.5px">검사자<select id="qc-in-inspector" style="width:100px;display:block"></select></label>
-      <label style="font-size:11.5px">비고<input type="text" id="qc-in-note" style="width:200px;display:block" placeholder="예: 색상 편차 등"></label>
-      <button class="btn sm" onclick="submitIncomingInspection()">등록</button>
-    </div>
-    <table class="th-center"><thead><tr>
-      <th style="width:9%">일자</th><th style="width:13%">발주번호</th><th style="width:16%">자재명</th><th style="width:14%">매입처</th>
-      <th class="num" style="width:10%">입고수량(kg)</th><th style="width:10%">판정</th><th style="width:11%">검사자</th><th style="width:13%">비고</th><th style="width:4%"></th>
-    </tr></thead><tbody id="t-qc-incoming"></tbody></table>
-    <p style="font-size:10.5px;color:var(--muted);margin-top:10px">※ 구매 발주가 "입고완료"된 건만 목록에 나타납니다. 수입검사는 자재 판정이며, 수주·출하 상태에는 영향을 주지 않습니다.</p>`;
-}
-function qcShipFormHTML(){
-  return `<h2 style="margin-top:0">출하검사 등록 <span style="font-size:11px;font-weight:400;color:var(--muted)">— 검사대기 상태의 수주 건 대상, 합격 시 출하대기로 자동 전환</span></h2>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;margin-bottom:14px">
-      <label style="font-size:11.5px">수주 건<select id="qc-ship-order" style="width:220px;display:block"></select></label>
-      <label style="font-size:11.5px">검사수량<input type="number" id="qc-ship-qty" style="width:64px;display:block" value="5"></label>
-      <label style="font-size:11.5px">불량수량<input type="number" id="qc-ship-defect" style="width:64px;display:block" value="0"></label>
-      <label style="font-size:11.5px">판정<select id="qc-ship-result" style="width:96px;display:block"><option>합격</option><option>조건부합격</option><option>불합격</option></select></label>
-      <label style="font-size:11.5px">검사자<select id="qc-ship-inspector" style="width:100px;display:block"></select></label>
-      <label style="font-size:11.5px">비고<input type="text" id="qc-ship-note" style="width:180px;display:block" placeholder="예: 최종 외관 확인 등"></label>
-      <button class="btn sm" onclick="submitShipInspection()">등록</button>
-    </div>
-    <table class="th-center"><thead><tr>
-      <th style="width:7%">일자</th><th style="width:11%">수주번호</th><th style="width:14%">품목명</th><th style="width:12%">규격명</th>
-      <th style="width:8%">검사수량</th><th style="width:8%">불량수량</th><th style="width:7%">불량률</th>
-      <th style="width:9%">판정</th><th style="width:9%">검사자</th><th style="width:11%">비고</th><th style="width:4%"></th>
-    </tr></thead><tbody id="t-qc-ship"></tbody></table>
-    <p style="font-size:10.5px;color:var(--muted);margin-top:10px">※ 이 화면이 옛 "출하검사성적서 발행"을 대신합니다(2026-08-07 삭제) — 합격으로 등록하면 검사대기 → 출하대기로 자동 전환됩니다.</p>`;
-}
-function qcProcessFormHTML(){
-  // 중소기업 · 공정검사 탭 — 기존 구조 유지(수주번호/품목명 분리 + 규격명 추가는 2026-08-07 반영됨)
-  return `<h2 style="margin-top:0">공정검사 등록 <span style="font-size:11px;font-weight:400;color:var(--muted)">— 중소기업: 초/중/종물 + 검사수량·불량률 상세 기록</span></h2>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;margin-bottom:14px">
-      <label style="font-size:11.5px">수주 건<select id="qc-order" style="width:200px;display:block"></select></label>
-      <label style="font-size:11.5px">검사단계<select id="qc-stage" style="width:80px;display:block"><option>초물</option><option>중물</option><option>종물</option></select></label>
-      <label style="font-size:11.5px">검사수량<input type="number" id="qc-qty" style="width:64px;display:block" value="5"></label>
-      <label style="font-size:11.5px">불량수량<input type="number" id="qc-defect" style="width:64px;display:block" value="0"></label>
-      <label style="font-size:11.5px">판정<select id="qc-result" style="width:96px;display:block"><option>합격</option><option>조건부합격</option><option>불합격</option></select></label>
-      <label style="font-size:11.5px">검사자<select id="qc-inspector" style="width:100px;display:block"></select></label>
-      <label style="font-size:11.5px">비고<input type="text" id="qc-note" style="width:180px;display:block" placeholder="예: 게이트부 크랙, 치수 이상 등"></label>
-      <button class="btn sm" onclick="submitQualityCheck()">등록</button>
-    </div>
-    <div id="qc-history-filter-bar"></div>
-    <table class="th-center"><thead><tr>
-      <th style="width:6%">일자</th><th style="width:10%">수주번호</th><th style="width:13%">품목명</th><th style="width:12%">규격명</th>
-      <th style="width:7%">단계</th><th style="width:8%">검사수량</th><th style="width:8%">불량수량</th><th style="width:7%">불량률</th>
-      <th style="width:9%">판정</th><th style="width:8%">검사자</th><th style="width:8%">비고</th><th style="width:4%"></th>
-    </tr></thead><tbody id="t-qualitycheck"></tbody></table>
-    <p style="font-size:10.5px;color:var(--muted);margin-top:10px">※ 초물에서 불합격이 나오면 금형·설비 조정 후 재검사(다시 "초물"로 등록)하는 것이 일반적입니다 — 재검사 이력도 그대로 쌓여 조치 흐름을 추적할 수 있습니다.</p>`;
-}
-function qcSmeShellHTML(){
-  const tab = S.qcSubTab || '공정검사';
-  const tabBtn = name => `<button class="btn ${tab===name?'':'gh'} sm" onclick="switchQcSubTab('${name}')">${name}</button>`;
-  const body = tab==='수입검사' ? qcIncomingFormHTML() : tab==='출하검사' ? qcShipFormHTML() : qcProcessFormHTML();
-  return `<div style="display:flex;gap:6px;margin-bottom:14px">${tabBtn('수입검사')}${tabBtn('공정검사')}${tabBtn('출하검사')}</div>${body}`;
-}
-function qcFormShellHTML(scale){
-  if(scale==='영세기업'){
-    return `<h2 style="margin-top:0">공정검사 등록 <span style="font-size:11px;font-weight:400;color:var(--muted)">— 영세기업: 합격/불합격만 기록</span></h2>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;margin-bottom:14px">
-      <label style="font-size:11.5px">수주 건<select id="qc-order" style="width:220px;display:block"></select></label>
-      <label style="font-size:11.5px">판정<select id="qc-result" style="width:90px;display:block"><option>합격</option><option>불합격</option></select></label>
-      <label style="font-size:11.5px">검사자<select id="qc-inspector" style="width:100px;display:block"></select></label>
-      <label style="font-size:11.5px">비고<input type="text" id="qc-note" style="width:220px;display:block" placeholder="예: 외관 불량 등"></label>
-      <button class="btn sm" onclick="submitQualityCheck()">등록</button>
-    </div>
-    <div id="qc-history-filter-bar"></div>
-    <table class="th-center"><thead><tr>
-      <th style="width:9%">일자</th><th style="width:14%">수주번호</th><th style="width:16%">품목명</th><th style="width:16%">규격명</th>
-      <th style="width:9%">판정</th><th style="width:11%">검사자</th><th style="width:20%">비고</th><th style="width:5%"></th>
-    </tr></thead><tbody id="t-qualitycheck"></tbody></table>
-    <p style="font-size:10.5px;color:var(--muted);margin-top:10px">※ 영세기업 화면은 검사단계·검사수량 구분 없이 "합격/불합격" 결과만 남깁니다. 합격 등록 시 출하대기 전환과 창고입고 확정이 자동으로 함께 처리됩니다.</p>`;
-  }
-  if(scale==='소기업'){
-    return `<h2 style="margin-top:0">공정검사 등록 <span style="font-size:11px;font-weight:400;color:var(--muted)">— 소기업: 외관·치수·형합 3항목</span></h2>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;margin-bottom:14px">
-      <label style="font-size:11.5px">수주 건<select id="qc-order" style="width:200px;display:block"></select></label>
-      <label style="font-size:11.5px">검사단계<select id="qc-stage" style="width:80px;display:block"><option>초물</option><option>중물</option><option>종물</option></select></label>
-      <label style="font-size:11.5px">외관<select id="qc-appearance" style="width:80px;display:block"><option>합격</option><option>불합격</option></select></label>
-      <label style="font-size:11.5px">치수<select id="qc-dimension" style="width:80px;display:block"><option>합격</option><option>불합격</option></select></label>
-      <label style="font-size:11.5px">형합<select id="qc-fitting" style="width:80px;display:block"><option>합격</option><option>불합격</option></select></label>
-      <label style="font-size:11.5px">검사자<select id="qc-inspector" style="width:100px;display:block"></select></label>
-      <label style="font-size:11.5px">비고<input type="text" id="qc-note" style="width:180px;display:block" placeholder="예: 게이트부 크랙 등"></label>
-      <button class="btn sm" onclick="submitQualityCheck()">등록</button>
-    </div>
-    <div id="qc-history-filter-bar"></div>
-    <table class="th-center"><thead><tr>
-      <th style="width:7%">일자</th><th style="width:11%">수주번호</th><th style="width:13%">품목명</th><th style="width:13%">규격명</th>
-      <th style="width:7%">단계</th><th style="width:8%">외관</th><th style="width:8%">치수</th><th style="width:8%">형합</th>
-      <th style="width:9%">종합판정</th><th style="width:9%">검사자</th><th style="width:14%">비고</th><th style="width:4%"></th>
-    </tr></thead><tbody id="t-qualitycheck"></tbody></table>
-    <p style="font-size:10.5px;color:var(--muted);margin-top:10px">※ 외관·치수·형합 3항목이 전부 합격이어야 종합판정이 합격입니다. 종합판정이 합격이면 출하대기 전환과 창고입고 확정이 자동으로 함께 처리됩니다. 하나라도 불합격이면 표에 "⚠ 출고 보류 검토" 배지만 뜹니다(안내까지만, 이번 라운드 확인).</p>`;
-  }
-  return qcSmeShellHTML();
-}
-function qcRowHTML(scale, q){
-  const o = S.orderItems.find(x=>x.id===q.orderItemId);
-  const orderNo = o ? o.orderNo : '(삭제된 수주)';
-  const item = o ? o.item : '—';
-  const spec = o ? (o.specName||'—') : '—';
-  if(scale==='영세기업'){
-    return `<tr><td>7/${q.date.split('-')[1]}</td><td>${orderNo}</td><td>${item}</td><td>${spec}</td>
-      <td style="color:${QC_RESULT_COLOR[q.result]||'inherit'};font-weight:700">${q.result}</td>
-      <td>${q.inspector}</td><td style="color:var(--muted);font-size:11px">${q.note||'—'}</td>
-      <td><button class="btn del sm" onclick="removeQualityCheck(${q.id})">×</button></td></tr>`;
-  }
-  if(scale==='소기업'){
-    const badge = q.result==='불합격' ? ' <span class="tag sup" style="font-size:9px">⚠ 출고 보류 검토</span>' : '';
-    const sub = v => `<span style="color:${v==='불합격'?'var(--red)':'inherit'}">${v||'—'}</span>`;
-    return `<tr><td>7/${q.date.split('-')[1]}</td><td>${orderNo}</td><td>${item}</td><td>${spec}</td>
-      <td>${q.stage?`<span class="tag fix">${q.stage}</span>`:'—'}</td>
-      <td>${sub(q.appearance)}</td><td>${sub(q.dimension)}</td><td>${sub(q.fitting)}</td>
-      <td style="color:${QC_RESULT_COLOR[q.result]||'inherit'};font-weight:700">${q.result}${badge}</td>
-      <td>${q.inspector}</td><td style="color:var(--muted);font-size:11px">${q.note||'—'}</td>
-      <td><button class="btn del sm" onclick="removeQualityCheck(${q.id})">×</button></td></tr>`;
-  }
-  const defectRate = q.qty>0 ? (q.defectQty/q.qty*100) : 0;
-  return `<tr><td>7/${q.date.split('-')[1]}</td><td>${orderNo}</td><td>${item}</td><td>${spec}</td>
-    <td>${q.stage?`<span class="tag fix">${q.stage}</span>`:'—'}</td>
-    <td class="num">${q.qty.toLocaleString()}</td>
-    <td class="num" style="${q.defectQty?'color:var(--red)':''}">${q.defectQty.toLocaleString()}</td>
-    <td class="num">${defectRate.toFixed(1)}%</td>
-    <td style="color:${QC_RESULT_COLOR[q.result]||'inherit'};font-weight:700">${q.result}</td>
-    <td>${q.inspector}</td><td style="color:var(--muted);font-size:11px">${q.note||'—'}</td>
-    <td><button class="btn del sm" onclick="removeQualityCheck(${q.id})">×</button></td></tr>`;
-}
-function renderQualityCheck(){
-  const body = $('qc-card-body');
-  if(!body) return;
-  const scale = qcScale();
-  const subtabKey = scale==='중소기업' ? (S.qcSubTab||'공정검사') : '';
-  if(body.dataset.scale !== scale || body.dataset.subtab !== subtabKey){
-    body.innerHTML = qcFormShellHTML(scale);
-    body.dataset.scale = scale;
-    body.dataset.subtab = subtabKey;
-  }
-  const sub = $('qc-scale-sub');
-  if(sub){
-    const tip = {'영세기업':'영세기업 모드 — 판정(합격/불합격)만 남깁니다.', '소기업':'소기업 모드 — 외관·치수·형합 3항목을 각각 검사합니다.', '중소기업':'중소기업 모드 — 수입검사·공정검사·출하검사 3단계를 각각 관리합니다.'}[scale];
-    sub.innerHTML = `사출 작업 중 자체 점검(공정검사) 결과를 기록합니다. 중소기업 모드에서는 수입검사·출하검사 탭도 함께 제공됩니다. <b style="color:var(--blue-d)">${tip}</b> (<a href="#" onclick="event.preventDefault();navTo('settings')" style="color:var(--blue-d)">환경설정에서 변경</a>)`;
-  }
-  if(scale==='중소기업' && subtabKey==='수입검사'){
-    const poSel = $('qc-in-po');
-    if(poSel && !poSel.innerHTML) poSel.innerHTML = qcIncomingPoOptionsHTML();
-    const inspSel = $('qc-in-inspector');
-    if(inspSel && !inspSel.innerHTML) inspSel.innerHTML = qcInspectorOptionsHTML();
-    const tbl = $('t-qc-incoming');
-    if(tbl) tbl.innerHTML = S.incomingInspections.length
-      ? S.incomingInspections.slice().reverse().map(qcIncomingRowHTML).join('')
-      : `<tr><td colspan="9" style="color:var(--muted)">등록된 수입검사 이력이 없습니다</td></tr>`;
-    return;
-  }
-  if(scale==='중소기업' && subtabKey==='출하검사'){
-    const orderSel = $('qc-ship-order');
-    if(orderSel && !orderSel.innerHTML) orderSel.innerHTML = qcShipOrderOptionsHTML();
-    const inspSel = $('qc-ship-inspector');
-    if(inspSel && !inspSel.innerHTML) inspSel.innerHTML = qcInspectorOptionsHTML();
-    const tbl = $('t-qc-ship');
-    if(tbl) tbl.innerHTML = S.shipInspections.length
-      ? S.shipInspections.slice().reverse().map(qcShipRowHTML).join('')
-      : `<tr><td colspan="11" style="color:var(--muted)">등록된 출하검사 이력이 없습니다</td></tr>`;
-    return;
-  }
-  const orderSel = $('qc-order');
-  if(orderSel && !orderSel.innerHTML) orderSel.innerHTML = qcOrderOptionsHTML();
-  const inspectorSel = $('qc-inspector');
-  if(inspectorSel && !inspectorSel.innerHTML) inspectorSel.innerHTML = qcInspectorOptionsHTML();
-  const filterBar = $('qc-history-filter-bar');
-  if(filterBar) filterBar.innerHTML = qcHistoryFilterBarHTML(); // 2026-08-03(T4): 매번 갱신해 활성 필터 표시 반영
-  const tbl = $('t-qualitycheck');
-  if(!tbl) return;
-  const filteredChecks = qcHistoryFilterRows(S.qualityChecks);
-  tbl.innerHTML = filteredChecks.length
-    ? filteredChecks.slice().reverse().map(q=>qcRowHTML(scale,q)).join('')
-    : `<tr><td colspan="12" style="color:var(--muted)">${S.qcHistoryFilter==='all'?'등록된 공정검사 이력이 없습니다':'해당 조건의 이력이 없습니다'}</td></tr>`;
+function renderQcShip(){
+  const offNote = $('qc-ship-offnote');
+  if(offNote) offNote.style.display = S.qcModules.ship ? 'none' : '';
+  const rows = shipInspCandidates();
+  const tbl = $('t-qcship-candidates');
+  if(tbl) tbl.innerHTML = rows.length ? rows.map(qcShipCandidateRowHTML).join('') : '<tr><td colspan="9" style="color:var(--muted)">검사대기 상태의 수주 건이 없습니다</td></tr>';
+  const histTbl = $('t-qc-ship');
+  if(histTbl) histTbl.innerHTML = S.shipInspections.length ? S.shipInspections.slice().reverse().map(qcShipHistRowHTML).join('') : '<tr><td colspan="11" style="color:var(--muted)">등록된 출하검사 이력이 없습니다</td></tr>';
 }
 // 2026-08-06(31차): "자재 입출고 내역" 화면(#p-mattx) 신설과 함께 기존 출고 전용
 // submitMatAdjustment/removeMatAdjustment/renderMatAdjustments를 입고까지 다루는
@@ -16185,6 +16276,22 @@ function navTo(page){
   if(mainEl) mainEl.scrollTop = 0; // 방어적 안전장치: .main이 예기치 않게 자체 스크롤 컨테이너가 되는 경우 대비
 }
 document.querySelectorAll('.nav a').forEach(a=>a.onclick=()=>navTo(a.dataset.p));
+
+// 2026-08-11(40차): 품질검사 3화면(수입검사/공정검사/출하검사) 데모 연결 데이터 시드.
+// 상현님 지시(7번 항목)에 따라 수주→생산/외주→품질검사로 이어지는 실제 연결 데이터를 화면당 10건씩 생성했습니다.
+// 공정검사(수주 50~59): 오늘자 생산일보와 연결된 당일 생산 건 10개, 그 중 3건은 도중에 생산완료. 초물/중물/종물 결과 혼합(합격 7·조건부합격 1·불합격 1—경고 알림 확인용).
+// 수입검사(수주 60~69 + 외주발주 OPO-00011~00020): 결재완료 상태 외주발주 10건을 매입처·공정 다양화해 등록, 합격 8건(자동 입고완료 처리)·불합격 2건(외주생산 입고 진행현황에 입고불합격 표시).
+// 출하검사(수주 70~79): 검사대기 상태 수주 10건, 합격 7·조건부합격 1·불합격 1(재검사 대상) 결과를 등록해 이력을 남겼습니다.
+S.orderItems.push(...[{"id": 50, "orderNo": "260725-30", "regDate": "07-25", "cust": "대한전자부품", "item": "보시아 50g 크림 캡 - 백색 사출 MB : S-9432-1-4.5%", "specName": "ABS121H/백색삼성9432-1-4.5%", "materialsSummary": "ABS121H + 흑색 MB-K200", "moldNo": "M-1050", "qty": 500, "doneQty": 200, "unitPrice": 0, "cycleTimeSec": 30, "cavityCount": 8, "weightG": 2.5, "runnerWeightG": 8, "status": "생산중", "dueDate": "08-20", "recvYm": "2026-07", "productCode": "HS-00001", "cancelled": false, "overQty": 0}, {"id": 51, "orderNo": "260725-31", "regDate": "07-25", "cust": "우성모빌리티", "item": "필터팩트 상체-백색 사출MB: 재의뢰 요청할것(S-9432 X)※신작코어", "specName": "ABS121H/백색사출", "materialsSummary": "ABS121H", "moldNo": "M-1051", "qty": 600, "doneQty": 240, "unitPrice": 0, "cycleTimeSec": 40, "cavityCount": 6, "weightG": 4, "runnerWeightG": 10, "status": "생산중", "dueDate": "08-20", "recvYm": "2026-07", "productCode": "HS-00002", "cancelled": false, "overQty": 0}, {"id": 52, "orderNo": "260725-32", "regDate": "07-25", "cust": "한빛정밀산업", "item": "3cc 주사기 밀대(신형)", "specName": "PN200/NP", "materialsSummary": "PN200", "moldNo": "M-1052", "qty": 700, "doneQty": 280, "unitPrice": 0, "cycleTimeSec": 50, "cavityCount": 4, "weightG": 8, "runnerWeightG": 12, "status": "생산중", "dueDate": "08-20", "recvYm": "2026-07", "productCode": "HS-00003", "cancelled": false, "overQty": 0}, {"id": 53, "orderNo": "260725-33", "regDate": "07-25", "cust": "코스텍전자", "item": "24파이 아로마티카 단캡", "specName": "오렌지반투명 사출-PP 560S", "materialsSummary": "PP 560S", "moldNo": "M-1053", "qty": 800, "doneQty": 320, "unitPrice": 0, "cycleTimeSec": 60, "cavityCount": 4, "weightG": 12, "runnerWeightG": 14, "status": "생산중", "dueDate": "08-20", "recvYm": "2026-07", "productCode": "HS-00004", "cancelled": false, "overQty": 0}, {"id": 54, "orderNo": "260725-34", "regDate": "07-25", "cust": "동양오토파츠", "item": "60ml 오버캡", "specName": "PN200/NP", "materialsSummary": "PN200 + 적색안료 PR-101", "moldNo": "M-1054", "qty": 900, "doneQty": 360, "unitPrice": 0, "cycleTimeSec": 30, "cavityCount": 8, "weightG": 2.5, "runnerWeightG": 8, "status": "생산중", "dueDate": "08-20", "recvYm": "2026-07", "productCode": "HS-00005", "cancelled": false, "overQty": 0}, {"id": 55, "orderNo": "260725-35", "regDate": "07-25", "cust": "신성테크", "item": "대라쿠션 본품 리필 용기(옐로우 사출) 금형번호 : M1-CSR1X015-06 MB: M-26-0116-13 6%", "specName": "PPJ560/옐로우", "materialsSummary": "PPJ560", "moldNo": "M-1055", "qty": 500, "doneQty": 200, "unitPrice": 0, "cycleTimeSec": 40, "cavityCount": 6, "weightG": 4, "runnerWeightG": 10, "status": "생산중", "dueDate": "08-20", "recvYm": "2026-07", "productCode": "HS-00006", "cancelled": false, "overQty": 0}, {"id": 56, "orderNo": "260725-36", "regDate": "07-25", "cust": "미래산업기계", "item": "18파이 스포이드캡(신대ver.2/아누아용)백색사출※MB: S-9158 4% 금no:MSC01010", "specName": "PN200/삼성9158-4%백색", "materialsSummary": "PN200", "moldNo": "M-1056", "qty": 600, "doneQty": 240, "unitPrice": 0, "cycleTimeSec": 50, "cavityCount": 4, "weightG": 8, "runnerWeightG": 12, "status": "생산중", "dueDate": "08-20", "recvYm": "2026-07", "productCode": "HS-00007", "cancelled": false, "overQty": 0}, {"id": 57, "orderNo": "260725-37", "regDate": "07-25", "cust": "대한전자부품", "item": "18파이 스포이드 패킹(소)", "specName": "원색사출-LDPE MB9205", "materialsSummary": "LDPEMB9205", "moldNo": "M-1057", "qty": 700, "doneQty": 700, "unitPrice": 0, "cycleTimeSec": 60, "cavityCount": 4, "weightG": 12, "runnerWeightG": 14, "status": "생산완료", "dueDate": "08-20", "recvYm": "2026-07", "productCode": "HS-00008", "cancelled": false, "overQty": 0}, {"id": 58, "orderNo": "260725-38", "regDate": "07-25", "cust": "우성모빌리티", "item": "메디필 에어리스펌프 버튼(원형팁)", "specName": "PPJ560/백색사출 플라스콤 MW-10203 3%", "materialsSummary": "PPJ560 + UV안정제 배합용", "moldNo": "M-1058", "qty": 800, "doneQty": 800, "unitPrice": 0, "cycleTimeSec": 30, "cavityCount": 8, "weightG": 2.5, "runnerWeightG": 8, "status": "생산완료", "dueDate": "08-20", "recvYm": "2026-07", "productCode": "HS-00009", "cancelled": false, "overQty": 0}, {"id": 59, "orderNo": "260725-39", "regDate": "07-25", "cust": "한빛정밀산업", "item": "15파이 토너 패킹 커버", "specName": "LDPE5318/삼성9075-3%백색사출", "materialsSummary": "LDPE5318", "moldNo": "M-1059", "qty": 900, "doneQty": 900, "unitPrice": 0, "cycleTimeSec": 40, "cavityCount": 6, "weightG": 4, "runnerWeightG": 10, "status": "생산완료", "dueDate": "08-20", "recvYm": "2026-07", "productCode": "HS-00010", "cancelled": false, "overQty": 0}, {"id": 60, "orderNo": "260725-50", "regDate": "07-25", "cust": "미래산업기계", "item": "라라추 쿠션 브러쉬 상커버-블랙 사출", "specName": "MABS XG569C블랙", "materialsSummary": "MABS XG569C", "moldNo": "M-2060", "qty": 300, "doneQty": 0, "unitPrice": 0, "cycleTimeSec": 40, "cavityCount": 6, "weightG": 4, "runnerWeightG": 10, "status": "생산완료", "dueDate": "08-22", "recvYm": "2026-07", "productCode": "HS-00014", "cancelled": false, "overQty": 0}, {"id": 61, "orderNo": "260725-51", "regDate": "07-25", "cust": "대한전자부품", "item": "라라추 쿠션 외용기 커버", "specName": "ABS121H 원색", "materialsSummary": "ABS121H", "moldNo": "M-2061", "qty": 300, "doneQty": 0, "unitPrice": 0, "cycleTimeSec": 50, "cavityCount": 4, "weightG": 8, "runnerWeightG": 12, "status": "생산완료", "dueDate": "08-22", "recvYm": "2026-07", "productCode": "HS-00015", "cancelled": false, "overQty": 0}, {"id": 62, "orderNo": "260725-52", "regDate": "07-25", "cust": "우성모빌리티", "item": "24파이 아로마티카 단캡", "specName": "오렌지반투명 사출-PP 560S", "materialsSummary": "PP 560S", "moldNo": "M-2062", "qty": 300, "doneQty": 0, "unitPrice": 0, "cycleTimeSec": 60, "cavityCount": 4, "weightG": 12, "runnerWeightG": 14, "status": "생산완료", "dueDate": "08-22", "recvYm": "2026-07", "productCode": "HS-00016", "cancelled": false, "overQty": 0}, {"id": 63, "orderNo": "260725-53", "regDate": "07-25", "cust": "한빛정밀산업", "item": "라라추 쿠션 외용기 중체-블랙 사출", "specName": "ABS121H 삼성BK-31 2%", "materialsSummary": "ABS121H + 청색안료 PB-205", "moldNo": "M-2063", "qty": 300, "doneQty": 0, "unitPrice": 0, "cycleTimeSec": 30, "cavityCount": 8, "weightG": 2.5, "runnerWeightG": 8, "status": "생산완료", "dueDate": "08-22", "recvYm": "2026-07", "productCode": "HS-00017", "cancelled": false, "overQty": 0}, {"id": 64, "orderNo": "260725-54", "regDate": "07-25", "cust": "코스텍전자", "item": "대라쿠션 본품 상체", "specName": "옐로우 사출-ABS 121H-MB(M-26-0116-09)", "materialsSummary": "ABS121H", "moldNo": "M-2064", "qty": 300, "doneQty": 0, "unitPrice": 0, "cycleTimeSec": 40, "cavityCount": 6, "weightG": 4, "runnerWeightG": 10, "status": "생산완료", "dueDate": "08-22", "recvYm": "2026-07", "productCode": "HS-00018", "cancelled": false, "overQty": 0}, {"id": 65, "orderNo": "260725-55", "regDate": "07-25", "cust": "동양오토파츠", "item": "바이오던스 구슬 크림 50ml 캡", "specName": "보라 불투명사출-PP 560S-MB(260317-29)", "materialsSummary": "PP 560S", "moldNo": "M-2065", "qty": 300, "doneQty": 0, "unitPrice": 0, "cycleTimeSec": 50, "cavityCount": 4, "weightG": 8, "runnerWeightG": 12, "status": "생산완료", "dueDate": "08-22", "recvYm": "2026-07", "productCode": "HS-00019", "cancelled": false, "overQty": 0}, {"id": 66, "orderNo": "260725-56", "regDate": "07-25", "cust": "신성테크", "item": "18파이 스포이드 패킹(소)", "specName": "원색사출-LDPE MB9205", "materialsSummary": "LDPEMB9205", "moldNo": "M-2066", "qty": 300, "doneQty": 0, "unitPrice": 0, "cycleTimeSec": 60, "cavityCount": 4, "weightG": 12, "runnerWeightG": 14, "status": "생산완료", "dueDate": "08-22", "recvYm": "2026-07", "productCode": "HS-00020", "cancelled": false, "overQty": 0}, {"id": 67, "orderNo": "260725-57", "regDate": "07-25", "cust": "미래산업기계", "item": "20파이 스포이드 패킹(공용)", "specName": "원색사출-LLDPE 7635", "materialsSummary": "LLDPE 7635 + 대전방지 배합용", "moldNo": "M-2067", "qty": 300, "doneQty": 0, "unitPrice": 0, "cycleTimeSec": 30, "cavityCount": 8, "weightG": 2.5, "runnerWeightG": 8, "status": "생산완료", "dueDate": "08-22", "recvYm": "2026-07", "productCode": "HS-00021", "cancelled": false, "overQty": 0}, {"id": 68, "orderNo": "260725-58", "regDate": "07-25", "cust": "대한전자부품", "item": "18파이 스포이드 캡(신대)(부식)", "specName": "백색사출-PN 200-MB(251201-40)", "materialsSummary": "PN200", "moldNo": "M-2068", "qty": 300, "doneQty": 0, "unitPrice": 0, "cycleTimeSec": 40, "cavityCount": 6, "weightG": 4, "runnerWeightG": 10, "status": "생산완료", "dueDate": "08-22", "recvYm": "2026-07", "productCode": "HS-00022", "cancelled": false, "overQty": 0}, {"id": 69, "orderNo": "260725-59", "regDate": "07-25", "cust": "우성모빌리티", "item": "18파이 스포이드 캡(신대)(ver2)", "specName": "보라색 사출-PN 200-MB(260122-26)", "materialsSummary": "PN200", "moldNo": "M-2069", "qty": 300, "doneQty": 0, "unitPrice": 0, "cycleTimeSec": 50, "cavityCount": 4, "weightG": 8, "runnerWeightG": 12, "status": "생산완료", "dueDate": "08-22", "recvYm": "2026-07", "productCode": "HS-00023", "cancelled": false, "overQty": 0}, {"id": 70, "orderNo": "260725-70", "regDate": "07-25", "cust": "대한전자부품", "item": "방열판 브라켓", "specName": "방열판 브라켓 Type-A (내열PC)", "materialsSummary": "PC 1080 (내열) + 흑색 마스터배치", "moldNo": "M-3070", "qty": 800, "doneQty": 0, "unitPrice": 0, "cycleTimeSec": 18, "cavityCount": 4, "weightG": 42, "runnerWeightG": 18, "status": "출하대기", "dueDate": "08-18", "recvYm": "2026-07", "productCode": "MDO00001", "cancelled": false, "overQty": 0, "warehouseInQty": 0}, {"id": 71, "orderNo": "260725-71", "regDate": "07-25", "cust": "동양오토파츠", "item": "센서 하우징 B", "specName": "센서 하우징 B (2차 협상)", "materialsSummary": "ABS121H", "moldNo": "M-3071", "qty": 900, "doneQty": 0, "unitPrice": 0, "cycleTimeSec": 20, "cavityCount": 4, "weightG": 36, "runnerWeightG": 16, "status": "출하대기", "dueDate": "08-18", "recvYm": "2026-07", "productCode": "MDO00002", "cancelled": false, "overQty": 0, "warehouseInQty": 0}, {"id": 72, "orderNo": "260725-72", "regDate": "07-25", "cust": "대한전자부품", "item": "보시아 50g 크림 캡 - 백색 사출 MB : S-9432-1-4.5%", "specName": "ABS121H/백색삼성9432-1-4.5%", "materialsSummary": "ABS121H + 흑색 MB-K200", "moldNo": "M-3072", "qty": 1000, "doneQty": 0, "unitPrice": 0, "cycleTimeSec": 30, "cavityCount": 8, "weightG": 2.5, "runnerWeightG": 8, "status": "출하대기", "dueDate": "08-18", "recvYm": "2026-07", "productCode": "HS-00001", "cancelled": false, "overQty": 0, "warehouseInQty": 0}, {"id": 73, "orderNo": "260725-73", "regDate": "07-25", "cust": "우성모빌리티", "item": "필터팩트 상체-백색 사출MB: 재의뢰 요청할것(S-9432 X)※신작코어", "specName": "ABS121H/백색사출", "materialsSummary": "ABS121H", "moldNo": "M-3073", "qty": 1100, "doneQty": 0, "unitPrice": 0, "cycleTimeSec": 40, "cavityCount": 6, "weightG": 4, "runnerWeightG": 10, "status": "출하대기", "dueDate": "08-18", "recvYm": "2026-07", "productCode": "HS-00002", "cancelled": false, "overQty": 0, "warehouseInQty": 0}, {"id": 74, "orderNo": "260725-74", "regDate": "07-25", "cust": "한빛정밀산업", "item": "3cc 주사기 밀대(신형)", "specName": "PN200/NP", "materialsSummary": "PN200", "moldNo": "M-3074", "qty": 800, "doneQty": 0, "unitPrice": 0, "cycleTimeSec": 50, "cavityCount": 4, "weightG": 8, "runnerWeightG": 12, "status": "출하대기", "dueDate": "08-18", "recvYm": "2026-07", "productCode": "HS-00003", "cancelled": false, "overQty": 0, "warehouseInQty": 0}, {"id": 75, "orderNo": "260725-75", "regDate": "07-25", "cust": "코스텍전자", "item": "24파이 아로마티카 단캡", "specName": "오렌지반투명 사출-PP 560S", "materialsSummary": "PP 560S", "moldNo": "M-3075", "qty": 900, "doneQty": 0, "unitPrice": 0, "cycleTimeSec": 60, "cavityCount": 4, "weightG": 12, "runnerWeightG": 14, "status": "출하대기", "dueDate": "08-18", "recvYm": "2026-07", "productCode": "HS-00004", "cancelled": false, "overQty": 0, "warehouseInQty": 0}, {"id": 76, "orderNo": "260725-76", "regDate": "07-25", "cust": "동양오토파츠", "item": "60ml 오버캡", "specName": "PN200/NP", "materialsSummary": "PN200 + 적색안료 PR-101", "moldNo": "M-3076", "qty": 1000, "doneQty": 0, "unitPrice": 0, "cycleTimeSec": 30, "cavityCount": 8, "weightG": 2.5, "runnerWeightG": 8, "status": "출하대기", "dueDate": "08-18", "recvYm": "2026-07", "productCode": "HS-00005", "cancelled": false, "overQty": 0, "warehouseInQty": 0}, {"id": 77, "orderNo": "260725-77", "regDate": "07-25", "cust": "신성테크", "item": "대라쿠션 본품 리필 용기(옐로우 사출) 금형번호 : M1-CSR1X015-06 MB: M-26-0116-13 6%", "specName": "PPJ560/옐로우", "materialsSummary": "PPJ560", "moldNo": "M-3077", "qty": 1100, "doneQty": 0, "unitPrice": 0, "cycleTimeSec": 40, "cavityCount": 6, "weightG": 4, "runnerWeightG": 10, "status": "검사대기", "dueDate": "08-18", "recvYm": "2026-07", "productCode": "HS-00006", "cancelled": false, "overQty": 0}, {"id": 78, "orderNo": "260725-78", "regDate": "07-25", "cust": "미래산업기계", "item": "18파이 스포이드캡(신대ver.2/아누아용)백색사출※MB: S-9158 4% 금no:MSC01010", "specName": "PN200/삼성9158-4%백색", "materialsSummary": "PN200", "moldNo": "M-3078", "qty": 800, "doneQty": 0, "unitPrice": 0, "cycleTimeSec": 50, "cavityCount": 4, "weightG": 8, "runnerWeightG": 12, "status": "검사대기", "dueDate": "08-18", "recvYm": "2026-07", "productCode": "HS-00007", "cancelled": false, "overQty": 0}, {"id": 79, "orderNo": "260725-79", "regDate": "07-25", "cust": "대한전자부품", "item": "18파이 스포이드 패킹(소)", "specName": "원색사출-LDPE MB9205", "materialsSummary": "LDPEMB9205", "moldNo": "M-3079", "qty": 900, "doneQty": 0, "unitPrice": 0, "cycleTimeSec": 60, "cavityCount": 4, "weightG": 12, "runnerWeightG": 14, "status": "출하대기", "dueDate": "08-18", "recvYm": "2026-07", "productCode": "HS-00008", "cancelled": false, "overQty": 0, "warehouseInQty": 0}]);
+S.prodLog.push(...[{"date": "07-25", "machine": 1, "orderItemId": 50, "kg": 0.7105, "qty": 200, "badQty": 3, "actualCycleTimeSec": 30}, {"date": "07-25", "machine": 2, "orderItemId": 51, "kg": 1.36, "qty": 240, "badQty": 0, "actualCycleTimeSec": 41}, {"date": "07-25", "machine": 3, "orderItemId": 52, "kg": 3.08, "qty": 280, "badQty": 0, "actualCycleTimeSec": 52}, {"date": "07-25", "machine": 4, "orderItemId": 53, "kg": 4.96, "qty": 320, "badQty": 0, "actualCycleTimeSec": 60}, {"date": "07-25", "machine": 5, "orderItemId": 54, "kg": 1.2705, "qty": 360, "badQty": 3, "actualCycleTimeSec": 31}, {"date": "07-25", "machine": 6, "orderItemId": 55, "kg": 1.1333333333333335, "qty": 200, "badQty": 0, "actualCycleTimeSec": 42}, {"date": "07-25", "machine": 7, "orderItemId": 56, "kg": 2.64, "qty": 240, "badQty": 0, "actualCycleTimeSec": 50}, {"date": "07-25", "machine": 8, "orderItemId": 57, "kg": 10.85, "qty": 700, "badQty": 0, "actualCycleTimeSec": 61}, {"date": "07-25", "machine": 9, "orderItemId": 58, "kg": 2, "qty": 800, "badQty": 3, "actualCycleTimeSec": 32}, {"date": "07-25", "machine": 10, "orderItemId": 59, "kg": 3.6, "qty": 900, "badQty": 0, "actualCycleTimeSec": 40}]);
+S.outsourcePOs.push(...[{"no": "OPO-00011", "date": "07-25", "orderNo": "260725-50", "vendor": "정밀도금산업", "process": "도금", "item": "라라추 쿠션 브러쉬 상커버-블랙 사출", "specName": "MABS XG569C블랙", "qty": 100, "unitPrice": 3000, "expectedDate": "07-30", "stage": "입고완료", "note": "", "cancelled": false, "saved": true, "chainDefect": false, "liableVendor": "", "chainCauseNote": "", "claimCreated": false, "receivedQty": 100, "inspectFail": false}, {"no": "OPO-00012", "date": "07-25", "orderNo": "260725-51", "vendor": "한빛표면처리", "process": "실크인쇄", "item": "라라추 쿠션 외용기 커버", "specName": "ABS121H 원색", "qty": 120, "unitPrice": 3200, "expectedDate": "07-30", "stage": "입고완료", "note": "", "cancelled": false, "saved": true, "chainDefect": false, "liableVendor": "", "chainCauseNote": "", "claimCreated": false, "receivedQty": 120, "inspectFail": false}, {"no": "OPO-00013", "date": "07-25", "orderNo": "260725-52", "vendor": "대성사출가공", "process": "조립", "item": "24파이 아로마티카 단캡", "specName": "오렌지반투명 사출-PP 560S", "qty": 140, "unitPrice": 3400, "expectedDate": "07-30", "stage": "입고완료", "note": "", "cancelled": false, "saved": true, "chainDefect": false, "liableVendor": "", "chainCauseNote": "", "claimCreated": false, "receivedQty": 140, "inspectFail": false}, {"no": "OPO-00014", "date": "07-25", "orderNo": "260725-53", "vendor": "우진몰드텍", "process": "포장", "item": "라라추 쿠션 외용기 중체-블랙 사출", "specName": "ABS121H 삼성BK-31 2%", "qty": 160, "unitPrice": 3600, "expectedDate": "07-30", "stage": "입고완료", "note": "", "cancelled": false, "saved": true, "chainDefect": false, "liableVendor": "", "chainCauseNote": "", "claimCreated": false, "receivedQty": 160, "inspectFail": false}, {"no": "OPO-00015", "date": "07-25", "orderNo": "260725-54", "vendor": "신영금속가공", "process": "열처리", "item": "대라쿠션 본품 상체", "specName": "옐로우 사출-ABS 121H-MB(M-26-0116-09)", "qty": 180, "unitPrice": 3800, "expectedDate": "07-30", "stage": "입고완료", "note": "", "cancelled": false, "saved": true, "chainDefect": false, "liableVendor": "", "chainCauseNote": "", "claimCreated": false, "receivedQty": 180, "inspectFail": false}, {"no": "OPO-00016", "date": "07-25", "orderNo": "260725-55", "vendor": "태양아노다이징", "process": "아노다이징", "item": "바이오던스 구슬 크림 50ml 캡", "specName": "보라 불투명사출-PP 560S-MB(260317-29)", "qty": 100, "unitPrice": 4000, "expectedDate": "07-30", "stage": "입고완료", "note": "", "cancelled": false, "saved": true, "chainDefect": false, "liableVendor": "", "chainCauseNote": "", "claimCreated": false, "receivedQty": 100, "inspectFail": false}, {"no": "OPO-00017", "date": "07-25", "orderNo": "260725-56", "vendor": "정밀도금산업", "process": "도금", "item": "18파이 스포이드 패킹(소)", "specName": "원색사출-LDPE MB9205", "qty": 120, "unitPrice": 4200, "expectedDate": "07-30", "stage": "입고완료", "note": "", "cancelled": false, "saved": true, "chainDefect": false, "liableVendor": "", "chainCauseNote": "", "claimCreated": false, "receivedQty": 120, "inspectFail": false}, {"no": "OPO-00018", "date": "07-25", "orderNo": "260725-57", "vendor": "한빛표면처리", "process": "실크인쇄", "item": "20파이 스포이드 패킹(공용)", "specName": "원색사출-LLDPE 7635", "qty": 140, "unitPrice": 4400, "expectedDate": "07-30", "stage": "입고완료", "note": "", "cancelled": false, "saved": true, "chainDefect": false, "liableVendor": "", "chainCauseNote": "", "claimCreated": false, "receivedQty": 140, "inspectFail": false}, {"no": "OPO-00019", "date": "07-25", "orderNo": "260725-58", "vendor": "대성사출가공", "process": "조립", "item": "18파이 스포이드 캡(신대)(부식)", "specName": "백색사출-PN 200-MB(251201-40)", "qty": 160, "unitPrice": 4600, "expectedDate": "07-30", "stage": "결재완료", "note": "", "cancelled": false, "saved": true, "chainDefect": false, "liableVendor": "", "chainCauseNote": "", "claimCreated": false, "receivedQty": 0, "inspectFail": true}, {"no": "OPO-00020", "date": "07-25", "orderNo": "260725-59", "vendor": "우진몰드텍", "process": "포장", "item": "18파이 스포이드 캡(신대)(ver2)", "specName": "보라색 사출-PN 200-MB(260122-26)", "qty": 180, "unitPrice": 4800, "expectedDate": "07-30", "stage": "결재완료", "note": "", "cancelled": false, "saved": true, "chainDefect": false, "liableVendor": "", "chainCauseNote": "", "claimCreated": false, "receivedQty": 0, "inspectFail": true}]);
+S.qualityChecks.push(...[{"id": 20, "date": "07-25", "orderItemId": 50, "stage": "초물", "qty": 20, "defectQty": 0, "result": "합격", "inspector": "이생산", "note": ""}, {"id": 21, "date": "07-25", "orderItemId": 51, "stage": "중물", "qty": 21, "defectQty": 0, "result": "합격", "inspector": "최기사", "note": ""}, {"id": 22, "date": "07-25", "orderItemId": 52, "stage": "종물", "qty": 22, "defectQty": 0, "result": "합격", "inspector": "한서연", "note": ""}, {"id": 23, "date": "07-25", "orderItemId": 53, "stage": "초물", "qty": 23, "defectQty": 0, "result": "합격", "inspector": "노현우", "note": ""}, {"id": 24, "date": "07-25", "orderItemId": 54, "stage": "중물", "qty": 24, "defectQty": 0, "result": "합격", "inspector": "배일용", "note": ""}, {"id": 25, "date": "07-25", "orderItemId": 55, "stage": "종물", "qty": 25, "defectQty": 0, "result": "합격", "inspector": "이생산", "note": ""}, {"id": 26, "date": "07-25", "orderItemId": 56, "stage": "초물", "qty": 26, "defectQty": 1, "result": "조건부합격", "inspector": "최기사", "note": "경미한 웰드라인, 사용 가능 판정"}, {"id": 27, "date": "07-25", "orderItemId": 57, "stage": "중물", "qty": 27, "defectQty": 4, "result": "불합격", "inspector": "한서연", "note": "게이트부 크랙 다수 발견, 재작업 필요"}, {"id": 28, "date": "07-25", "orderItemId": 58, "stage": "종물", "qty": 28, "defectQty": 0, "result": "합격", "inspector": "노현우", "note": ""}, {"id": 29, "date": "07-25", "orderItemId": 59, "stage": "초물", "qty": 29, "defectQty": 0, "result": "합격", "inspector": "배일용", "note": ""}]);
+S.incomingInspections.push(...[{"id": 3, "date": "07-25", "sourcePoNo": "OPO-00011", "orderNo": "260725-50", "vendor": "정밀도금산업", "item": "라라추 쿠션 브러쉬 상커버-블랙 사출", "specName": "MABS XG569C블랙", "qty": 100, "result": "합격", "inspector": "한서연", "note": ""}, {"id": 4, "date": "07-25", "sourcePoNo": "OPO-00012", "orderNo": "260725-51", "vendor": "한빛표면처리", "item": "라라추 쿠션 외용기 커버", "specName": "ABS121H 원색", "qty": 120, "result": "합격", "inspector": "노현우", "note": ""}, {"id": 5, "date": "07-25", "sourcePoNo": "OPO-00013", "orderNo": "260725-52", "vendor": "대성사출가공", "item": "24파이 아로마티카 단캡", "specName": "오렌지반투명 사출-PP 560S", "qty": 140, "result": "합격", "inspector": "배일용", "note": ""}, {"id": 6, "date": "07-25", "sourcePoNo": "OPO-00014", "orderNo": "260725-53", "vendor": "우진몰드텍", "item": "라라추 쿠션 외용기 중체-블랙 사출", "specName": "ABS121H 삼성BK-31 2%", "qty": 160, "result": "합격", "inspector": "이생산", "note": ""}, {"id": 7, "date": "07-25", "sourcePoNo": "OPO-00015", "orderNo": "260725-54", "vendor": "신영금속가공", "item": "대라쿠션 본품 상체", "specName": "옐로우 사출-ABS 121H-MB(M-26-0116-09)", "qty": 180, "result": "합격", "inspector": "최기사", "note": ""}, {"id": 8, "date": "07-25", "sourcePoNo": "OPO-00016", "orderNo": "260725-55", "vendor": "태양아노다이징", "item": "바이오던스 구슬 크림 50ml 캡", "specName": "보라 불투명사출-PP 560S-MB(260317-29)", "qty": 100, "result": "합격", "inspector": "한서연", "note": ""}, {"id": 9, "date": "07-25", "sourcePoNo": "OPO-00017", "orderNo": "260725-56", "vendor": "정밀도금산업", "item": "18파이 스포이드 패킹(소)", "specName": "원색사출-LDPE MB9205", "qty": 120, "result": "합격", "inspector": "노현우", "note": ""}, {"id": 10, "date": "07-25", "sourcePoNo": "OPO-00018", "orderNo": "260725-57", "vendor": "한빛표면처리", "item": "20파이 스포이드 패킹(공용)", "specName": "원색사출-LLDPE 7635", "qty": 140, "result": "합격", "inspector": "배일용", "note": ""}, {"id": 11, "date": "07-25", "sourcePoNo": "OPO-00019", "orderNo": "260725-58", "vendor": "대성사출가공", "item": "18파이 스포이드 캡(신대)(부식)", "specName": "백색사출-PN 200-MB(251201-40)", "qty": 160, "result": "불합격", "inspector": "이생산", "note": "표면 도금 불균일, 반품/재작업 요청"}, {"id": 12, "date": "07-25", "sourcePoNo": "OPO-00020", "orderNo": "260725-59", "vendor": "우진몰드텍", "item": "18파이 스포이드 캡(신대)(ver2)", "specName": "보라색 사출-PN 200-MB(260122-26)", "qty": 180, "result": "불합격", "inspector": "최기사", "note": "표면 도금 불균일, 반품/재작업 요청"}]);
+S.shipInspections.push(...[{"id": 1, "date": "07-25", "orderItemId": 70, "qty": 800, "defectQty": 0, "result": "합격", "inspector": "최기사", "note": ""}, {"id": 2, "date": "07-25", "orderItemId": 71, "qty": 900, "defectQty": 0, "result": "합격", "inspector": "한서연", "note": ""}, {"id": 3, "date": "07-25", "orderItemId": 72, "qty": 1000, "defectQty": 0, "result": "합격", "inspector": "노현우", "note": ""}, {"id": 4, "date": "07-25", "orderItemId": 73, "qty": 1100, "defectQty": 0, "result": "합격", "inspector": "배일용", "note": ""}, {"id": 5, "date": "07-25", "orderItemId": 74, "qty": 800, "defectQty": 0, "result": "합격", "inspector": "이생산", "note": ""}, {"id": 6, "date": "07-25", "orderItemId": 75, "qty": 900, "defectQty": 0, "result": "합격", "inspector": "최기사", "note": ""}, {"id": 7, "date": "07-25", "orderItemId": 76, "qty": 1000, "defectQty": 0, "result": "합격", "inspector": "한서연", "note": ""}, {"id": 8, "date": "07-25", "orderItemId": 77, "qty": 1100, "defectQty": 4, "result": "조건부합격", "inspector": "노현우", "note": "미세 스크래치, 고객 사전 협의 후 출하"}, {"id": 9, "date": "07-25", "orderItemId": 78, "qty": 800, "defectQty": 15, "result": "불합격", "inspector": "배일용", "note": "치수불량 다량 검출, 전수 재검사 후 재출하 예정"}, {"id": 10, "date": "07-25", "orderItemId": 79, "qty": 900, "defectQty": 0, "result": "합격", "inspector": "이생산", "note": ""}]);
+S.qcNextId = Math.max(S.qcNextId, 30);
+S.incomingInspNextId = Math.max(S.incomingInspNextId, 13);
+S.shipInspNextId = Math.max(S.shipInspNextId, 11);
+S.outsourcePONextNo = Math.max(S.outsourcePONextNo, 21);
 
 recalc();
 </script>
