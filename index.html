@@ -550,7 +550,7 @@ table.mr-table input.form-control.ro{background:var(--bg);color:var(--muted)}
 <body>
 <div class="wrap">
 <aside class="side">
-  <div class="brand"><div class="brand-row"><img src="/icon-192.png" alt="DAMDA" class="brand-logo"><span class="brand-word">DAMDA</span></div><small>프로토타입 v0.70 · 마감수량 콤마표시 + 외주발주 열폭 조정 — 38차 라운드</small></div>
+  <div class="brand"><div class="brand-row"><img src="/icon-192.png" alt="DAMDA" class="brand-logo"><span class="brand-word">DAMDA</span></div><small>프로토타입 v0.71 · 외주마감 귀책업체 청구금액 자동 상계차감 — 39차 라운드</small></div>
   <nav class="nav">
     <!-- 2026-07-21(항목11) 대분류 재구성: 운영 모니터링-기본정보-영업,수주-구매-생산-납품,마감-자재-인사,급여-품질-원가관리-가이드-환경설정 (12개, 상현님 지시안) -->
     <div class="grp">운영 모니터링</div>
@@ -2651,6 +2651,7 @@ BEP 매출  = 월 고정비 ÷ 공헌이익률
         <tr><td>36차 라운드 — 외주 화면 UX 정리 6건 + 구매 사이드바 재구성 (2026-08-10, v0.68)</td><td>상현님이 원재료·외주 입고마감과 외주 발주/입고 화면들에 대해 6가지를 지적하셨습니다. <b>①마감수량 한 줄 표시</b> — 35차에서 추가한 마감수량 입력+잔여수량 캡션이 세로 2줄로 표시되던 것을 한 줄(input+작은 "/전체수량" 텍스트)로 붙였습니다(mat/out 공용 헬퍼라 양쪽에 함께 반영). <b>②외주 발주관리 자동완성</b> — 매입처는 거래처마스터(S.customers)에 실제 발주 이력(S.outsourcePOs.vendor)까지 합쳐 자동완성 후보로 쓰고, 공정명은 마스터데이터가 없어 전적으로 입력 이력 기반 신규 datalist를 만들었습니다 — 신규 값도 저장되는 즉시 다음 렌더부터 자동완성 후보에 들어가므로 "처음엔 타이핑, 두 번째부터는 자동완성" 요건을 별도 이력 테이블 없이 만족합니다. <b>③외주 발주관리 정렬·폭 재조정</b> — 입고예정일·상태·수주번호 열을 가운데정렬하고(poDateFieldHTML에 정렬 옵션 인자 추가), 12개 열 전체 폭을 재검토해 품목명(120→190px)·규격명(110→150px)에 가장 많은 여유를 배분했습니다. 버튼이 좁은 열에서 줄바꿈되던 문제는 <code>.btn{white-space:nowrap}</code>을 전역 추가해 해결했고, 결재대기 상태에서 상태 배지와 중복 표시되던 "결재대기중" 텍스트는 삭제했습니다. <b>④상태 드롭박스 조사</b> — 결재완료/입고대기/입고완료 3단 드롭박스가 정말 다른 화면 액션으로만 바뀌는지 조사한 결과, 결재완료(발주 결재함 승인)·입고완료(외주 입고등록 처리)는 실제로 외부 트리거가 있지만 <b>입고대기는 외주에서 이 드롭박스 말고는 어디서도 자동 전환되지 않고</b>(원재료의 무상사급 같은 자동 경로가 외주엔 없음), <code>matReceiveStatusLabel()</code>이 결재완료·입고대기를 이미 동일하게 표시하고 있어 사실상 무의미했습니다 — 상현님 추측이 맞아 읽기전용 배지로 전환했습니다(원재료는 무상사급 자동경로가 실재해 그대로 유지). <b>⑤외주 입고등록 폭 재조정</b> — 같은 원칙으로 품목명(90→120px)·규격명(80→107px)에 여유를 더 줬습니다. <b>⑥외주생산 입고 진행현황 정리</b> — "입고등록으로" 버튼명을 "입고등록"으로 줄이고, 외주 발주관리에서 이미 출력 가능한 PDF 발주서 버튼을 여기서는 제거해 중복을 없앴습니다. <b>⑦외주 입고마감 정리</b> — 규격명 셀의 별도 폰트축소(11.5px)를 없애 품목명과 같은 크기로 통일하고, 수주번호 열 폭(96→76px)을 줄여 품목명(138→148px)·규격명(120→130px)에 재배분했습니다. <b>⑧연쇄불량 청구금액 확정시점</b> — "무조건 100% 청구가 아니다"라는 지적에 컨펌받은 대로, 입고완료 시 발주금액을 <b>제안 기본값</b>으로 청구내역을 자동생성하되 <b>"정산완료 처리"를 누르기 전까지</b> 청구금액을 협의 결과에 맞춰 직접 수정할 수 있게 했습니다(이미 있던 정산완료 액션이 사실상 확정 시점이라는 점에 착안해 새 화면 없이 기존 흐름에 편집 가능한 입력만 추가). <b>⑨구매 사이드바 4분류</b> — "발주 결재함·원재료 구매·외주 구매·기타 구매"로 하위카테고리를 나눠 필요한 것만 펼쳐보게 했습니다. 신규 <code>.nav-subgrp</code> 헤더를 클릭하면 그 아래 화면들이 펼쳐지고(<code>toggleNavSub()</code>), 특정 화면으로 직접 이동(<code>navTo()</code>)하면 소속 카테고리가 자동으로 펼쳐져 사이드바에서 현재 위치를 항상 찾을 수 있습니다. 링크는 여전히 <code>.nav</code>의 직계 자식으로 남겨(<code>navGroupMap()</code>이 그룹 판별에 전제하는 DOM 구조를 보존) 권한 매트릭스(RBAC)·배지 로직을 전혀 건드리지 않았고, 권한이 없는 역할로 전환하면 카테고리 헤더까지 함께 숨겨지는지 확인했습니다. node --check 구문 검증과 jsdom 기반 검증(자동완성 이력 반영, 열 정렬·헤더 폭, 상태 배지 전환, 결재대기중 텍스트 제거, 사이드바 접힘/펼침·자동펼침·권한별 숨김, 연쇄불량 청구금액 수정→정산완료 잠금 전체 흐름, 64개 전 화면 순회)을 통과해 실제 오류 0건을 확인했습니다.</td></tr>
         <tr><td>37차 라운드 — 구매화면 UI 정리 9건 + 외주 분할입고 + 귀책업체 청구 상계안내 (2026-08-11, v0.69)</td><td>상현님이 구매 화면 전반에 대해 9가지를 지적하셨습니다. <b>①마감수량 입력창 확대</b> — 숫자가 잘린다는 지적에 원재료·외주 입고마감의 마감수량 입력창 폭을 1.5배(52→78px)로 넓혔습니다. <b>②외주발주관리 입고예정일 폭 축소</b> — 발주일 열과 같은 폭(116→84px)으로 줄여 남는 공간을 확보했습니다. <b>③원재료발주관리 작업열 정리</b> — 어차피 발주 결재함에서 처리하는 "▸ 발주 결재함" 버튼을 제거했습니다(결재권자는 결재함 화면만 보면 됨). <b>④수량/단가 입력창 스피너 제거</b> — 화살표로 숫자를 조정하는 기본 UI가 오히려 오조작 위험이 있다는 지적에, 원재료·외주·기타구매 3개 화면의 수량·단가 입력창에 <code>.no-spin</code> CSS를 적용해 스피너를 없애고, 입력창 폭도 수주번호 입력창과 같은 크기로 통일했습니다. <b>⑤원재료발주관리 상태 드롭박스 제거</b> — 외주와 동일한 논리로 조사한 결과, 결재완료→입고대기 전환에 무상사급 자동경로 외에는 트리거가 없다는 점에 착안해 <code>approveMaterialPO()</code>가 승인 즉시 입고대기로 넘어가도록 바꾸고(결재완료는 더 이상 별도로 노출되는 상태가 아님), 드롭박스를 읽기전용 배지로 전환했습니다. 남아있던 "결재대기중" 중복 텍스트도 제거하고, 예상입고일·발주일 열을 가운데정렬 + 폭을 다른 구매화면 수준으로 최적화했습니다. <b>⑥원재료 입고 진행현황 작업열 정리</b> — 반출·입고등록 버튼 모두 원재료 입고등록 화면에서 처리하는 업무라 중복이라는 지적에, 작업 열을 입고완료 건의 PDF 발주서 출력 기능만 남기고 정리했습니다. <b>⑦외주 입고등록 분할입고 팝업</b> — 발주수량이 한 번에 입고되지 않는 경우를 위해, "입고완료" 버튼을 누르면 입고수량 입력 팝업이 뜨도록 바꿨습니다(기본값=잔여수량, 수정 가능). 발주 건에 <code>receivedQty</code>(누적 입고수량) 필드를 신설해 잔여수량이 남아있는 한 발주가 입고등록 목록에 계속 남고, 전량 입고되는 순간 자동으로 입고완료 처리·연쇄불량 청구가 생성됩니다. 이 과정에서 발주 하나에 여러 회차의 외주비 반영 내역이 쌓일 수 있게 되어, 반출 시 첫 건만 되돌리던 <code>reverseOutPOAutoLink()</code>의 기존 버그도 함께 고쳐 전체 회차를 정확히 되돌리도록 했습니다. 선택 항목 일괄 입고완료는 팝업 없이 잔여수량 전량을 그대로 반영합니다(개별 처리와 같은 내부 로직 공유). <b>⑧귀책업체 재작업비 청구 — 명칭 변경 및 상계처리 방안</b> — "연쇄불량 태깅"이라는 이름이 실제 기능(귀책업체를 지정해 재작업비를 청구하는 것)을 드러내지 못한다는 지적에 버튼·모달·알림 라벨을 "귀책업체 재작업비 청구"로 통일했습니다(내부 데이터 키는 호환을 위해 유지). 더 근본적으로, 이 청구금액을 귀책업체의 실제 외주 매입대금 지급(외주입고마감)과 어떻게 상계할지 상현님께 여쭤 <b>수동 확인 방식</b>으로 컨펌받았습니다 — 시스템이 마감 금액을 자동으로 차감하면 마감내역서와 실제 지급액이 어긋날 위험이 있어, 외주 입고 마감 화면에서 매입처를 조회하면 그 업체 앞 정산완료·미상계 청구금액을 경고 배너로 안내만 하고, 실제 반영 여부는 담당자가 청구 현황 표의 "상계/회수 완료 처리" 버튼으로 직접 표시하도록 설계했습니다(신규 <code>collected</code> 필드 + <code>markVendorClaimCollected()</code>). <b>⑨기타구매 발주관리 정리</b> — 발주 결재함으로 이동하는 작업열 버튼을 삭제하고, 발주일·상태 열을 가운데정렬했습니다. <b>⑩외주생산 입고 진행현황 작업열 삭제</b> — 이미 다른 화면(외주 입고등록·외주 발주관리)에 있는 기능이라는 지적에 작업 열 자체를 없애고 나머지 열(품목명·규격명)에 폭을 재배분했습니다. node --check 구문 검증과 jsdom 기반 검증(분할입고 2회차 시나리오 — 팝업 기본값·잔여수량 표시·전량입고 시 목록 제거, 귀책업체 청구 등록→정산완료→마감화면 경고배너 노출→상계완료 처리 후 배너 소거, 버튼 명칭 전환, 34~36차 회귀 스위트 재실행, 64개 전 화면 순회)을 통과해 실제 오류 0건을 확인했습니다.</td></tr>
         <tr><td>38차 라운드 — 마감수량 콤마표시 + 외주발주관리 열 폭 조정 (2026-08-11, v0.70)</td><td>37차에서 1.5배로 넓혔던 원재료·외주 입고마감의 마감수량 입력창이 오히려 너무 넓다는 지적을 받아, 숫자를 <b>콤마로 구분 표시</b>(type=number → text+inputmode 전환)하는 방식으로 바꿨습니다 — 자릿수를 한눈에 읽을 수 있어 폭이 좁아도 잘림 걱정이 줄어듭니다(78px→64px). 원재료 입고마감 화면은 확보된 여유를 원재료명 열(110→148px)에 재배분하고, 마감수량(kg) 열 자체도 108px로 줄였습니다(외주 입고마감은 이번 요청 범위 밖이라 열 폭은 그대로 두고 콤마 표시만 공용으로 적용). 외주 발주관리 화면은 "귀책업체 재작업비 청구" 버튼명이 좁은 작업 열에서 길다는 지적에 <b>"재작업비 청구"</b>로 줄였고(모달·카드 제목 등 문맥이 있는 다른 곳은 원래 이름 유지), 수주번호 입력창이 브라우저 기본 datalist 드롭다운 화살표 아이콘에 값이 가려 잘려 보이던 문제를 열 폭 확대(82→96px, 공정명·상태·작업 열에서 재배분)와 입력창 우측 여백(padding-right:13px) 추가로 해결했습니다. node --check 구문 검증과 jsdom 기반 검증(마감수량 콤마 입력→재저장 라운드트립, 열 폭 확인, 버튼 라벨 전환 확인, 64개 전 화면 순회)을 통과해 실제 오류 0건을 확인했습니다.</td></tr>
+        <tr><td>39차 라운드 — 외주마감 귀책업체 청구금액 자동 상계차감 (2026-08-11, v0.71)</td><td>지난 라운드에서 만든 "정산완료된 청구금액을 경고만 하고 실제로는 차감하지 않는" 상계 방식이, 상현님이 처음 의도하신 "재작업으로 발생한 추가 매입 비용을 귀책업체 마감 지급액에서 실제로 반영"하는 것과는 다르다는 걸 대화 중에 확인해, 실제로 차감하는 기능으로 다시 설계했습니다. 외주 입고 마감에서 매입처를 조회해 발주 건을 <b>전체 선택하면</b>(등록 자체가 매입처 1곳 단위로만 가능하므로 선택된 건이 모두 같은 업체일 때), 그 업체 앞 정산완료·미상계 귀책업체 재작업비 청구금액과 선택 건 총액 중 작은 값이 <b>"상계차감액" 입력창에 자동 제안</b>되고(상현님 컨펌 — 자동 제안 + 수정가능 방식), 담당자가 필요하면 직접 줄이거나 늘릴 수 있습니다(총액 초과는 불가). <b>마감등록을 누르면 실제로 그 금액만큼 마감 총액에서 차감</b>되어 마감내역서에 총액·상계차감·실지급액이 함께 기록되고(<code>netDeduction</code>·<code>payableAmount</code> 필드 신설), 상계에 쓰인 청구 건들은 오래된 순서로 자동 "상계완료(마감번호)"로 표시됩니다(건을 쪼개지 않고 통째로만 상계에 포함해 어느 건이 상계됐는지 항상 명확하게 유지). 마감내역서 발행 이력 표에도 상계차감이 있는 건만 합계금액 아래에 차감 내역을 함께 보여줍니다. node --check 구문 검증과 jsdom 기반 검증(재작업 발주→귀책 태깅→입고완료→청구생성→정산완료 → 같은 업체 앞 별도 정상 발주 입고완료 → 외주마감에서 전체선택 시 상계차감 자동제안(40,000원) 확인 → 마감등록 후 총액 100,000원에서 실지급 60,000원 계산 확인 → 청구 현황에 상계완료(마감번호) 표시 확인, 34~38차 회귀 스위트 재실행, 64개 전 화면 순회)을 통과해 실제 오류 0건을 확인했습니다.</td></tr>
       </tbody>
     </table>
   </div>
@@ -7916,6 +7917,23 @@ function setClosingSearchField(kind, field, val){
   S.closingSearch[kind][field] = val;
   recalc();
 }
+// 2026-08-11(38차 신설): 외주 입고 마감 등록 시, 조회 중인 매입처 앞으로 정산완료됐지만 아직
+// 상계/회수되지 않은 귀책업체 재작업비 청구금액을 마감 총액에서 실제로 차감하는 "상계차감액" —
+// 상현님 컨펌(마감등록 시 자동 제안 + 수정가능): 미상계 청구금액 합계와 선택된 발주 건 총액 중 작은
+// 값을 기본 제안값으로 채우되, 담당자가 직접 줄이거나(0까지) 늘릴 수 있습니다(총액 초과는 불가).
+function setClosingNetDeduction(val){
+  if(!S.closingSearch.out) S.closingSearch.out = {};
+  const n = +String(val).replace(/,/g,'');
+  S.closingSearch.out.netDeduction = isNaN(n) ? 0 : Math.max(0, n);
+  S.closingSearch.out.netDeductionTouched = true;
+  recalc();
+}
+// 정산완료·미상계(collected가 아직 false)인 특정 업체 귀책청구 목록 — 오래된 순으로, 상계 배분 시
+// 앞에서부터 건 단위로 채워나갑니다(건을 쪼개지 않아 마감내역서에 "이 건은 상계됨/안됨"이 명확합니다).
+function eligibleVendorClaims(vendor){
+  return S.vendorClaims.filter(c=>c.settled && !c.collected && !c.isReversal && c.liableVendor===vendor)
+    .sort((a,b)=>a.date>b.date?1:-1);
+}
 function toggleClosingSelect(kind, id){
   if(!S.closingSelected[kind]) S.closingSelected[kind] = [];
   const arr = S.closingSelected[kind];
@@ -8006,7 +8024,32 @@ function registerClosing(kind){
   const totalQty = rows.reduce((s,r)=>s+qtyOf(r), 0);
   const totalAmount = rows.reduce((s,r)=>s+qtyOf(r)*(r.unitPrice||0), 0);
   const storedRows = rows.map(r => ({...r, qty: qtyOf(r)}));
-  listMap[kind].push({no, kind, partner, from:q.from||'', to:q.to||'', rows: storedRows, totalQty, totalAmount, issuedAt:todayMD()});
+  // 2026-08-11(38차): 외주 마감만 해당 — 이 매입처 앞으로 정산완료·미상계 귀책청구가 있으면 총액에서
+  // 실제로 차감하고, 상계에 쓰인 청구 건들을 상계완료로 표시합니다(건 단위로만 배분, 건을 쪼개지 않음).
+  let netDeduction = 0, nettedClaimIds = [];
+  if(kind==='out'){
+    const eligible = eligibleVendorClaims(partner);
+    const eligibleSum = eligible.reduce((s,c)=>s+c.amount,0);
+    const q2 = S.closingSearch.out || {};
+    const rawInput = q2.netDeductionTouched ? (+q2.netDeduction||0) : Math.min(eligibleSum, totalAmount);
+    const cappedInput = Math.max(0, Math.min(rawInput, totalAmount));
+    let running = 0;
+    for(const c of eligible){
+      if(running + c.amount > cappedInput + 0.5) break;
+      running += c.amount;
+      nettedClaimIds.push(c.id);
+    }
+    netDeduction = running;
+    nettedClaimIds.forEach(id=>{
+      const c = S.vendorClaims.find(x=>x.id===id);
+      if(c){ c.collected = true; c.nettedInClosingNo = no; }
+    });
+    if(!S.closingSearch.out) S.closingSearch.out = {};
+    S.closingSearch.out.netDeduction = null;
+    S.closingSearch.out.netDeductionTouched = false; // 다음 조회 시 다시 자동 제안값으로 시작
+  }
+  const payableAmount = totalAmount - netDeduction;
+  listMap[kind].push({no, kind, partner, from:q.from||'', to:q.to||'', rows: storedRows, totalQty, totalAmount, netDeduction, nettedClaimIds, payableAmount, issuedAt:todayMD()});
   if(kind==='cust'){
     rows.forEach(r=>{ const d = S.deliveries.find(x=>x.id===r.id); if(d) d.closedStmtNo = no; });
   } else {
@@ -8024,7 +8067,8 @@ function registerClosing(kind){
   }
   S.closingSelected[kind] = [];
   const kindLabel = kind==='cust' ? '매출' : '매입';
-  pushNotification('마감등록', `${partner} ${kindLabel} 마감내역서(${no})가 등록되었습니다 — ${rows.length}건, ${W(totalAmount)}원.`);
+  const netNote = netDeduction>0 ? ` (상계차감 ${W(netDeduction)}원 반영, 실지급액 ${W(payableAmount)}원)` : '';
+  pushNotification('마감등록', `${partner} ${kindLabel} 마감내역서(${no})가 등록되었습니다 — ${rows.length}건, ${W(totalAmount)}원.${netNote}`);
   recalc();
 }
 // 엑셀 다운로드 — SheetJS 무료판(xlsx@0.18.5)은 셀 색상·폰트 스타일을 파일에 저장하지 못한다는 제약이
@@ -8194,25 +8238,52 @@ function renderClosingSection(kind){
   const histTbl = $(histTblId);
   if(histTbl){
     const hist = listMap[kind].slice().sort((a,b)=>a.no<b.no?1:-1);
-    histTbl.innerHTML = hist.length ? hist.map(c=>`
-      <tr><td>${c.no}</td><td>${c.partner}</td><td style="font-size:11.5px">${c.from||'전체'} ~ ${c.to||'전체'}</td>
-        <td class="num">${c.rows.length}</td><td class="num">${W(c.totalAmount)}</td><td>2026-${c.issuedAt||'—'}</td>
-        <td><button class="btn gh sm" onclick="exportClosingExcel('${kind}','${c.no}')">⬇ 엑셀</button></td></tr>`).join('')
+    // 2026-08-11(38차): 외주 마감내역서 중 상계차감이 반영된 건은 합계금액 아래에 총액/상계차감/
+    // 실지급액을 함께 표시합니다(mat/cust는 상계 개념이 없어 기존과 동일).
+    histTbl.innerHTML = hist.length ? hist.map(c=>{
+      const amountCell = (kind==='out' && c.netDeduction>0)
+        ? `${W(c.totalAmount)}<div style="font-size:10px;color:#C0392B;margin-top:2px">− 상계 ${W(c.netDeduction)}</div><div style="font-size:10.5px;font-weight:600;margin-top:1px">= 실지급 ${W(c.payableAmount)}</div>`
+        : W(c.totalAmount);
+      return `<tr><td>${c.no}</td><td>${c.partner}</td><td style="font-size:11.5px">${c.from||'전체'} ~ ${c.to||'전체'}</td>
+        <td class="num">${c.rows.length}</td><td class="num">${amountCell}</td><td>2026-${c.issuedAt||'—'}</td>
+        <td><button class="btn gh sm" onclick="exportClosingExcel('${kind}','${c.no}')">⬇ 엑셀</button></td></tr>`;
+    }).join('')
       : `<tr><td colspan="7" style="color:var(--muted)">발행된 마감내역서가 없습니다</td></tr>`;
   }
-  // 2026-08-11(37차 신설): 외주 입고 마감에서 매입처를 조회하면, 그 업체 앞으로 정산완료됐지만 아직
-  // 상계/회수 처리로 표시되지 않은 귀책업체 재작업비 청구금액이 있는지 안내합니다. 자동으로 마감
-  // 금액을 차감하지는 않습니다(상현님 컨펌 — 수동 확인 방식) — 담당자가 직접 확인하고 필요시
-  // 마감등록 전에 금액을 조정하거나, 비용청구 현황 표에서 "상계/회수 완료 처리"로 표시합니다.
+  // 2026-08-11(38차 개정): 외주 입고 마감에서, 선택한 발주 건들이 전부 같은 매입처이고 그 업체 앞으로
+  // 정산완료·미상계 귀책업체 재작업비 청구금액이 있으면 "상계차감액" 입력창을 보여줍니다(상현님 컨펌 —
+  // 마감등록 시 자동 제안값을 채워두되 직접 수정 가능). 마감등록을 누르면 이 금액만큼 실제로 총액에서
+  // 차감되고, 상계에 쓰인 청구 건은 자동으로 "상계/회수 완료"로 표시됩니다. 아직 선택을 안 했거나 서로
+  // 다른 매입처가 섞여 있으면(등록 자체가 막히는 상태) 입력 없이 안내만 표시합니다.
   if(kind==='out'){
     const warnEl = $('outclosing-claim-warn');
     if(warnEl){
-      const qv = (S.closingSearch.out||{}).vendor || '';
-      const claims = qv ? S.vendorClaims.filter(c=>c.settled && !c.collected && !c.isReversal && lvMatch(c.liableVendor, qv)) : [];
-      if(claims.length){
-        const sum = claims.reduce((s,c)=>s+c.amount,0);
+      const q2 = S.closingSearch.out || {};
+      const selPartners = [...new Set(selRows.map(r=>r.partner))];
+      const selSum = selRows.reduce((s,r)=>s+(r.closeQty!=null?r.closeQty:(r.qty||0))*(r.unitPrice||0),0);
+      if(selPartners.length===1){
+        const vendor = selPartners[0];
+        const eligible = eligibleVendorClaims(vendor);
+        const eligibleSum = eligible.reduce((s,c)=>s+c.amount,0);
+        if(eligibleSum>0){
+          const defaultVal = Math.min(eligibleSum, selSum);
+          const shown = q2.netDeductionTouched ? Math.max(0, Math.min(+q2.netDeduction||0, selSum)) : defaultVal;
+          warnEl.style.display = '';
+          warnEl.innerHTML = `<div class="note" style="background:#FDF3E0;border-color:#E9C46A;margin:0">⚠️ <b>${vendor}</b> 앞으로 정산완료된 귀책업체 재작업비 청구금액 <b>${W(eligibleSum)}원</b>(${eligible.length}건)이 아직 상계되지 않았습니다.
+            <div style="margin-top:8px;display:flex;align-items:center;gap:8px">
+              <label style="font-size:12px;font-weight:600">이번 마감에서 상계차감액</label>
+              <input type="text" inputmode="numeric" value="${shown.toLocaleString()}" onchange="setClosingNetDeduction(this.value)" style="width:100px;text-align:right;font-size:12.5px">
+              <span style="font-size:11.5px;color:var(--muted)">원 (선택 건 총액 ${W(selSum)}원 한도)</span>
+            </div>
+            <div style="font-size:11px;color:var(--muted);margin-top:4px">마감등록을 누르면 이 금액만큼 총액에서 차감되고, 오래된 청구 건부터 순서대로 "상계완료"로 표시됩니다. <a href="#" onclick="event.preventDefault();navTo('out');switchOutCostTab('cost')" style="color:var(--blue-d)">청구 현황 보기</a></div>
+          </div>`;
+        } else {
+          warnEl.style.display = 'none';
+          warnEl.innerHTML = '';
+        }
+      } else if(selPartners.length>1){
         warnEl.style.display = '';
-        warnEl.innerHTML = `<div class="note" style="background:#FDF3E0;border-color:#E9C46A;margin:0">⚠️ <b>${claims[0].liableVendor}</b> 앞으로 정산완료된 귀책업체 재작업비 청구금액 <b>${W(sum)}원</b>(${claims.length}건)이 아직 상계/회수 처리되지 않았습니다. 이번 마감 대금에서 차감할지 확인해 주세요 — 시스템이 자동으로 빼지 않으므로, 실제로 반영했다면 <a href="#" onclick="event.preventDefault();navTo('out');switchOutCostTab('cost')" style="color:var(--blue-d)">청구 현황</a>에서 "상계/회수 완료 처리"를 눌러 표시해 주세요.</div>`;
+        warnEl.innerHTML = `<div class="note" style="margin:0">선택한 건에 서로 다른 매입처가 섞여 있어 상계차감을 계산할 수 없습니다 — 매입처 1곳만 선택해 주세요.</div>`;
       } else {
         warnEl.style.display = 'none';
         warnEl.innerHTML = '';
@@ -12758,7 +12829,7 @@ function renderVendorClaims(){
     if(neg){ statusCell = '—'; }
     else if(!c.settled){ statusCell = `<button class="btn gh sm" onclick="settleVendorClaim(${c.id})">정산완료 처리</button>`; }
     else if(!c.collected){ statusCell = `<span class="tag" style="background:#E6F4EC;color:#1E8449">정산완료(${c.settledDate})</span><br><button class="btn gh sm" style="margin-top:3px;font-size:10.5px" onclick="markVendorClaimCollected(${c.id})">상계/회수 완료 처리</button>`; }
-    else { statusCell = `<span class="tag" style="background:#E6F4EC;color:#1E8449">정산완료(${c.settledDate})</span><br><span class="tag" style="background:#EAF2FB;color:#2E5FA3;margin-top:3px;display:inline-block">✓ 상계/회수 완료</span>`; }
+    else { statusCell = `<span class="tag" style="background:#E6F4EC;color:#1E8449">정산완료(${c.settledDate})</span><br><span class="tag" style="background:#EAF2FB;color:#2E5FA3;margin-top:3px;display:inline-block">${c.nettedInClosingNo?`✓ 상계완료(${c.nettedInClosingNo})`:'✓ 상계/회수 완료'}</span>`; }
     return `<tr>
       <td style="text-align:center">2026-${c.date}</td>
       <td>${c.liableVendor}${c.isReversal?' <span class="tag" style="background:#F1E6FA;color:#7B3FA0;font-size:9.5px">취소분</span>':''}</td>
