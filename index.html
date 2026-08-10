@@ -550,7 +550,7 @@ table.mr-table input.form-control.ro{background:var(--bg);color:var(--muted)}
 <body>
 <div class="wrap">
 <aside class="side">
-  <div class="brand"><div class="brand-row"><img src="/icon-192.png" alt="DAMDA" class="brand-logo"><span class="brand-word">DAMDA</span></div><small>프로토타입 v0.69 · 구매화면 UI 정리 9건 + 외주 분할입고 + 귀책업체 청구 상계안내 — 37차 라운드</small></div>
+  <div class="brand"><div class="brand-row"><img src="/icon-192.png" alt="DAMDA" class="brand-logo"><span class="brand-word">DAMDA</span></div><small>프로토타입 v0.70 · 마감수량 콤마표시 + 외주발주 열폭 조정 — 38차 라운드</small></div>
   <nav class="nav">
     <!-- 2026-07-21(항목11) 대분류 재구성: 운영 모니터링-기본정보-영업,수주-구매-생산-납품,마감-자재-인사,급여-품질-원가관리-가이드-환경설정 (12개, 상현님 지시안) -->
     <div class="grp">운영 모니터링</div>
@@ -1705,10 +1705,10 @@ table.mr-table input.form-control.ro{background:var(--bg);color:var(--muted)}
     <div style="margin-bottom:13px"><button class="btn sm" onclick="addOutsourcePO()">+ 발주 등록</button></div>
     <div style="overflow-x:auto"><table class="th-center" style="table-layout:fixed">
       <thead><tr>
-        <th style="width:84px">발주일</th><th style="width:82px">수주번호</th><th style="width:84px">매입처</th><th style="width:80px">공정명</th>
+        <th style="width:84px">발주일</th><th style="width:96px">수주번호</th><th style="width:84px">매입처</th><th style="width:72px">공정명</th>
         <th style="width:190px">품목명</th><th style="width:150px">규격명</th>
         <th class="num" style="width:82px">발주수량</th><th class="num" style="width:82px">단가</th><th class="num" style="width:86px">발주금액</th>
-        <th style="width:84px">입고예정일</th><th style="width:76px">상태</th><th style="width:108px">작업</th>
+        <th style="width:84px">입고예정일</th><th style="width:72px">상태</th><th style="width:98px">작업</th>
       </tr></thead>
       <tbody id="t-outpo"></tbody>
     </table></div>
@@ -1979,8 +1979,8 @@ table.mr-table input.form-control.ro{background:var(--bg);color:var(--muted)}
     </div>
     <div style="overflow-x:auto"><table class="th-center" style="table-layout:fixed">
       <thead><tr>
-        <th style="width:30px"><input type="checkbox" id="matclosing-all" onchange="toggleAllClosingCandidates('mat',this.checked)"></th><th style="width:70px">입고일</th><th style="width:80px">입고처</th><th style="width:110px">원재료명</th><th style="width:70px">구분</th>
-        <th class="num" style="width:146px">마감수량(kg)</th><th class="num" style="width:78px">단가</th><th class="num" style="width:92px">금액</th>
+        <th style="width:30px"><input type="checkbox" id="matclosing-all" onchange="toggleAllClosingCandidates('mat',this.checked)"></th><th style="width:70px">입고일</th><th style="width:80px">입고처</th><th style="width:148px">원재료명</th><th style="width:70px">구분</th>
+        <th class="num" style="width:108px">마감수량(kg)</th><th class="num" style="width:78px">단가</th><th class="num" style="width:92px">금액</th>
       </tr></thead>
       <tbody id="t-matclosing-candidates"></tbody>
     </table></div>
@@ -2650,6 +2650,7 @@ BEP 매출  = 월 고정비 ÷ 공헌이익률
         <tr><td>35차 라운드 — 외주단가 관리 + 마감 부분마감(이월) (2026-08-10, v0.67)</td><td>34차에서 제안드리고 컨펌받은 두 가지 설계를 구현했습니다. <b>①외주단가 자동 기본값</b> — "매입처+품목 조합의 최근 발주단가"를 기준으로 확정(품목 단독이 아닌 이유는 매입처마다 협상단가가 다를 수 있어서). <code>lastOutsourcePrice(vendor,item)</code>이 <code>S.outsourcePOs</code> 이력에서 취소되지 않고 단가가 등록된(0원 초과) 가장 최근 건을 찾고, <code>setOutsourcePOField()</code>에서 매입처·품목·수주번호 중 하나가 채워질 때 매입처+품목이 모두 있고 <b>단가가 아직 0원(미입력)일 때만</b> 자동 제안합니다 — 이미 입력한 단가를 덮어쓰지 않습니다. <b>②외주단가 변동 추이 탭</b> — 원재료 화면과 동일한 3탭 구조로 "외주생산 입고 진행현황"에 새 탭을 추가했습니다(새 마스터 데이터를 만들지 않고 기존 발주이력을 매입처+품목 조합으로 집계·파생 — 외주는 원재료의 <code>priceHistory</code>와 달리 매 발주가 이미 단가를 남기고 있어 별도 이력 필드가 필요 없었습니다). 최초단가→최근단가 절감액·절감률을 조합별로 보여주고, 행을 클릭하면 해당 조합의 전체 발주 이력(건별 전건 대비 등락)이 펼쳐집니다 — 구매부 단가 절감 실적 보고 근거로 쓸 수 있습니다. <b>③마감 부분마감(이월)</b> — "매입량보다 줄여서 등록하면 남은 수량을 어떻게 할까"라는 질문에 상현님이 "잔여수량은 다음 마감 대상으로 이월"을 선택하셔서, 기존 <code>closedStmtNo</code>(마감 즉시 완전 제외) 방식을 <code>closedQty</code>(누적 마감수량 차감) 방식으로 전환했습니다. 원재료·외주 입고마감의 마감수량 칸이 잔여수량(입고량−이미 마감된 수량) 기본값의 편집 가능한 입력으로 바뀌었고, 잔여수량보다 적게 등록하면 남은 수량은 마감되지 않은 채 다음 조회에 다시 후보로 나타납니다(<code>S.closingQtyOverride</code>로 입력값을 관리하다 등록 시 초기화). 마감내역서에 저장되는 <code>rows[].qty</code>도 실제 마감수량으로 기록되므로 엑셀 다운로드도 자동으로 정확한 값을 반영합니다. 매출 마감(cust)은 이번 컨펌 범위 밖이라 기존 완전마감 방식을 그대로 유지했습니다. node --check 구문 검증과 jsdom 기반 검증(외주단가 자동 제안값 실측, 단가이력 탭 절감액·절감률 계산, 원재료 3000kg 중 1000kg 부분마감 후 잔여 2000kg 재조회 확인, 나머지 2000kg 마감 후 후보 소멸 확인, 마감내역서 2건 발행 확인, 64개 전 화면 순회)을 통과해 실제 오류 0건을 확인했습니다.</td></tr>
         <tr><td>36차 라운드 — 외주 화면 UX 정리 6건 + 구매 사이드바 재구성 (2026-08-10, v0.68)</td><td>상현님이 원재료·외주 입고마감과 외주 발주/입고 화면들에 대해 6가지를 지적하셨습니다. <b>①마감수량 한 줄 표시</b> — 35차에서 추가한 마감수량 입력+잔여수량 캡션이 세로 2줄로 표시되던 것을 한 줄(input+작은 "/전체수량" 텍스트)로 붙였습니다(mat/out 공용 헬퍼라 양쪽에 함께 반영). <b>②외주 발주관리 자동완성</b> — 매입처는 거래처마스터(S.customers)에 실제 발주 이력(S.outsourcePOs.vendor)까지 합쳐 자동완성 후보로 쓰고, 공정명은 마스터데이터가 없어 전적으로 입력 이력 기반 신규 datalist를 만들었습니다 — 신규 값도 저장되는 즉시 다음 렌더부터 자동완성 후보에 들어가므로 "처음엔 타이핑, 두 번째부터는 자동완성" 요건을 별도 이력 테이블 없이 만족합니다. <b>③외주 발주관리 정렬·폭 재조정</b> — 입고예정일·상태·수주번호 열을 가운데정렬하고(poDateFieldHTML에 정렬 옵션 인자 추가), 12개 열 전체 폭을 재검토해 품목명(120→190px)·규격명(110→150px)에 가장 많은 여유를 배분했습니다. 버튼이 좁은 열에서 줄바꿈되던 문제는 <code>.btn{white-space:nowrap}</code>을 전역 추가해 해결했고, 결재대기 상태에서 상태 배지와 중복 표시되던 "결재대기중" 텍스트는 삭제했습니다. <b>④상태 드롭박스 조사</b> — 결재완료/입고대기/입고완료 3단 드롭박스가 정말 다른 화면 액션으로만 바뀌는지 조사한 결과, 결재완료(발주 결재함 승인)·입고완료(외주 입고등록 처리)는 실제로 외부 트리거가 있지만 <b>입고대기는 외주에서 이 드롭박스 말고는 어디서도 자동 전환되지 않고</b>(원재료의 무상사급 같은 자동 경로가 외주엔 없음), <code>matReceiveStatusLabel()</code>이 결재완료·입고대기를 이미 동일하게 표시하고 있어 사실상 무의미했습니다 — 상현님 추측이 맞아 읽기전용 배지로 전환했습니다(원재료는 무상사급 자동경로가 실재해 그대로 유지). <b>⑤외주 입고등록 폭 재조정</b> — 같은 원칙으로 품목명(90→120px)·규격명(80→107px)에 여유를 더 줬습니다. <b>⑥외주생산 입고 진행현황 정리</b> — "입고등록으로" 버튼명을 "입고등록"으로 줄이고, 외주 발주관리에서 이미 출력 가능한 PDF 발주서 버튼을 여기서는 제거해 중복을 없앴습니다. <b>⑦외주 입고마감 정리</b> — 규격명 셀의 별도 폰트축소(11.5px)를 없애 품목명과 같은 크기로 통일하고, 수주번호 열 폭(96→76px)을 줄여 품목명(138→148px)·규격명(120→130px)에 재배분했습니다. <b>⑧연쇄불량 청구금액 확정시점</b> — "무조건 100% 청구가 아니다"라는 지적에 컨펌받은 대로, 입고완료 시 발주금액을 <b>제안 기본값</b>으로 청구내역을 자동생성하되 <b>"정산완료 처리"를 누르기 전까지</b> 청구금액을 협의 결과에 맞춰 직접 수정할 수 있게 했습니다(이미 있던 정산완료 액션이 사실상 확정 시점이라는 점에 착안해 새 화면 없이 기존 흐름에 편집 가능한 입력만 추가). <b>⑨구매 사이드바 4분류</b> — "발주 결재함·원재료 구매·외주 구매·기타 구매"로 하위카테고리를 나눠 필요한 것만 펼쳐보게 했습니다. 신규 <code>.nav-subgrp</code> 헤더를 클릭하면 그 아래 화면들이 펼쳐지고(<code>toggleNavSub()</code>), 특정 화면으로 직접 이동(<code>navTo()</code>)하면 소속 카테고리가 자동으로 펼쳐져 사이드바에서 현재 위치를 항상 찾을 수 있습니다. 링크는 여전히 <code>.nav</code>의 직계 자식으로 남겨(<code>navGroupMap()</code>이 그룹 판별에 전제하는 DOM 구조를 보존) 권한 매트릭스(RBAC)·배지 로직을 전혀 건드리지 않았고, 권한이 없는 역할로 전환하면 카테고리 헤더까지 함께 숨겨지는지 확인했습니다. node --check 구문 검증과 jsdom 기반 검증(자동완성 이력 반영, 열 정렬·헤더 폭, 상태 배지 전환, 결재대기중 텍스트 제거, 사이드바 접힘/펼침·자동펼침·권한별 숨김, 연쇄불량 청구금액 수정→정산완료 잠금 전체 흐름, 64개 전 화면 순회)을 통과해 실제 오류 0건을 확인했습니다.</td></tr>
         <tr><td>37차 라운드 — 구매화면 UI 정리 9건 + 외주 분할입고 + 귀책업체 청구 상계안내 (2026-08-11, v0.69)</td><td>상현님이 구매 화면 전반에 대해 9가지를 지적하셨습니다. <b>①마감수량 입력창 확대</b> — 숫자가 잘린다는 지적에 원재료·외주 입고마감의 마감수량 입력창 폭을 1.5배(52→78px)로 넓혔습니다. <b>②외주발주관리 입고예정일 폭 축소</b> — 발주일 열과 같은 폭(116→84px)으로 줄여 남는 공간을 확보했습니다. <b>③원재료발주관리 작업열 정리</b> — 어차피 발주 결재함에서 처리하는 "▸ 발주 결재함" 버튼을 제거했습니다(결재권자는 결재함 화면만 보면 됨). <b>④수량/단가 입력창 스피너 제거</b> — 화살표로 숫자를 조정하는 기본 UI가 오히려 오조작 위험이 있다는 지적에, 원재료·외주·기타구매 3개 화면의 수량·단가 입력창에 <code>.no-spin</code> CSS를 적용해 스피너를 없애고, 입력창 폭도 수주번호 입력창과 같은 크기로 통일했습니다. <b>⑤원재료발주관리 상태 드롭박스 제거</b> — 외주와 동일한 논리로 조사한 결과, 결재완료→입고대기 전환에 무상사급 자동경로 외에는 트리거가 없다는 점에 착안해 <code>approveMaterialPO()</code>가 승인 즉시 입고대기로 넘어가도록 바꾸고(결재완료는 더 이상 별도로 노출되는 상태가 아님), 드롭박스를 읽기전용 배지로 전환했습니다. 남아있던 "결재대기중" 중복 텍스트도 제거하고, 예상입고일·발주일 열을 가운데정렬 + 폭을 다른 구매화면 수준으로 최적화했습니다. <b>⑥원재료 입고 진행현황 작업열 정리</b> — 반출·입고등록 버튼 모두 원재료 입고등록 화면에서 처리하는 업무라 중복이라는 지적에, 작업 열을 입고완료 건의 PDF 발주서 출력 기능만 남기고 정리했습니다. <b>⑦외주 입고등록 분할입고 팝업</b> — 발주수량이 한 번에 입고되지 않는 경우를 위해, "입고완료" 버튼을 누르면 입고수량 입력 팝업이 뜨도록 바꿨습니다(기본값=잔여수량, 수정 가능). 발주 건에 <code>receivedQty</code>(누적 입고수량) 필드를 신설해 잔여수량이 남아있는 한 발주가 입고등록 목록에 계속 남고, 전량 입고되는 순간 자동으로 입고완료 처리·연쇄불량 청구가 생성됩니다. 이 과정에서 발주 하나에 여러 회차의 외주비 반영 내역이 쌓일 수 있게 되어, 반출 시 첫 건만 되돌리던 <code>reverseOutPOAutoLink()</code>의 기존 버그도 함께 고쳐 전체 회차를 정확히 되돌리도록 했습니다. 선택 항목 일괄 입고완료는 팝업 없이 잔여수량 전량을 그대로 반영합니다(개별 처리와 같은 내부 로직 공유). <b>⑧귀책업체 재작업비 청구 — 명칭 변경 및 상계처리 방안</b> — "연쇄불량 태깅"이라는 이름이 실제 기능(귀책업체를 지정해 재작업비를 청구하는 것)을 드러내지 못한다는 지적에 버튼·모달·알림 라벨을 "귀책업체 재작업비 청구"로 통일했습니다(내부 데이터 키는 호환을 위해 유지). 더 근본적으로, 이 청구금액을 귀책업체의 실제 외주 매입대금 지급(외주입고마감)과 어떻게 상계할지 상현님께 여쭤 <b>수동 확인 방식</b>으로 컨펌받았습니다 — 시스템이 마감 금액을 자동으로 차감하면 마감내역서와 실제 지급액이 어긋날 위험이 있어, 외주 입고 마감 화면에서 매입처를 조회하면 그 업체 앞 정산완료·미상계 청구금액을 경고 배너로 안내만 하고, 실제 반영 여부는 담당자가 청구 현황 표의 "상계/회수 완료 처리" 버튼으로 직접 표시하도록 설계했습니다(신규 <code>collected</code> 필드 + <code>markVendorClaimCollected()</code>). <b>⑨기타구매 발주관리 정리</b> — 발주 결재함으로 이동하는 작업열 버튼을 삭제하고, 발주일·상태 열을 가운데정렬했습니다. <b>⑩외주생산 입고 진행현황 작업열 삭제</b> — 이미 다른 화면(외주 입고등록·외주 발주관리)에 있는 기능이라는 지적에 작업 열 자체를 없애고 나머지 열(품목명·규격명)에 폭을 재배분했습니다. node --check 구문 검증과 jsdom 기반 검증(분할입고 2회차 시나리오 — 팝업 기본값·잔여수량 표시·전량입고 시 목록 제거, 귀책업체 청구 등록→정산완료→마감화면 경고배너 노출→상계완료 처리 후 배너 소거, 버튼 명칭 전환, 34~36차 회귀 스위트 재실행, 64개 전 화면 순회)을 통과해 실제 오류 0건을 확인했습니다.</td></tr>
+        <tr><td>38차 라운드 — 마감수량 콤마표시 + 외주발주관리 열 폭 조정 (2026-08-11, v0.70)</td><td>37차에서 1.5배로 넓혔던 원재료·외주 입고마감의 마감수량 입력창이 오히려 너무 넓다는 지적을 받아, 숫자를 <b>콤마로 구분 표시</b>(type=number → text+inputmode 전환)하는 방식으로 바꿨습니다 — 자릿수를 한눈에 읽을 수 있어 폭이 좁아도 잘림 걱정이 줄어듭니다(78px→64px). 원재료 입고마감 화면은 확보된 여유를 원재료명 열(110→148px)에 재배분하고, 마감수량(kg) 열 자체도 108px로 줄였습니다(외주 입고마감은 이번 요청 범위 밖이라 열 폭은 그대로 두고 콤마 표시만 공용으로 적용). 외주 발주관리 화면은 "귀책업체 재작업비 청구" 버튼명이 좁은 작업 열에서 길다는 지적에 <b>"재작업비 청구"</b>로 줄였고(모달·카드 제목 등 문맥이 있는 다른 곳은 원래 이름 유지), 수주번호 입력창이 브라우저 기본 datalist 드롭다운 화살표 아이콘에 값이 가려 잘려 보이던 문제를 열 폭 확대(82→96px, 공정명·상태·작업 열에서 재배분)와 입력창 우측 여백(padding-right:13px) 추가로 해결했습니다. node --check 구문 검증과 jsdom 기반 검증(마감수량 콤마 입력→재저장 라운드트립, 열 폭 확인, 버튼 라벨 전환 확인, 64개 전 화면 순회)을 통과해 실제 오류 0건을 확인했습니다.</td></tr>
       </tbody>
     </table>
   </div>
@@ -8132,9 +8133,12 @@ function renderClosingSection(kind){
     // 2026-08-09(34차): mat도 동일하게 "입고처" 열을 입고일 우측에 추가하고, out은 수주번호 열을 추가.
     // 2026-08-10(35차): mat/out은 마감수량을 잔여수량(r.qty) 기본값의 편집 가능한 입력으로 바꿨습니다
     // — 그보다 적게 입력하면 부분마감되고 남은 잔여분은 다음 조회에 다시 나타납니다(setClosingQty).
-    // 2026-08-11(37차): 숫자가 잘린다는 지적에 입력창 폭을 1.5배(52px -> 78px)로 넓혔습니다.
+    // 2026-08-11(37차): 숫자가 잘린다는 지적에 입력창 폭을 1.5배(52px -> 78px)로 넓혔었으나, 이번엔
+    // 반대로 너무 넓다는 지적을 받아 콤마 구분 표시(text+inputmode)로 바꾸면서 폭도 64px로 재조정
+    // 했습니다 — 콤마 덕분에 자릿수를 한눈에 읽을 수 있어 좁아져도 잘림 걱정이 적습니다. 원재료 입고
+    // 마감(mat)에서 남는 폭은 원재료명 열로 재배분했습니다(th 폭은 화면별 thead에서 개별 조정).
     const closeQtyCell = r => `<td class="num" style="white-space:nowrap">
-        <input type="number" value="${r.closeQty}" min="0" max="${r.qty}" onchange="setClosingQty('${kind}','${r.id}',this.value)" style="width:78px;text-align:right;font-size:11.5px;display:inline-block">
+        <input type="text" inputmode="numeric" value="${(r.closeQty||0).toLocaleString()}" onchange="setClosingQty('${kind}','${r.id}',this.value.replace(/,/g,''))" style="width:64px;text-align:right;font-size:11.5px;display:inline-block">
         <span style="font-size:9px;color:var(--muted)">/${(r.qty||0).toLocaleString()}</span>
       </td>`;
     tbl.innerHTML = rows.length ? rows.map(r=>{
@@ -11956,7 +11960,7 @@ function restoreOutsourcePO(no){
 // 읽기표시하고 수정 버튼을 숨겨, 이미 발행된 청구 내역과 발주 정보가 어긋나지 않게 합니다.
 function chainDefectBtnHTML(p){
   if(p.claimCreated) return `<span style="font-size:10px;color:#7B3FA0">⚠️ ${p.liableVendor} 귀책 청구됨</span>`;
-  return `<button class="btn gh sm" onclick="openChainDefectModal('${p.no}')">${p.chainDefect?'🔗 귀책 수정':'🔗 귀책업체 재작업비 청구'}</button>`;
+  return `<button class="btn gh sm" onclick="openChainDefectModal('${p.no}')">${p.chainDefect?'🔗 귀책 수정':'🔗 재작업비 청구'}</button>`;
 }
 function outPOActionsHTML(p){
   if(p.cancelled) return `<button class="btn gh sm" style="width:100%" onclick="restoreOutsourcePO('${p.no}')">복원</button>`;
@@ -12016,7 +12020,7 @@ function renderOutsourcePOs(){
       : `<span class="tag" style="${poStatusBadge(p.stage)}">${p.stage}</span>`;
     return `<tr style="${rowStyle}">
         <td>${poDateFieldHTML('opo-date-'+p.no, p.date, `setOutsourcePOField('${p.no}','date',__V__)`, locked)}</td>
-        <td><input type="text" list="dl-orders-outpo" value="${p.orderNo||''}" placeholder="수주번호(선택)" ${locked?'disabled':''} onchange="setOutsourcePOField('${p.no}','orderNo',this.value)" style="width:100%;font-size:11px;text-align:center"></td>
+        <td><input type="text" list="dl-orders-outpo" value="${p.orderNo||''}" placeholder="수주번호(선택)" ${locked?'disabled':''} onchange="setOutsourcePOField('${p.no}','orderNo',this.value)" style="width:100%;font-size:11px;text-align:center;padding-right:13px"></td>
         <td><input type="text" list="dl-customers-outpo" value="${p.vendor}" placeholder="매입처" ${locked?'disabled':''} onchange="setOutsourcePOField('${p.no}','vendor',this.value)" style="width:100%"></td>
         <td><input type="text" list="dl-process-outpo" value="${p.process||''}" placeholder="공정명" ${locked?'disabled':''} onchange="setOutsourcePOField('${p.no}','process',this.value)" style="width:100%"></td>
         <td><input type="text" value="${p.item||''}" placeholder="품목" ${locked?'disabled':''} onchange="setOutsourcePOField('${p.no}','item',this.value)" style="width:100%">${p.chainDefect?`<div style="font-size:9.5px;color:#7B3FA0;margin-top:2px">⚠️귀책청구(${p.liableVendor})</div>`:''}</td>
