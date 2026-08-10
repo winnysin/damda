@@ -550,7 +550,7 @@ table.mr-table input.form-control.ro{background:var(--bg);color:var(--muted)}
 <body>
 <div class="wrap">
 <aside class="side">
-  <div class="brand"><div class="brand-row"><img src="/icon-192.png" alt="DAMDA" class="brand-logo"><span class="brand-word">DAMDA</span></div><small>프로토타입 v0.72 · 품질검사 3화면 분할(수입/공정/출하) — 40차 라운드</small></div>
+  <div class="brand"><div class="brand-row"><img src="/icon-192.png" alt="DAMDA" class="brand-logo"><span class="brand-word">DAMDA</span></div><small>프로토타입 v0.73 · 품질검사 3화면 표 다듬기 + 납품관리 수주번호 연결 — 41차 라운드</small></div>
   <nav class="nav">
     <!-- 2026-07-21(항목11) 대분류 재구성: 운영 모니터링-기본정보-영업,수주-구매-생산-납품,마감-자재-인사,급여-품질-원가관리-가이드-환경설정 (12개, 상현님 지시안) -->
     <div class="grp">운영 모니터링</div>
@@ -1355,12 +1355,12 @@ table.mr-table input.form-control.ro{background:var(--bg);color:var(--muted)}
   <div class="note">2026-08-01(28차 보완): <b>분할납품을 지원합니다</b> — 이전에는 등록 버튼 한 번으로 수주수량 전체가 즉시 납품완료 처리됐는데, 완박스 단위 등으로 일부만 먼저 출고해야 하는 경우 대응이 안 됐습니다. 이제 "납품 등록"을 누르면 팝업에서 <b>납품수량을 직접 입력</b>할 수 있고(기본값은 잔량), 잔량이 남으면 수주는 계속 "출하대기"에 남아 다음 분할건을 등록할 수 있으며, 잔량이 0이 되는 시점에만 "납품완료"로 전환됩니다. 아래 표의 "잔량"이 이번에 등록 가능한 최대 수량입니다.</div>
   <div class="card">
     <h2 style="margin-top:0">출하대기 — 납품 등록 대상</h2>
-    <table>
-      <thead><tr><th style="width:16%">거래처</th><th style="width:22%">품목명</th><th class="num" style="width:11%">수주수량</th>
-        <th class="num" style="width:11%">기납품</th><th class="num" style="width:11%">잔량</th>
-        <th class="num" style="width:11%">단가</th><th class="num" style="width:12%">잔량 공급가</th><th style="width:11%"></th></tr></thead>
+    <div style="overflow-x:auto"><table class="th-center" style="table-layout:fixed">
+      <thead><tr><th style="width:90px">거래처</th><th style="width:86px">수주번호</th><th>품목명</th><th>규격명</th>
+        <th class="num" style="width:74px">수주수량</th><th class="num" style="width:74px">기납품</th><th class="num" style="width:74px">잔량</th>
+        <th class="num" style="width:74px">단가</th><th class="num" style="width:90px">잔량 공급가</th><th style="width:84px"></th></tr></thead>
       <tbody id="t-delivery-pending"></tbody>
-    </table>
+    </table></div>
   </div>
   <div class="card">
     <div class="lv-toolbar">
@@ -1379,11 +1379,11 @@ table.mr-table input.form-control.ro{background:var(--bg);color:var(--muted)}
       <button class="btn gh sm" onclick="lvResetSearch('delivery');document.querySelectorAll('#p-delivery .lv-search input').forEach(i=>i.value='');document.querySelectorAll('#p-delivery .lv-search select').forEach(s=>s.value='')">검색 초기화</button>
       <span class="lv-count" id="delivery-count"></span>
     </div>
-    <div style="overflow-x:auto"><table>
-      <thead><tr><th style="width:11%">납품일</th><th style="width:15%">거래처</th><th style="width:20%">품목명</th><th style="width:18%">규격명</th>
-        <th class="num" style="width:10%">수량</th><th class="num" style="width:13%">공급가</th><th style="width:13%">인수확인</th></tr></thead>
+    <div style="overflow-x:auto"><table class="th-center" style="table-layout:fixed">
+      <thead><tr><th style="width:92px">납품일</th><th style="width:84px">수주번호</th><th style="width:84px">거래처</th><th>품목명</th><th>규격명</th>
+        <th class="num" style="width:64px">수량</th><th class="num" style="width:88px">공급가</th><th style="width:88px">인수확인</th></tr></thead>
       <tbody id="t-delivery-hist"></tbody>
-      <tfoot><tr><td colspan="5">합계</td><td class="num" id="dv-sum"></td><td></td></tr></tfoot>
+      <tfoot><tr><td colspan="6">합계</td><td class="num" id="dv-sum"></td><td></td></tr></tfoot>
     </table></div>
     <div id="delivery-pager"></div>
   </div>
@@ -2672,9 +2672,8 @@ BEP 매출  = 월 고정비 ÷ 공헌이익률
         <tr><td>38차 라운드 — 마감수량 콤마표시 + 외주발주관리 열 폭 조정 (2026-08-11, v0.70)</td><td>37차에서 1.5배로 넓혔던 원재료·외주 입고마감의 마감수량 입력창이 오히려 너무 넓다는 지적을 받아, 숫자를 <b>콤마로 구분 표시</b>(type=number → text+inputmode 전환)하는 방식으로 바꿨습니다 — 자릿수를 한눈에 읽을 수 있어 폭이 좁아도 잘림 걱정이 줄어듭니다(78px→64px). 원재료 입고마감 화면은 확보된 여유를 원재료명 열(110→148px)에 재배분하고, 마감수량(kg) 열 자체도 108px로 줄였습니다(외주 입고마감은 이번 요청 범위 밖이라 열 폭은 그대로 두고 콤마 표시만 공용으로 적용). 외주 발주관리 화면은 "귀책업체 재작업비 청구" 버튼명이 좁은 작업 열에서 길다는 지적에 <b>"재작업비 청구"</b>로 줄였고(모달·카드 제목 등 문맥이 있는 다른 곳은 원래 이름 유지), 수주번호 입력창이 브라우저 기본 datalist 드롭다운 화살표 아이콘에 값이 가려 잘려 보이던 문제를 열 폭 확대(82→96px, 공정명·상태·작업 열에서 재배분)와 입력창 우측 여백(padding-right:13px) 추가로 해결했습니다. node --check 구문 검증과 jsdom 기반 검증(마감수량 콤마 입력→재저장 라운드트립, 열 폭 확인, 버튼 라벨 전환 확인, 64개 전 화면 순회)을 통과해 실제 오류 0건을 확인했습니다.</td></tr>
         <tr><td>39차 라운드 — 외주마감 귀책업체 청구금액 자동 상계차감 (2026-08-11, v0.71)</td><td>지난 라운드에서 만든 "정산완료된 청구금액을 경고만 하고 실제로는 차감하지 않는" 상계 방식이, 상현님이 처음 의도하신 "재작업으로 발생한 추가 매입 비용을 귀책업체 마감 지급액에서 실제로 반영"하는 것과는 다르다는 걸 대화 중에 확인해, 실제로 차감하는 기능으로 다시 설계했습니다. 외주 입고 마감에서 매입처를 조회해 발주 건을 <b>전체 선택하면</b>(등록 자체가 매입처 1곳 단위로만 가능하므로 선택된 건이 모두 같은 업체일 때), 그 업체 앞 정산완료·미상계 귀책업체 재작업비 청구금액과 선택 건 총액 중 작은 값이 <b>"상계차감액" 입력창에 자동 제안</b>되고(상현님 컨펌 — 자동 제안 + 수정가능 방식), 담당자가 필요하면 직접 줄이거나 늘릴 수 있습니다(총액 초과는 불가). <b>마감등록을 누르면 실제로 그 금액만큼 마감 총액에서 차감</b>되어 마감내역서에 총액·상계차감·실지급액이 함께 기록되고(<code>netDeduction</code>·<code>payableAmount</code> 필드 신설), 상계에 쓰인 청구 건들은 오래된 순서로 자동 "상계완료(마감번호)"로 표시됩니다(건을 쪼개지 않고 통째로만 상계에 포함해 어느 건이 상계됐는지 항상 명확하게 유지). 마감내역서 발행 이력 표에도 상계차감이 있는 건만 합계금액 아래에 차감 내역을 함께 보여줍니다. node --check 구문 검증과 jsdom 기반 검증(재작업 발주→귀책 태깅→입고완료→청구생성→정산완료 → 같은 업체 앞 별도 정상 발주 입고완료 → 외주마감에서 전체선택 시 상계차감 자동제안(40,000원) 확인 → 마감등록 후 총액 100,000원에서 실지급 60,000원 계산 확인 → 청구 현황에 상계완료(마감번호) 표시 확인, 34~38차 회귀 스위트 재실행, 64개 전 화면 순회)을 통과해 실제 오류 0건을 확인했습니다.</td></tr>
         <tr><td>40차 라운드 — 품질검사 3화면 분할 개편 (2026-08-11, v0.72)</td><td>품질 카테고리를 <b>수입검사·공정검사·출하검사 3개의 독립된 메뉴</b>로 분할했습니다. ①수입검사(신설): 원재료는 대상에서 제외하고 외주발주 중 미입고(결재완료·입고대기) 건만 후보로 삼습니다. 매입처명·수주번호·품목명으로 조회하며, 합격이면 즉시 잔여수량 전량 입고완료 처리(기존 입고등록 로직 재사용), 불합격이면 <code>inspectFail</code> 플래그를 세워 외주생산 입고 진행현황에 "입고불합격" 배지로 표시됩니다. ②공정검사(개편): 상현님 지시대로 "다른 화면에 영향을 주지 않는 순수 이력" 화면으로 재설계 — 기업규모별(영세/소기업 등) 분기 로직을 전부 제거하고, 당일 생산중이거나 당일 생산일보가 있는 모든 수주 건을 기본 노출합니다(도중에 완료된 건도 포함). 저장해도 수주 상태는 전혀 바뀌지 않습니다. ③출하검사: 검사대기→출하대기 전환을 전담하는 유일한 게이트로 통일했습니다(수주관리에서 "검사 시작"을 누르면 검사대기로 전환). 세 화면 모두 환경설정에 사용여부 토글을 추가해(<code>S.qcModules</code>) 항상 메뉴는 노출하되, 미사용 설정 시 수입검사는 자동 입고완료, 출하검사는 검사 시작 즉시 자동으로 출하대기까지 전환되는 "검사생략" 동작을 하도록 만들었습니다(영세·소기업처럼 일부 검사 단계를 생략하는 회사도 메뉴 구조를 바꾸지 않고 대응). 구현 중 출하검사 자동생략이 상태는 정상 전환되는데 화면이 중간 상태(검사대기)에 멈춰 보이는 버그를 발견해, <code>passShipInspectionAuto()</code> 끝에 <code>recalc()</code> 호출을 추가해 해결했습니다. 마지막으로 수주→생산/외주→품질검사로 이어지는 연결 데모 데이터를 화면당 10건씩(공정검사 10·수입검사 10·출하검사 10, 합격/조건부합격/불합격 결과 혼합) 생성해 반영했습니다. node --check 구문 검증과 jsdom 기반 검증(3화면 후보/이력 렌더링, 수입검사 합격→자동입고 확인, 공정검사 저장 후 수주 상태 불변 확인, 출하검사 자동생략 전체 플로우 재현 및 버그 재현·수정 확인, 신규 시드데이터 프레시 로드 검증, 34~39차 회귀 스위트 재실행, 66개 전 화면 순회)을 통과해 실제 오류 0건을 확인했습니다.</td></tr>
-      </tbody>
-    </table>
-  </div>
+        <tr><td>41차 라운드 — 품질검사 3화면 표 다듬기 + 납품관리 수주번호 연결 (2026-08-11, v0.73)</td><td>40차에서 새로 만든 화면들을 상현님이 실제로 열어보신 뒤 나온 다듬기 요청입니다. <b>①품질검사 3화면 공통</b> — 수주번호·매입처명 열에 줄바꿈이 일어나 값이 깨져 보이던 문제를 <code>white-space:nowrap</code>으로 잡고, 판정·검사자(수입검사는 비고도)처럼 드롭박스가 들어가는 열은 "조건부합격"처럼 긴 옵션값과 화살표 아이콘이 잘리지 않도록 폭을 74~90px에서 96~104px로 넉넉히 넓혔습니다(공정검사 단계 열도 56→68px). <b>②수입검사 이력 조회 신설</b> — 그동안 미입고 후보 목록에만 있던 매입처명/수주번호/품목명 조회를 검사 이력 표에도 별도로 달았습니다(<code>lv('qcincoming-hist')</code> 독립 키 사용, 후보 조회와 서로 간섭하지 않음). <b>③납품관리 2개 표 개편</b> — 헤더를 전부 가운데정렬하고, 출하대기 표는 거래처 옆에 수주번호를, 품목명 옆에 규격명을 신설해 남는 폭을 두 열에 몰아줬습니다. 납품이력 표는 납품일 옆에 수주번호를 추가하고(과거 시드데이터 24건 중 21건은 <code>orderId</code>가 끊겨 있어 거래처+품목명으로 한 번 더 매칭하는 보정을 추가), 규격명 폰트를 품목명과 동일하게 맞추고 인수확인 열을 가운데정렬했습니다. <b>④검사이력 삭제 기능 검토</b>와 <b>⑤마감관리 재검토 분석</b>은 코드 변경 없이 대화로 결과를 보고드렸습니다(각각 삭제 시 부작용 분석과, 마감관리에 검사 미결 건수 경고가 없다는 리스크 분석 — 상세는 대화 참고). node --check 구문 검증과 jsdom 기반 검증(3화면 헤더 폭 확인, 수입검사 이력 조회 필터링, 납품관리 2개 표 렌더링·수주번호 매칭, 34~40차 회귀 스위트 재실행)을 통과해 실제 오류 0건을 확인했습니다.</td></tr>
+      </tbody> </div>
 </section>
 
 <!-- ══════════ 프로세스맵 (인터랙티브, 2026-07-22 신설) — 첨부 프로세스맵 파일을 6-STAGE + 5개
@@ -3152,18 +3151,25 @@ BEP 매출  = 월 고정비 ÷ 공헌이익률
     </div>
     <div style="overflow-x:auto"><table class="th-center" style="table-layout:fixed">
       <thead><tr>
-        <th style="width:70px">수주번호</th><th style="width:90px">매입처명</th><th>품목명</th><th>규격명</th>
-        <th class="num" style="width:64px">입고수량</th><th style="width:80px">판정</th><th style="width:90px">검사자</th><th style="width:130px">비고</th><th style="width:56px">저장</th>
+        <th style="width:84px">수주번호</th><th style="width:104px">매입처명</th><th>품목명</th><th>규격명</th>
+        <th class="num" style="width:58px">입고수량</th><th style="width:100px">판정</th><th style="width:100px">검사자</th><th style="width:170px">비고</th><th style="width:52px">저장</th>
       </tr></thead>
       <tbody id="t-qcincoming-candidates"></tbody>
     </table></div>
   </div>
   <div class="card">
     <h2 style="margin-top:0">검사 이력</h2>
+    <div class="lv-search">
+      <div><label>매입처명</label><input type="text" placeholder="매입처명" oninput="lvSetSearch('qcincoming-hist','vendor',this.value)"></div>
+      <div><label>수주번호</label><input type="text" placeholder="수주번호" oninput="lvSetSearch('qcincoming-hist','orderNo',this.value)"></div>
+      <div><label>품목명</label><input type="text" placeholder="품목명" oninput="lvSetSearch('qcincoming-hist','item',this.value)"></div>
+      <button class="btn gh sm" onclick="lvResetSearch('qcincoming-hist');document.querySelectorAll('#p-qcincoming .card:last-of-type .lv-search input').forEach(i=>i.value='')">검색 초기화</button>
+      <span class="lv-count" id="qcincoming-hist-count"></span>
+    </div>
     <div style="overflow-x:auto"><table class="th-center" style="table-layout:fixed">
       <thead><tr>
-        <th style="width:64px">검사일</th><th style="width:70px">수주번호</th><th style="width:90px">매입처명</th><th>품목명</th><th>규격명</th>
-        <th class="num" style="width:64px">입고수량</th><th style="width:80px">판정</th><th style="width:90px">검사자</th><th style="width:130px">비고</th><th style="width:100px">작업</th>
+        <th style="width:60px">검사일</th><th style="width:84px">수주번호</th><th style="width:104px">매입처명</th><th>품목명</th><th>규격명</th>
+        <th class="num" style="width:58px">입고수량</th><th style="width:100px">판정</th><th style="width:100px">검사자</th><th style="width:170px">비고</th><th style="width:100px">작업</th>
       </tr></thead>
       <tbody id="t-qcincoming-history"></tbody>
     </table></div>
@@ -3179,8 +3185,8 @@ BEP 매출  = 월 고정비 ÷ 공헌이익률
     <h2 style="margin-top:0">오늘 생산 목록</h2>
     <div style="overflow-x:auto"><table class="th-center" style="table-layout:fixed">
       <thead><tr>
-        <th style="width:70px">수주번호</th><th>품목명</th><th>규격명</th><th style="width:56px">단계</th>
-        <th class="num" style="width:66px">검사수량</th><th class="num" style="width:66px">불량수량</th><th style="width:74px">판정</th><th style="width:66px">검사자</th><th>비고</th><th style="width:56px">저장</th>
+        <th style="width:84px">수주번호</th><th>품목명</th><th>규격명</th><th style="width:68px">단계</th>
+        <th class="num" style="width:64px">검사수량</th><th class="num" style="width:64px">불량수량</th><th style="width:100px">판정</th><th style="width:96px">검사자</th><th>비고</th><th style="width:52px">저장</th>
       </tr></thead>
       <tbody id="t-qc-process-candidates"></tbody>
     </table></div>
@@ -3189,9 +3195,9 @@ BEP 매출  = 월 고정비 ÷ 공헌이익률
     <h2 style="margin-top:0">검사 이력</h2>
     <div style="overflow-x:auto"><table class="th-center" style="table-layout:fixed">
       <thead><tr>
-        <th style="width:56px">일자</th><th style="width:70px">수주번호</th><th>품목명</th><th>규격명</th><th style="width:56px">단계</th>
-        <th class="num" style="width:66px">검사수량</th><th class="num" style="width:66px">불량수량</th><th class="num" style="width:60px">불량률</th>
-        <th style="width:74px">판정</th><th style="width:66px">검사자</th><th>비고</th><th style="width:100px">작업</th>
+        <th style="width:52px">일자</th><th style="width:84px">수주번호</th><th>품목명</th><th>규격명</th><th style="width:68px">단계</th>
+        <th class="num" style="width:60px">검사수량</th><th class="num" style="width:60px">불량수량</th><th class="num" style="width:56px">불량률</th>
+        <th style="width:100px">판정</th><th style="width:96px">검사자</th><th>비고</th><th style="width:100px">작업</th>
       </tr></thead>
       <tbody id="t-qualitycheck"></tbody>
     </table></div>
@@ -3207,9 +3213,9 @@ BEP 매출  = 월 고정비 ÷ 공헌이익률
     <h2 style="margin-top:0">검사대기 목록</h2>
     <div style="overflow-x:auto"><table class="th-center" style="table-layout:fixed">
       <thead><tr>
-        <th style="width:80px">수주번호</th><th>품목명</th><th>규격명</th>
-        <th class="num" style="width:70px">검사수량</th><th class="num" style="width:70px">불량수량</th>
-        <th style="width:80px">판정</th><th style="width:90px">검사자</th><th style="width:140px">비고</th><th style="width:56px">저장</th>
+        <th style="width:88px">수주번호</th><th>품목명</th><th>규격명</th>
+        <th class="num" style="width:66px">검사수량</th><th class="num" style="width:66px">불량수량</th>
+        <th style="width:100px">판정</th><th style="width:100px">검사자</th><th style="width:140px">비고</th><th style="width:52px">저장</th>
       </tr></thead>
       <tbody id="t-qcship-candidates"></tbody>
     </table></div>
@@ -3218,9 +3224,9 @@ BEP 매출  = 월 고정비 ÷ 공헌이익률
     <h2 style="margin-top:0">검사 이력</h2>
     <div style="overflow-x:auto"><table class="th-center" style="table-layout:fixed">
       <thead><tr>
-        <th style="width:60px">일자</th><th style="width:80px">수주번호</th><th>품목명</th><th>규격명</th>
-        <th class="num" style="width:70px">검사수량</th><th class="num" style="width:70px">불량수량</th><th class="num" style="width:60px">불량률</th>
-        <th style="width:80px">판정</th><th style="width:90px">검사자</th><th style="width:140px">비고</th><th style="width:100px">작업</th>
+        <th style="width:56px">일자</th><th style="width:88px">수주번호</th><th>품목명</th><th>규격명</th>
+        <th class="num" style="width:62px">검사수량</th><th class="num" style="width:62px">불량수량</th><th class="num" style="width:56px">불량률</th>
+        <th style="width:100px">판정</th><th style="width:100px">검사자</th><th style="width:140px">비고</th><th style="width:100px">작업</th>
       </tr></thead>
       <tbody id="t-qc-ship"></tbody>
     </table></div>
@@ -7712,13 +7718,15 @@ function renderProduction(){
     const delivered = orderDeliveredQty(o.id);
     const remaining = orderRemainingQty(o);
     return `<tr>
-        <td>${o.cust}</td><td>${o.item}</td><td class="num">${o.qty.toLocaleString()}</td>
+        <td style="white-space:nowrap">${o.cust}</td><td style="text-align:center;font-size:11.5px;color:var(--ink-soft);white-space:nowrap">${o.orderNo}</td>
+        <td style="text-align:left">${o.item}</td><td style="text-align:left;font-size:11.5px">${o.specName||'—'}</td>
+        <td class="num">${o.qty.toLocaleString()}</td>
         <td class="num">${delivered?delivered.toLocaleString():'—'}</td>
         <td class="num" style="font-weight:700">${remaining.toLocaleString()}</td>
         <td class="num">${o.unitPrice.toLocaleString()}</td><td class="num">${W(remaining*o.unitPrice)}</td>
-        <td><button class="btn sm" onclick="openDeliveryModal(${o.id})">납품 등록</button></td></tr>`;
+        <td style="text-align:center"><button class="btn sm" onclick="openDeliveryModal(${o.id})">납품 등록</button></td></tr>`;
   }).join('')
-    : '<tr><td colspan="8" style="color:var(--muted)">출하대기 중인 라인이 없습니다</td></tr>';
+    : '<tr><td colspan="10" style="color:var(--muted)">출하대기 중인 라인이 없습니다</td></tr>';
 
   // 납품관리 — 이력(2026-07-28, 20차 라운드: 검색+페이지네이션 30/50/100, 규격 열 추가)
   const dvSorted = S.deliveries.slice().sort((a,b)=>a.date<b.date?1:-1);
@@ -7738,9 +7746,13 @@ function renderProduction(){
     const carried = d.ym && d.ym!==S.ym;
     const rowStyle = carried ? 'background:#FFF7E8' : '';
     const carriedTag = carried ? ` <span class="tag" style="background:#FDF3E0;color:#B7791F;font-size:9.5px">이월(${d.ym})</span>` : '';
-    return `<tr style="${rowStyle}"><td>2026-${d.date}${carriedTag}</td><td>${d.cust}</td><td>${d.item}</td><td style="font-size:11.5px;color:var(--ink-soft)">${deliverySpecName(d)}</td>
+    // 2026-08-11(41차): orderId로 못 찾으면(오래된 시드데이터 등) 거래처+품목명 조합으로 한 번 더 시도합니다(표시 전용, 최선노력 매칭).
+    const dOrder = S.orderItems.find(x=>x.id===d.orderId) || S.orderItems.find(x=>x.cust===d.cust && x.item===d.item);
+    return `<tr style="${rowStyle}"><td style="white-space:nowrap">2026-${d.date}${carriedTag}</td>
+        <td style="text-align:center;font-size:11.5px;color:var(--ink-soft);white-space:nowrap">${dOrder?dOrder.orderNo:'—'}</td>
+        <td style="white-space:nowrap">${d.cust}</td><td style="text-align:left">${d.item}</td><td style="text-align:left;color:var(--ink-soft)">${deliverySpecName(d)}</td>
         <td class="num">${d.qty.toLocaleString()}</td><td class="num">${W(d.qty*d.unitPrice)}</td>
-        <td><button class="btn ${d.received?'gh':''} sm" onclick="S.deliveries[${idx}].received=!S.deliveries[${idx}].received;recalc()">${d.received?'확인완료':'확인대기'}</button></td></tr>`;
+        <td style="text-align:center"><button class="btn ${d.received?'gh':''} sm" onclick="S.deliveries[${idx}].received=!S.deliveries[${idx}].received;recalc()">${d.received?'확인완료':'확인대기'}</button></td></tr>`;
   }).join('');
   $('dv-sum').textContent = W(dvFiltered.reduce((s,d)=>s+d.qty*d.unitPrice,0));
 }
@@ -13680,7 +13692,7 @@ function qcProcessTodayCandidates(){
 function qcProcessCandidateRowHTML(o){
   const uid = o.id;
   return `<tr>
-    <td style="text-align:center;font-size:11.5px;color:var(--ink-soft)">${o.orderNo}</td>
+    <td style="text-align:center;font-size:11.5px;color:var(--ink-soft);white-space:nowrap">${o.orderNo}</td>
     <td>${o.item}</td>
     <td style="font-size:11.5px">${o.specName||'—'}</td>
     <td style="text-align:center"><select id="qc-stage-${uid}" style="width:100%;font-size:11px"><option>초물</option><option>중물</option><option>종물</option></select></td>
@@ -13737,7 +13749,7 @@ function qcProcessHistRowHTML(q){
   if(S.qcEditId===q.id){
     return `<tr>
       <td style="text-align:center">${q.date}</td>
-      <td style="text-align:center;font-size:11.5px">${orderNo}</td>
+      <td style="text-align:center;font-size:11.5px;white-space:nowrap">${orderNo}</td>
       <td>${item}</td><td style="font-size:11.5px">${spec}</td>
       <td style="text-align:center"><select id="qce-stage-${q.id}" style="width:100%;font-size:11px"><option ${q.stage==='초물'?'selected':''}>초물</option><option ${q.stage==='중물'?'selected':''}>중물</option><option ${q.stage==='종물'?'selected':''}>종물</option></select></td>
       <td class="num"><input type="number" id="qce-qty-${q.id}" value="${q.qty}" class="no-spin" style="width:100%;text-align:right"></td>
@@ -13751,7 +13763,7 @@ function qcProcessHistRowHTML(q){
   }
   return `<tr>
     <td style="text-align:center">7/${q.date.split('-')[1]}</td>
-    <td style="text-align:center;font-size:11.5px;color:var(--ink-soft)">${orderNo}</td>
+    <td style="text-align:center;font-size:11.5px;color:var(--ink-soft);white-space:nowrap">${orderNo}</td>
     <td>${item}</td><td style="font-size:11.5px">${spec}</td>
     <td style="text-align:center">${q.stage?`<span class="tag fix">${q.stage}</span>`:'—'}</td>
     <td class="num">${q.qty.toLocaleString()}</td>
@@ -13792,8 +13804,8 @@ function qcIncomingCandidateRowHTML(p){
   const remaining = (p.qty||0) - (p.receivedQty||0);
   const failBadge = p.inspectFail ? ` <span class="tag" style="background:#FBE7E7;color:#B03A2E;font-size:9px">이전 판정: 불합격</span>` : '';
   return `<tr>
-    <td style="text-align:center;font-size:11.5px;color:var(--ink-soft)">${p.orderNo||'—'}</td>
-    <td>${p.vendor}</td>
+    <td style="text-align:center;font-size:11.5px;color:var(--ink-soft);white-space:nowrap">${p.orderNo||'—'}</td>
+    <td style="white-space:nowrap">${p.vendor}</td>
     <td>${p.item}${failBadge}</td>
     <td style="font-size:11.5px">${p.specName||'—'}</td>
     <td class="num">${remaining.toLocaleString()}</td>
@@ -13838,8 +13850,8 @@ function qcIncomingHistRowHTML(q){
   if(S.qcInEditId===q.id){
     return `<tr>
       <td style="text-align:center">${q.date}</td>
-      <td style="text-align:center;font-size:11.5px">${q.orderNo||'—'}</td>
-      <td>${q.vendor}</td><td>${q.item}</td><td style="font-size:11.5px">${q.specName||'—'}</td>
+      <td style="text-align:center;font-size:11.5px;white-space:nowrap">${q.orderNo||'—'}</td>
+      <td style="white-space:nowrap">${q.vendor}</td><td>${q.item}</td><td style="font-size:11.5px">${q.specName||'—'}</td>
       <td class="num">${(q.qty||0).toLocaleString()}</td>
       <td style="text-align:center"><select id="qcine-result-${q.id}" style="width:100%;font-size:11px"><option ${q.result==='합격'?'selected':''}>합격</option><option ${q.result==='조건부합격'?'selected':''}>조건부합격</option><option ${q.result==='불합격'?'selected':''}>불합격</option></select></td>
       <td style="text-align:center"><select id="qcine-inspector-${q.id}" style="width:100%;font-size:11px">${qcInspectorOptionsHTML(q.inspector)}</select></td>
@@ -13849,14 +13861,20 @@ function qcIncomingHistRowHTML(q){
   }
   return `<tr>
     <td style="text-align:center">7/${q.date.split('-')[1]}</td>
-    <td style="text-align:center;font-size:11.5px;color:var(--ink-soft)">${q.orderNo||'—'}</td>
-    <td>${q.vendor}</td><td>${q.item}</td><td style="font-size:11.5px">${q.specName||'—'}</td>
+    <td style="text-align:center;font-size:11.5px;color:var(--ink-soft);white-space:nowrap">${q.orderNo||'—'}</td>
+    <td style="white-space:nowrap">${q.vendor}</td><td>${q.item}</td><td style="font-size:11.5px">${q.specName||'—'}</td>
     <td class="num">${(q.qty||0).toLocaleString()}</td>
     <td style="text-align:center;color:${QC_RESULT_COLOR[q.result]||'inherit'};font-weight:700">${q.result}</td>
     <td style="text-align:center">${q.inspector}</td>
     <td style="font-size:11px;color:var(--muted)">${q.note||'—'}</td>
     <td style="text-align:center;white-space:nowrap"><button class="btn gh sm" onclick="editIncomingInspection(${q.id})">수정</button> <button class="btn del sm" onclick="removeIncomingInspection(${q.id})">삭제</button></td>
   </tr>`;
+}
+// 2026-08-11(40차 보완): 검사 이력 영역 전용 조회조건(매입처명/수주번호/품목명) — 후보 목록 조회와는
+// 별도의 lv 키('qcincoming-hist')를 써서 서로 간섭하지 않습니다.
+function qcIncomingHistSearchRows(){
+  const q = lv('qcincoming-hist').search || {};
+  return S.incomingInspections.filter(x=>lvMatch(x.vendor,q.vendor) && lvMatch(x.orderNo,q.orderNo) && lvMatch(x.item,q.item));
 }
 function renderQcIncoming(){
   const offNote = $('qc-incoming-offnote');
@@ -13865,8 +13883,10 @@ function renderQcIncoming(){
   const cntEl = $('qcincoming-count'); if(cntEl) cntEl.textContent = `${rows.length}건`;
   const tbl = $('t-qcincoming-candidates');
   if(tbl) tbl.innerHTML = rows.length ? rows.map(qcIncomingCandidateRowHTML).join('') : '<tr><td colspan="9" style="color:var(--muted)">조건에 맞는 미입고 외주 발주가 없습니다</td></tr>';
+  const histRows = qcIncomingHistSearchRows();
+  const histCntEl = $('qcincoming-hist-count'); if(histCntEl) histCntEl.textContent = `${histRows.length}건`;
   const histTbl = $('t-qcincoming-history');
-  if(histTbl) histTbl.innerHTML = S.incomingInspections.length ? S.incomingInspections.slice().reverse().map(qcIncomingHistRowHTML).join('') : '<tr><td colspan="10" style="color:var(--muted)">등록된 수입검사 이력이 없습니다</td></tr>';
+  if(histTbl) histTbl.innerHTML = histRows.length ? histRows.slice().reverse().map(qcIncomingHistRowHTML).join('') : '<tr><td colspan="10" style="color:var(--muted)">조건에 맞는 수입검사 이력이 없습니다</td></tr>';
 }
 
 // ── 출하검사(검사대기→출하대기 유일 게이트) ──
@@ -13875,7 +13895,7 @@ function shipInspCandidates(){
 }
 function qcShipCandidateRowHTML(o){
   return `<tr>
-    <td style="text-align:center;font-size:11.5px;color:var(--ink-soft)">${o.orderNo}</td>
+    <td style="text-align:center;font-size:11.5px;color:var(--ink-soft);white-space:nowrap">${o.orderNo}</td>
     <td>${o.item}</td>
     <td style="font-size:11.5px">${o.specName||'—'}</td>
     <td class="num"><input type="number" id="qcship-qty-${o.id}" value="5" class="no-spin" style="width:100%;text-align:right"></td>
@@ -13940,7 +13960,7 @@ function qcShipHistRowHTML(q){
   if(S.qcShipEditId===q.id){
     return `<tr>
       <td style="text-align:center">${q.date}</td>
-      <td style="text-align:center;font-size:11.5px">${orderNo}</td>
+      <td style="text-align:center;font-size:11.5px;white-space:nowrap">${orderNo}</td>
       <td>${item}</td><td style="font-size:11.5px">${spec}</td>
       <td class="num"><input type="number" id="qcshipe-qty-${q.id}" value="${q.qty}" class="no-spin" style="width:100%;text-align:right"></td>
       <td class="num"><input type="number" id="qcshipe-defect-${q.id}" value="${q.defectQty}" class="no-spin" style="width:100%;text-align:right"></td>
@@ -13953,7 +13973,7 @@ function qcShipHistRowHTML(q){
   }
   return `<tr>
     <td style="text-align:center">7/${q.date.split('-')[1]}</td>
-    <td style="text-align:center;font-size:11.5px;color:var(--ink-soft)">${orderNo}</td>
+    <td style="text-align:center;font-size:11.5px;color:var(--ink-soft);white-space:nowrap">${orderNo}</td>
     <td>${item}</td><td style="font-size:11.5px">${spec}</td>
     <td class="num">${q.qty.toLocaleString()}</td>
     <td class="num" style="${q.defectQty?'color:var(--red)':''}">${q.defectQty.toLocaleString()}</td>
