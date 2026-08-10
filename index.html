@@ -551,7 +551,7 @@ table.mr-table input.form-control.ro{background:var(--bg);color:var(--muted)}
 <body>
 <div class="wrap">
 <aside class="side">
-  <div class="brand"><div class="brand-row"><img src="/icon-192.png" alt="DAMDA" class="brand-logo"><span class="brand-word">DAMDA</span></div><small>프로토타입 v0.75 · 납품 인수확인 완료 알림 연동 — 43차 라운드</small></div>
+  <div class="brand"><div class="brand-row"><img src="/icon-192.png" alt="DAMDA" class="brand-logo"><span class="brand-word">DAMDA</span></div><small>프로토타입 v0.76 · 납품 인수확인 알림대상 정정 + 영업 역할 신설 — 44차 라운드</small></div>
   <nav class="nav">
     <!-- 2026-07-21(항목11) 대분류 재구성: 운영 모니터링-기본정보-영업,수주-구매-생산-납품,마감-자재-인사,급여-품질-원가관리-가이드-환경설정 (12개, 상현님 지시안) -->
     <div class="grp">운영 모니터링</div>
@@ -2450,6 +2450,13 @@ table.mr-table input.form-control.ro{background:var(--bg);color:var(--muted)}
   </div>
 
   <div class="card">
+    <h2 style="margin-top:0">납품 인수확인 추가 알림대상 (2026-08-11 신설)</h2>
+    <div class="sub" style="margin:-4px 0 12px">납품이 <b>인수확인 완료</b>로 등록되면 기본적으로 영업(SALES)·생산관리(PRODMGR) 역할 전체에게 알림이 갑니다. 특정 역할과 무관하게 이 건을 꼭 따로 챙겨야 할 사람(직원이든 임원이든)이 있다면 아래에서 지정해두면 그 사람에게도 함께 남습니다.</div>
+    <table><thead><tr><th>지정</th><th>이름</th><th>직책</th><th>권한(role)</th></tr></thead><tbody id="t-delivery-confirm-extra"></tbody></table>
+    <p style="font-size:11px;color:var(--muted);margin-top:10px" id="delivery-confirm-extra-summary"></p>
+  </div>
+
+  <div class="card">
     <h2 style="margin-top:0">품질검사 사용 설정 (2026-08-11 신설)</h2>
     <div class="sub" style="margin:-4px 0 12px">수입검사·공정검사·출하검사 3개 메뉴는 회사 규모와 무관하게 항상 노출됩니다. 다만 규모가 작아 특정 검사를 정식으로 운영하기 어려운 경우, 아래에서 꺼두면 해당 검사 없이 다음 단계로 자동 진행됩니다.</div>
     <label style="display:flex;align-items:flex-start;gap:8px;font-size:12.5px;margin-bottom:10px">
@@ -2694,7 +2701,8 @@ BEP 매출  = 월 고정비 ÷ 공헌이익률
         <tr><td>39차 라운드 — 외주마감 귀책업체 청구금액 자동 상계차감 (2026-08-11, v0.71)</td><td>지난 라운드에서 만든 "정산완료된 청구금액을 경고만 하고 실제로는 차감하지 않는" 상계 방식이, 상현님이 처음 의도하신 "재작업으로 발생한 추가 매입 비용을 귀책업체 마감 지급액에서 실제로 반영"하는 것과는 다르다는 걸 대화 중에 확인해, 실제로 차감하는 기능으로 다시 설계했습니다. 외주 입고 마감에서 매입처를 조회해 발주 건을 <b>전체 선택하면</b>(등록 자체가 매입처 1곳 단위로만 가능하므로 선택된 건이 모두 같은 업체일 때), 그 업체 앞 정산완료·미상계 귀책업체 재작업비 청구금액과 선택 건 총액 중 작은 값이 <b>"상계차감액" 입력창에 자동 제안</b>되고(상현님 컨펌 — 자동 제안 + 수정가능 방식), 담당자가 필요하면 직접 줄이거나 늘릴 수 있습니다(총액 초과는 불가). <b>마감등록을 누르면 실제로 그 금액만큼 마감 총액에서 차감</b>되어 마감내역서에 총액·상계차감·실지급액이 함께 기록되고(<code>netDeduction</code>·<code>payableAmount</code> 필드 신설), 상계에 쓰인 청구 건들은 오래된 순서로 자동 "상계완료(마감번호)"로 표시됩니다(건을 쪼개지 않고 통째로만 상계에 포함해 어느 건이 상계됐는지 항상 명확하게 유지). 마감내역서 발행 이력 표에도 상계차감이 있는 건만 합계금액 아래에 차감 내역을 함께 보여줍니다. node --check 구문 검증과 jsdom 기반 검증(재작업 발주→귀책 태깅→입고완료→청구생성→정산완료 → 같은 업체 앞 별도 정상 발주 입고완료 → 외주마감에서 전체선택 시 상계차감 자동제안(40,000원) 확인 → 마감등록 후 총액 100,000원에서 실지급 60,000원 계산 확인 → 청구 현황에 상계완료(마감번호) 표시 확인, 34~38차 회귀 스위트 재실행, 64개 전 화면 순회)을 통과해 실제 오류 0건을 확인했습니다.</td></tr>
         <tr><td>40차 라운드 — 품질검사 3화면 분할 개편 (2026-08-11, v0.72)</td><td>품질 카테고리를 <b>수입검사·공정검사·출하검사 3개의 독립된 메뉴</b>로 분할했습니다. ①수입검사(신설): 원재료는 대상에서 제외하고 외주발주 중 미입고(결재완료·입고대기) 건만 후보로 삼습니다. 매입처명·수주번호·품목명으로 조회하며, 합격이면 즉시 잔여수량 전량 입고완료 처리(기존 입고등록 로직 재사용), 불합격이면 <code>inspectFail</code> 플래그를 세워 외주생산 입고 진행현황에 "입고불합격" 배지로 표시됩니다. ②공정검사(개편): 상현님 지시대로 "다른 화면에 영향을 주지 않는 순수 이력" 화면으로 재설계 — 기업규모별(영세/소기업 등) 분기 로직을 전부 제거하고, 당일 생산중이거나 당일 생산일보가 있는 모든 수주 건을 기본 노출합니다(도중에 완료된 건도 포함). 저장해도 수주 상태는 전혀 바뀌지 않습니다. ③출하검사: 검사대기→출하대기 전환을 전담하는 유일한 게이트로 통일했습니다(수주관리에서 "검사 시작"을 누르면 검사대기로 전환). 세 화면 모두 환경설정에 사용여부 토글을 추가해(<code>S.qcModules</code>) 항상 메뉴는 노출하되, 미사용 설정 시 수입검사는 자동 입고완료, 출하검사는 검사 시작 즉시 자동으로 출하대기까지 전환되는 "검사생략" 동작을 하도록 만들었습니다(영세·소기업처럼 일부 검사 단계를 생략하는 회사도 메뉴 구조를 바꾸지 않고 대응). 구현 중 출하검사 자동생략이 상태는 정상 전환되는데 화면이 중간 상태(검사대기)에 멈춰 보이는 버그를 발견해, <code>passShipInspectionAuto()</code> 끝에 <code>recalc()</code> 호출을 추가해 해결했습니다. 마지막으로 수주→생산/외주→품질검사로 이어지는 연결 데모 데이터를 화면당 10건씩(공정검사 10·수입검사 10·출하검사 10, 합격/조건부합격/불합격 결과 혼합) 생성해 반영했습니다. node --check 구문 검증과 jsdom 기반 검증(3화면 후보/이력 렌더링, 수입검사 합격→자동입고 확인, 공정검사 저장 후 수주 상태 불변 확인, 출하검사 자동생략 전체 플로우 재현 및 버그 재현·수정 확인, 신규 시드데이터 프레시 로드 검증, 34~39차 회귀 스위트 재실행, 66개 전 화면 순회)을 통과해 실제 오류 0건을 확인했습니다.</td></tr>
         <tr><td>41차 라운드 — 품질검사 3화면 표 다듬기 + 납품관리 수주번호 연결 (2026-08-11, v0.73)</td><td>40차에서 새로 만든 화면들을 상현님이 실제로 열어보신 뒤 나온 다듬기 요청입니다. <b>①품질검사 3화면 공통</b> — 수주번호·매입처명 열에 줄바꿈이 일어나 값이 깨져 보이던 문제를 <code>white-space:nowrap</code>으로 잡고, 판정·검사자(수입검사는 비고도)처럼 드롭박스가 들어가는 열은 "조건부합격"처럼 긴 옵션값과 화살표 아이콘이 잘리지 않도록 폭을 74~90px에서 96~104px로 넉넉히 넓혔습니다(공정검사 단계 열도 56→68px). <b>②수입검사 이력 조회 신설</b> — 그동안 미입고 후보 목록에만 있던 매입처명/수주번호/품목명 조회를 검사 이력 표에도 별도로 달았습니다(<code>lv('qcincoming-hist')</code> 독립 키 사용, 후보 조회와 서로 간섭하지 않음). <b>③납품관리 2개 표 개편</b> — 헤더를 전부 가운데정렬하고, 출하대기 표는 거래처 옆에 수주번호를, 품목명 옆에 규격명을 신설해 남는 폭을 두 열에 몰아줬습니다. 납품이력 표는 납품일 옆에 수주번호를 추가하고(과거 시드데이터 24건 중 21건은 <code>orderId</code>가 끊겨 있어 거래처+품목명으로 한 번 더 매칭하는 보정을 추가), 규격명 폰트를 품목명과 동일하게 맞추고 인수확인 열을 가운데정렬했습니다. <b>④검사이력 삭제 기능 개선</b> — 삭제가 이력만 지우고 그때 함께 반영된 상태변화(입고완료·원가반영·귀책청구·검사대기↔출하대기 전환)는 그대로 남아있던 문제를 분석해 상현님께 보고드렸고, "진짜 되돌리기"로 개선하는 방향을 확인받아 구현했습니다. 수입검사는 합격/조건부합격 이력 저장 시 <code>prevStage·prevReceivedQty·prevInspectFail</code> 스냅샷을 함께 남기고, 삭제하면 <code>receivedQty·stage</code>를 되돌리고 그 검사로 생긴 원가반영(<code>S.out</code>) 항목을 제거하며, 귀책업체 청구가 걸려있었다면 기존 <code>reverseVendorClaim()</code>으로 함께 취소합니다(불합격 이력은 <code>inspectFail</code> 플래그만 이전 값으로 복원). 출하검사는 합격 이력 저장 시 <code>prevStatus·prevWarehouseInQty</code>를 남기고, 삭제 시 검사대기로 되돌리되 <b>이미 납품이 등록된 건은 실물이 창고를 나간 뒤라 되돌릴 수 없어 삭제를 막고 안내 메시지를 띄웁니다</b>(공정검사는 원래부터 순수 로그라 변경 없음). <b>⑤마감관리 재검토 분석</b>은 코드 변경 없이 대화로 결과를 보고드렸습니다(마감관리에 검사 미결 건수 경고가 없다는 리스크 분석 — 상세는 대화 참고). node --check 구문 검증과 jsdom 기반 검증(3화면 헤더 폭 확인, 수입검사 이력 조회 필터링, 납품관리 2개 표 렌더링·수주번호 매칭, 수입검사 합격 삭제→입고완료·원가반영 되돌리기 확인, 출하검사 합격 삭제→검사대기 복귀 확인, 납품등록된 건 삭제 차단 확인, 34~40차 회귀 스위트 재실행)을 통과해 실제 오류 0건을 확인했습니다.</td></tr>
-        <tr><td>42차 라운드 — 납품관리 버그수정 + 매출 마감관리 개편 (2026-08-11, v0.74)</td><td>①<b>납품일 중복표시 버그 수정</b> — 납품 등록 팝업의 날짜 입력창(type=date)은 항상 "YYYY-MM-DD" 전체를 돌려주는데, 저장할 때 그 값을 그대로 저장해버려서 화면에서 "2026-"를 한 번 더 붙이는 기존 표시 로직과 겹쳐 "2026-2026-07-25"처럼 연도가 두 번 보이던 버그였습니다(상현님 발견). 저장 직전 MM-DD만 추출하도록 정규화(<code>saveDeliveryRegistration</code>·<code>staffSaveDelivery</code> 두 곳 모두)해 해결했고, 납품이력 표의 수량·공급가 열 폭도 각각 999,999·99,999,999까지 안 잘리게 넓혔습니다. ②<b>출하대기 거래처 조회 신설</b> — 여러 거래처를 동시에 관리할 때 특정 거래처분만 모아 상차·등록할 수 있도록 조회조건을 추가했습니다. ③<b>매출 마감관리로 개편</b> — 상현님 의견대로 화면명을 "마감관리"에서 "매출 마감관리"로 바꿔 향후 구매 쪽 마감 화면과 헷갈리지 않게 했고(nav·타이틀·가이드허브 버튼 4곳), 지난 대화에서 제안드린 "마감 전 확인사항" 경고 카드를 신설했습니다 — 수입검사 대기(원가 미반영)·그중 불합격 보류·출하검사 대기(매출 미반영) 건수를 보여주고 클릭하면 해당 검사 화면으로 이동합니다(미결 건이 있을 때만 노출, 없으면 카드 자체를 숨김). ④<b>인수확인 이후 조회·알림 흐름</b>은 상현님과 상의 후 방향을 확정하는 대로 다음 라운드에서 반영합니다(이번 라운드에는 분석·의견만 대화로 전달). node --check 구문 검증과 jsdom 기반 검증(납품일 정규화 확인, 거래처 조회 필터링, 매출 마감관리 타이틀/nav 명칭, 경고카드 표시조건 및 건수 확인, 34~41차 회귀 스위트 재실행)을 통과해 실제 오류 0건을 확인했습니다.</td></tr>
+        <tr><td>43차 라운드 — 납품 인수확인 완료 알림 연동 (2026-08-11, v0.75)</td><td>42차에서 분석만 드렸던 "인수확인 이후 조회·알림 흐름"을 상현님이 두 방향 모두("1,2번을 모두 적용해줘") 반영하기로 확정해주셔서 함께 구현했습니다. ①<b>매출 마감관리 카드 확장</b> — 기존 3칸 경고카드(수입검사 대기·불합격 보류·출하검사 대기)에 <b>납품 인수확인 대기</b> 건수를 4번째 칸으로 추가했습니다(<code>.grid4</code> 신설). 앞 3칸과 달리 이 칸은 매출 마감을 막는 항목이 아니라 "체크리스트성 확인 항목"이라 카드 설명 문구로 그 차이를 명확히 안내했습니다. ②<b>알림센터 연동</b> — 납품이력에서 확인대기→확인완료로 바뀌는 순간 <code>toggleDeliveryReceived()</code> 함수를 신설해 기존 인라인 토글을 대체하고, <code>pushNotification('납품인수확인', ...)</code>을 호출해 화면 안 알림센터 기록과 실제 기기 푸시를 함께 남기도록 했습니다(반대로 확인완료→확인대기로 되돌릴 때는 담당자의 단순 실수 수정일 뿐이라 알림을 보내지 않습니다). node --check 구문 검증과 jsdom 기반 검증(경고카드 4번째 칸 표시조건·건수, 확인완료 토글 시 알림 기록 생성 확인, 34~42차 회귀 스위트 재실행)을 통과해 실제 오류 0건을 확인했습니다. 이 라운드에서 지정한 알림 대상(사장·경리)이 실제 업무 흐름과 맞지 않아 44차에서 바로 정정합니다.</td></tr>
+        <tr><td>44차 라운드 — 납품 인수확인 알림대상 정정 + 영업 역할 신설 + 추가인원 지정 (2026-08-11, v0.76)</td><td>43차에서 제가 임의로 정한 알림 대상(사장·경리)이 실제 업무 흐름과 맞지 않는다는 상현님 지적("알림이 가는 대상은 사장, 경리가 아니야. 영업, 생산관리+ 추가인원이야")을 반영해 대상을 다시 설계했습니다. ①<b>영업(SALES) 역할 신설</b> — 그동안 이 앱에는 영업 담당자를 가리키는 역할이 없어(수주·납품 화면은 있었지만 그걸 다루는 전용 역할이 없었음), 상현님 확인을 거쳐 <code>permRoleLabels</code>·<code>permMatrix</code>(13개 그룹 전체에 SALES 열 추가, "영업,수주"·"납품,마감" 2곳만 기본 허용)·<code>notifyRoleLabels</code>에 새 역할을 추가하고 데모 직원(정영업)을 등록했습니다. 화면 접근권한표·알림설정표·직원 역할 드롭다운은 모두 <code>Object.keys()</code> 기반으로 이미 범용화되어 있어 이 두 군데만 고치면 앱 전체에 자동 반영됩니다. ②<b>notifyRules 정정</b> — <code>납품인수확인</code> 알림 대상을 사장·경리(false)에서 영업·생산관리(true)로 교체했습니다. ③<b>"추가인원" 지정 기능 신설</b> — 상현님이 "직원이 될 수도 있고 임원이 될 수도 있어"라고 하신 대로, 역할과 무관하게 특정 개인을 지정할 수 있어야 해서 기존 "구매 결재 대리인"과 동일한 패턴(<code>S.deliveryConfirmExtraEmpIds</code> 배열)으로 별도 설계했습니다. 환경설정에 새 카드(납품 인수확인 추가 알림대상)를 만들어 재직 중인 전 직원(임원 포함) 중 누구든 체크로 지정할 수 있고, <code>pushNotification()</code> 함수에 5번째 인자(<code>extraEmpIds</code>)를 추가해 알림 기록에 <code>empIds</code> 필드로 함께 남도록 확장했습니다. 직원용 모니터링 앱의 "내게 온 알림" 필터도 역할 일치뿐 아니라 지정된 개인 ID 일치도 함께 보도록 넓혔고, 알림센터 피드에는 지정된 사람 이름을 👤 태그로 별도 표시했습니다. 단, 실제 기기 푸시(<code>sendRealPush</code>)는 아직 역할 단위 구독만 지원해 추가인원 지정은 화면 안 알림센터 기록에만 반영되고 실제 푸시알림은 받지 못한다는 한계를 코드 주석으로 남겨두었습니다(1개 테스트베드 업체 파일럿 범위, 추후 개인별 구독 도입 시 확장). node --check 구문 검증과 jsdom 기반 검증(SALES 역할이 권한표·알림설정표에 정상 노출, 납품인수확인 알림이 영업·생산관리에만 가고 사장·경리에는 안 가는지 확인, 추가인원으로 경리 직원 1명을 지정한 뒤 실제로 알림에 포함되고 👤 태그로 표시되는지 확인, 34~42차 회귀 스위트 재실행)을 통과해 실제 오류 0건을 확인했습니다.</td></tr>
       </tbody>
     </table>
   </div>
@@ -3368,7 +3376,9 @@ const S = {
     {id:7, name:'한서연', role:'OPERATION', roleLabel:'품질관리',           empType:'정직원', payType:'연봉', wageYear:2026, monthlySalary:3000000, hireDate:'2024-01-01', active:true, hasAccount:true, annualLeaveTotal:15},
     // 2026-08-07(30차 신설) — "생산관리자"(PRODMGR) 역할 미리보기·테스트용 데모 직원(상현님 확인).
     // 영업과 생산 사이에서 생산계획을 수립하고 작업지시를 내리는 역할(알림트리거 마스터리스트 v1.2 감사에서 확정).
-    {id:8, name:'노현우', role:'PRODMGR', roleLabel:'생산관리자',            empType:'정직원', payType:'연봉', wageYear:2026, monthlySalary:3400000, hireDate:'2025-06-01', active:true, hasAccount:true, annualLeaveTotal:15}
+    {id:8, name:'노현우', role:'PRODMGR', roleLabel:'생산관리자',            empType:'정직원', payType:'연봉', wageYear:2026, monthlySalary:3400000, hireDate:'2025-06-01', active:true, hasAccount:true, annualLeaveTotal:15},
+    // 2026-08-11(44차 신설) — "영업"(SALES) 역할 미리보기·테스트용 데모 직원(상현님 지시, PRODMGR 신설 때와 동일한 패턴).
+    {id:9, name:'정영업', role:'SALES', roleLabel:'영업담당',              empType:'정직원', payType:'연봉', wageYear:2026, monthlySalary:3200000, hireDate:'2023-11-01', active:true, hasAccount:true, annualLeaveTotal:15}
   ],
   // 2026-08-05(31차) 신설 — 마스터계정 권한설정 화면(상현님 지시)의 배경 설명용 상태입니다.
   // 이 SaaS(담다)를 공급하는 지투아이넷(SI사)의 유지보수용 관리자 계정입니다. 세아전자 같은
@@ -3478,6 +3488,9 @@ const S = {
   resettleDesignatedEmpIds:[], // 사장이 지정한 과거월 재정산 권한 보유 직원(최대 2명, OWNER 본인은 항상 포함되므로 별도 등록 불필요)
   // 구매 발주 결재(2026-07-28, 21차 라운드 신설) — 정식 그룹웨어 전자결재가 아니라 약식 절차입니다.
   poApprovalDelegateEmpIds:[], // 사장님이 지정한 결재 대리인(인원 제한 없음, OWNER 본인은 항상 결재 가능)
+  // 2026-08-11(44차 신설) — 납품 인수확인 알림의 "추가인원"(상현님 지시: 직원이든 임원이든 무관하게 지정 가능).
+  // 결재 대리인과 동일한 패턴이지만 역할과 무관한 특정 개인을 더하는 용도라 별도 배열로 관리합니다.
+  deliveryConfirmExtraEmpIds:[],
   poApprovalSkip:false, // true면 결재 단계 없이 결재상신 즉시 결재완료 처리(사장님이 매번 결재하기 번거로울 때)
   // 2026-08-11(40차 신설): 품질검사 3화면(수입/공정/출하) 각각 사용 여부 — 상현님 컨펌(항상 3개 메뉴는
   // 노출하되, 규모가 작아 특정 검사를 안 하는 회사는 환경설정에서 꺼두면 자동으로 넘어가는 방식).
@@ -3485,7 +3498,7 @@ const S = {
   // 도달하는 즉시 자동으로 출하대기 전환됩니다. process(공정검사)는 애초에 다른 화면에 영향을 주지 않는
   // 순수 이력이라 꺼도 막히는 동작은 없고, 화면에 "미사용" 안내만 표시됩니다.
   qcModules:{incoming:true, process:true, ship:true},
-  permRoleLabels:{OWNER:'사장', EXEC:'임원', ACCOUNT:'경리(직원)', FACTORY:'공장장(직원)', OPERATION:'생산·품질(직원)', DRIVER:'납품기사(직원)', WORKER:'생산직(직원)', PRODMGR:'생산관리자(직원)'},
+  permRoleLabels:{OWNER:'사장', EXEC:'임원', ACCOUNT:'경리(직원)', FACTORY:'공장장(직원)', OPERATION:'생산·품질(직원)', DRIVER:'납품기사(직원)', WORKER:'생산직(직원)', PRODMGR:'생산관리자(직원)', SALES:'영업(직원)'}, // 2026-08-11(44차 신설) — 상현님 지시: 납품 인수확인 알림 등 '영업' 전용 대상이 필요해 신설. PRODMGR와 동일한 최소 기본값 원칙 적용.
   // 2026-07-21(항목11) 대분류 재구성에 맞춰 permGroups/permMatrix도 새 12개 그룹 기준으로 다시 정의합니다.
   // 여러 기존 그룹이 하나로 합쳐진 곳(예: 운영 모니터링=사장화면+알림, 원가관리=원가분석+월고정비+전력비 등)은
   // 판단하여 보완: 손익처럼 민감한 화면이 포함된 그룹은 기존의 더 엄격한 쪽 권한을 유지하고(운영 모니터링 —
@@ -3503,21 +3516,21 @@ const S = {
     // 2026-08-07(30차): "생산관리자"(PRODMGR) 신규 역할 추가 — 영업과 생산 사이에서 생산계획·작업지시를
     // 담당하는 역할(알림트리거 마스터리스트 v1.2 감사에서 확정). 상현님 지시대로 최소 기본값(생산+영업,수주만
     // true)으로 시작하고, 나머지 그룹은 필요시 환경설정 > 권한관리에서 직접 열 수 있습니다.
-    '운영 모니터링': {OWNER:true, EXEC:true,  ACCOUNT:false, FACTORY:false, OPERATION:false, DRIVER:false, WORKER:false, PRODMGR:false},
-    '기본정보':     {OWNER:true, EXEC:true,  ACCOUNT:true,  FACTORY:true,  OPERATION:true,  DRIVER:false, WORKER:false, PRODMGR:false},
-    '영업,수주':    {OWNER:true, EXEC:true,  ACCOUNT:true,  FACTORY:false, OPERATION:false, DRIVER:false, WORKER:false, PRODMGR:true},
-    '구매':        {OWNER:true, EXEC:true,  ACCOUNT:true,  FACTORY:true,  OPERATION:false, DRIVER:false, WORKER:false, PRODMGR:false},
-    '생산':        {OWNER:true, EXEC:true,  ACCOUNT:false, FACTORY:true,  OPERATION:true,  DRIVER:false, WORKER:false, PRODMGR:true},
-    '납품,마감':    {OWNER:true, EXEC:true,  ACCOUNT:true,  FACTORY:false, OPERATION:true,  DRIVER:true,  WORKER:false, PRODMGR:false},
-    '자재':        {OWNER:true, EXEC:true,  ACCOUNT:true,  FACTORY:true,  OPERATION:false, DRIVER:false, WORKER:false, PRODMGR:false},
-    '인사,급여':    {OWNER:true, EXEC:true,  ACCOUNT:true,  FACTORY:true,  OPERATION:false, DRIVER:false, WORKER:false, PRODMGR:false},
-    '품질':        {OWNER:true, EXEC:true,  ACCOUNT:true,  FACTORY:false, OPERATION:true,  DRIVER:false, WORKER:false, PRODMGR:false},
-    '원가관리':     {OWNER:true, EXEC:true,  ACCOUNT:true,  FACTORY:true,  OPERATION:false, DRIVER:false, WORKER:false, PRODMGR:false},
+    '운영 모니터링': {OWNER:true, EXEC:true,  ACCOUNT:false, FACTORY:false, OPERATION:false, DRIVER:false, WORKER:false, PRODMGR:false, SALES:false},
+    '기본정보':     {OWNER:true, EXEC:true,  ACCOUNT:true,  FACTORY:true,  OPERATION:true,  DRIVER:false, WORKER:false, PRODMGR:false, SALES:false},
+    '영업,수주':    {OWNER:true, EXEC:true,  ACCOUNT:true,  FACTORY:false, OPERATION:false, DRIVER:false, WORKER:false, PRODMGR:true, SALES:true},
+    '구매':        {OWNER:true, EXEC:true,  ACCOUNT:true,  FACTORY:true,  OPERATION:false, DRIVER:false, WORKER:false, PRODMGR:false, SALES:false},
+    '생산':        {OWNER:true, EXEC:true,  ACCOUNT:false, FACTORY:true,  OPERATION:true,  DRIVER:false, WORKER:false, PRODMGR:true, SALES:false},
+    '납품,마감':    {OWNER:true, EXEC:true,  ACCOUNT:true,  FACTORY:false, OPERATION:true,  DRIVER:true,  WORKER:false, PRODMGR:false, SALES:true},
+    '자재':        {OWNER:true, EXEC:true,  ACCOUNT:true,  FACTORY:true,  OPERATION:false, DRIVER:false, WORKER:false, PRODMGR:false, SALES:false},
+    '인사,급여':    {OWNER:true, EXEC:true,  ACCOUNT:true,  FACTORY:true,  OPERATION:false, DRIVER:false, WORKER:false, PRODMGR:false, SALES:false},
+    '품질':        {OWNER:true, EXEC:true,  ACCOUNT:true,  FACTORY:false, OPERATION:true,  DRIVER:false, WORKER:false, PRODMGR:false, SALES:false},
+    '원가관리':     {OWNER:true, EXEC:true,  ACCOUNT:true,  FACTORY:true,  OPERATION:false, DRIVER:false, WORKER:false, PRODMGR:false, SALES:false},
     // 월간 보고(2026-07-27) — 부서 담당자(품질/생산 등 실무 역할 포함)도 자기 부서 입력화면은 볼 수 있어야 하므로
     // 원가관리보다 넓게 열어둡니다. 부서 단위 세부 접근제한(자기 부서만 입력)은 아직 role 모델에 없어 후속 과제로 남깁니다.
-    '월간 보고':    {OWNER:true, EXEC:true,  ACCOUNT:true,  FACTORY:true,  OPERATION:true,  DRIVER:false, WORKER:false, PRODMGR:false},
-    '환경설정':     {OWNER:true, EXEC:false, ACCOUNT:false, FACTORY:false, OPERATION:false, DRIVER:false, WORKER:false, PRODMGR:false},
-    '검증':        {OWNER:true, EXEC:false, ACCOUNT:false, FACTORY:false, OPERATION:false, DRIVER:false, WORKER:false, PRODMGR:false}
+    '월간 보고':    {OWNER:true, EXEC:true,  ACCOUNT:true,  FACTORY:true,  OPERATION:true,  DRIVER:false, WORKER:false, PRODMGR:false, SALES:false},
+    '환경설정':     {OWNER:true, EXEC:false, ACCOUNT:false, FACTORY:false, OPERATION:false, DRIVER:false, WORKER:false, PRODMGR:false, SALES:false},
+    '검증':        {OWNER:true, EXEC:false, ACCOUNT:false, FACTORY:false, OPERATION:false, DRIVER:false, WORKER:false, PRODMGR:false, SALES:false}
   },
 
   // 완제품 재고 — 생산완료(doneQty)-납품(deliveries) 계산값에 수동 조정(기타입고/출고)을 더해 관리
@@ -4240,10 +4253,12 @@ const S = {
     // ↓ 감사문서 범위 밖, 이번에 코드 대조 중 추가로 발견해 상현님 승인받은 2건(합리적 제안)
     '완제품재고':          {OWNER:false, ACCOUNT:true,  FACTORY:true,  OPERATION:false, DRIVER:false, WORKER:false, PRODMGR:false},
     '수주정보변경':        {OWNER:false, ACCOUNT:false, FACTORY:true,  OPERATION:true,  DRIVER:false, WORKER:false, PRODMGR:false},
-    // 2026-08-11(43차 신설): 납품관리 인수확인 완료 시 영업/경리·사장에게 알림(상현님 확인)
-    '납품인수확인':        {OWNER:true,  ACCOUNT:true,  FACTORY:false, OPERATION:false, DRIVER:false, WORKER:false, PRODMGR:false}
+    // 2026-08-11(43차 신설, 44차 정정): 납품관리 인수확인 완료 시 영업·생산관리에게 알림 —
+    // 상현님이 43차의 사장/경리 대상 설정을 정정해주셨습니다(사장·경리가 아니라 영업·생산관리 담당).
+    // '추가인원'(직원·임원 무관 특정 개인 지정)은 역할표만으로는 표현이 안 돼, 별도 empIds 방식으로 함께 발송합니다.
+    '납품인수확인':        {OWNER:false, ACCOUNT:false, FACTORY:false, OPERATION:false, DRIVER:false, WORKER:false, PRODMGR:true, SALES:true}
   },
-  notifyRoleLabels:{OWNER:'사장', ACCOUNT:'경리', FACTORY:'공장장', OPERATION:'생산·품질', DRIVER:'납품기사', WORKER:'생산직', PRODMGR:'생산관리자'},
+  notifyRoleLabels:{OWNER:'사장', ACCOUNT:'경리', FACTORY:'공장장', OPERATION:'생산·품질', DRIVER:'납품기사', WORKER:'생산직', PRODMGR:'생산관리자', SALES:'영업'},
   notifyTypeLabels:{
     '월마감완료':'월 마감 완료', '납기임박지연':'납기 임박·지연', '적자전환':'그 달 적자 전환',
     '수주등록':'수주 등록', '납품완료':'납품 완료', '생산완료':'생산 완료',
@@ -7806,7 +7821,7 @@ function toggleDeliveryReceived(idx){
   if(!d) return;
   d.received = !d.received;
   if(d.received){
-    pushNotification('납품인수확인', `${d.cust} ${d.item} ${d.qty.toLocaleString()}개 납품이 인수확인 완료로 등록되었습니다.`);
+    pushNotification('납품인수확인', `${d.cust} ${d.item} ${d.qty.toLocaleString()}개 납품이 인수확인 완료로 등록되었습니다.`, null, null, S.deliveryConfirmExtraEmpIds);
   }
   recalc();
 }
@@ -9732,17 +9747,22 @@ function daysBetweenMD(a,b){ return mdToDoy(b) - mdToDoy(a); }
 
 // 2026-08-05(28차): severity(선택, 'danger') 추가 — 납품 불량판정처럼 경고성으로 강조해야 하는 알림을
 // 알림센터에서 붉은 계열로 구분 표시하기 위함입니다. 넘기지 않으면 기존과 동일(일반 알림).
-function pushNotification(type, msg, targetRoles, severity){
+function pushNotification(type, msg, targetRoles, severity, extraEmpIds){
   // targetRoles를 직접 넘기면(업무전달처럼 매번 대상이 달라지는 경우) 규칙표 대신 그 대상을 그대로 씁니다.
   let roles = targetRoles;
   if(!roles){
     const rules = S.notifyRules[type] || {};
     roles = Object.keys(rules).filter(r=>rules[r]);
   }
-  if(!roles.length) return; // 수신 대상이 하나도 없으면 기록하지 않음
-  S.notifications.unshift({id: Date.now()+Math.random(), type, roles, msg, at: `${S.ym} ${S.elapsed}일차`, read:false, severity: severity||null});
+  // 2026-08-11(44차 신설) — extraEmpIds: 역할과 무관하게 지정된 특정 개인(예: "추가인원")에게도 함께 남깁니다.
+  const empIds = extraEmpIds && extraEmpIds.length ? extraEmpIds.slice() : [];
+  if(!roles.length && !empIds.length) return; // 수신 대상이 하나도 없으면 기록하지 않음
+  S.notifications.unshift({id: Date.now()+Math.random(), type, roles, empIds, msg, at: `${S.ym} ${S.elapsed}일차`, read:false, severity: severity||null});
   if(S.notifications.length>50) S.notifications.length = 50;
-  sendRealPush(roles, type, msg, severity); // 2026-08-07 신설 — 화면 안 기록과 별개로 실제 기기 푸시도 함께 발송
+  // 2026-08-07 신설 — 화면 안 기록과 별개로 실제 기기 푸시도 함께 발송. 단, 실제 기기 푸시는 아직
+  // 역할(role) 단위 구독만 지원해(1개 테스트베드 업체 파일럿 범위) 특정 개인(empIds) 지정은 화면 안
+  // 알림센터 기록에만 반영되고 실제 푸시는 못 받습니다 — 추후 개인별 구독이 생기면 확장할 지점입니다.
+  sendRealPush(roles, type, msg, severity);
 }
 // ══════════ 웹 푸시(PWA) — 2026-08-07 신설 ══════════
 // 1개 테스트베드 업체 파일럿 범위. Supabase Edge Function(send-push)에 "이 이벤트를 받을 역할 목록"을
@@ -10126,6 +10146,29 @@ function togglePOApprovalDelegate(empId, checked){
   }
   recalc();
 }
+// 2026-08-11(44차 신설) — 납품 인수확인 알림 "추가인원" 지정. 결재 대리인과 동일한 패턴이지만
+// 역할과 무관하게(직원이든 임원이든) 특정 개인을 더할 수 있어 OWNER도 후보에서 제외하지 않습니다.
+function toggleDeliveryConfirmExtra(empId, checked){
+  const list = S.deliveryConfirmExtraEmpIds || (S.deliveryConfirmExtraEmpIds = []);
+  if(checked){
+    if(!list.includes(empId)) list.push(empId);
+  } else {
+    S.deliveryConfirmExtraEmpIds = list.filter(id=>id!==empId);
+  }
+  recalc();
+}
+function renderDeliveryConfirmExtraSettings(){
+  const tbl = $('t-delivery-confirm-extra');
+  if(!tbl) return;
+  const designated = S.deliveryConfirmExtraEmpIds || [];
+  const candidates = S.employees.filter(e=>e.active!==false);
+  tbl.innerHTML = candidates.map(e=>`<tr>
+      <td class="num"><input type="checkbox" ${designated.includes(e.id)?'checked':''} onchange="toggleDeliveryConfirmExtra(${e.id},this.checked)"></td>
+      <td>${e.name}</td><td>${e.roleLabel||'—'}</td><td>${S.permRoleLabels[e.role]||e.role}</td>
+    </tr>`).join('') || '<tr><td colspan="4" style="color:var(--muted)">지정 가능한 직원이 없습니다.</td></tr>';
+  const summary = $('delivery-confirm-extra-summary');
+  if(summary) summary.textContent = '현재 지정: ' + (designated.length ? candidates.filter(e=>designated.includes(e.id)).map(e=>e.name).join(', ') : '없음(영업·생산관리 역할 전체에게만 발송)');
+}
 function renderPOApprovalSettings(){
   if($('cfg-po-approval-skip')) $('cfg-po-approval-skip').checked = !!S.poApprovalSkip;
   if($('cfg-qc-incoming-use')) $('cfg-qc-incoming-use').checked = !!S.qcModules.incoming;
@@ -10431,7 +10474,7 @@ function renderNotifications(){
       <div class="notify-item" style="${n.severity==='danger'?'background:#FDEEEC;border-left:3px solid var(--red);padding-left:8px;border-radius:4px':''}">
         <div class="notify-head"><b style="${n.severity==='danger'?'color:var(--red)':''}">${n.severity==='danger'?'⚠ ':''}${S.notifyTypeLabels[n.type]||n.type}</b><span style="color:var(--muted);font-size:10px">${n.at}</span></div>
         <div class="notify-msg">${n.msg}</div>
-        <div class="notify-roles">${n.roles.map(r=>`<span class="tag fix">${S.notifyRoleLabels[r]}</span>`).join(' ')}</div>
+        <div class="notify-roles">${n.roles.map(r=>`<span class="tag fix">${S.notifyRoleLabels[r]}</span>`).join(' ')}${(n.empIds||[]).map(id=>{ const e=S.employees.find(x=>x.id===id); return e?`<span class="tag fix" style="background:var(--blue-l)">👤 ${e.name}</span>`:''; }).join(' ')}</div>
       </div>`).join('') : '<p style="color:var(--muted)">알림 이력이 없습니다.</p>';
   }
   const grid = $('t-notify-rules');
@@ -11469,7 +11512,7 @@ function renderMonitorStaff(){
     ['quotes','🧮','견적등록','신규 견적을 등록합니다','#8B6FE0','#F3F0FD']
   ];
   // 오늘의 할일 — 내게 온 알림(시스템 알림 + 업무 전달)만 필터링해 접이식으로 표시(2026-07-23 신설)
-  const myNotifs = me ? S.notifications.filter(n=>n.roles.includes(me.role)) : [];
+  const myNotifs = me ? S.notifications.filter(n=>n.roles.includes(me.role) || (n.empIds||[]).includes(me.id)) : [];
   const notifHTML = myNotifs.length ? `
     <div class="pc" style="margin-bottom:8px;cursor:pointer" onclick="toggleStaffNotify()">
       <div style="display:flex;justify-content:space-between;align-items:center">
@@ -11581,6 +11624,7 @@ function recalc(){
   renderNavPermissions();
   renderPermMatrix();
   renderPOApprovalSettings();
+  renderDeliveryConfirmExtraSettings();
 
   /* 입력표 */
   $('t-fixed').innerHTML = S.fixed.map((f,i)=>`
