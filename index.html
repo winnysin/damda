@@ -2672,7 +2672,7 @@ BEP 매출  = 월 고정비 ÷ 공헌이익률
         <tr><td>38차 라운드 — 마감수량 콤마표시 + 외주발주관리 열 폭 조정 (2026-08-11, v0.70)</td><td>37차에서 1.5배로 넓혔던 원재료·외주 입고마감의 마감수량 입력창이 오히려 너무 넓다는 지적을 받아, 숫자를 <b>콤마로 구분 표시</b>(type=number → text+inputmode 전환)하는 방식으로 바꿨습니다 — 자릿수를 한눈에 읽을 수 있어 폭이 좁아도 잘림 걱정이 줄어듭니다(78px→64px). 원재료 입고마감 화면은 확보된 여유를 원재료명 열(110→148px)에 재배분하고, 마감수량(kg) 열 자체도 108px로 줄였습니다(외주 입고마감은 이번 요청 범위 밖이라 열 폭은 그대로 두고 콤마 표시만 공용으로 적용). 외주 발주관리 화면은 "귀책업체 재작업비 청구" 버튼명이 좁은 작업 열에서 길다는 지적에 <b>"재작업비 청구"</b>로 줄였고(모달·카드 제목 등 문맥이 있는 다른 곳은 원래 이름 유지), 수주번호 입력창이 브라우저 기본 datalist 드롭다운 화살표 아이콘에 값이 가려 잘려 보이던 문제를 열 폭 확대(82→96px, 공정명·상태·작업 열에서 재배분)와 입력창 우측 여백(padding-right:13px) 추가로 해결했습니다. node --check 구문 검증과 jsdom 기반 검증(마감수량 콤마 입력→재저장 라운드트립, 열 폭 확인, 버튼 라벨 전환 확인, 64개 전 화면 순회)을 통과해 실제 오류 0건을 확인했습니다.</td></tr>
         <tr><td>39차 라운드 — 외주마감 귀책업체 청구금액 자동 상계차감 (2026-08-11, v0.71)</td><td>지난 라운드에서 만든 "정산완료된 청구금액을 경고만 하고 실제로는 차감하지 않는" 상계 방식이, 상현님이 처음 의도하신 "재작업으로 발생한 추가 매입 비용을 귀책업체 마감 지급액에서 실제로 반영"하는 것과는 다르다는 걸 대화 중에 확인해, 실제로 차감하는 기능으로 다시 설계했습니다. 외주 입고 마감에서 매입처를 조회해 발주 건을 <b>전체 선택하면</b>(등록 자체가 매입처 1곳 단위로만 가능하므로 선택된 건이 모두 같은 업체일 때), 그 업체 앞 정산완료·미상계 귀책업체 재작업비 청구금액과 선택 건 총액 중 작은 값이 <b>"상계차감액" 입력창에 자동 제안</b>되고(상현님 컨펌 — 자동 제안 + 수정가능 방식), 담당자가 필요하면 직접 줄이거나 늘릴 수 있습니다(총액 초과는 불가). <b>마감등록을 누르면 실제로 그 금액만큼 마감 총액에서 차감</b>되어 마감내역서에 총액·상계차감·실지급액이 함께 기록되고(<code>netDeduction</code>·<code>payableAmount</code> 필드 신설), 상계에 쓰인 청구 건들은 오래된 순서로 자동 "상계완료(마감번호)"로 표시됩니다(건을 쪼개지 않고 통째로만 상계에 포함해 어느 건이 상계됐는지 항상 명확하게 유지). 마감내역서 발행 이력 표에도 상계차감이 있는 건만 합계금액 아래에 차감 내역을 함께 보여줍니다. node --check 구문 검증과 jsdom 기반 검증(재작업 발주→귀책 태깅→입고완료→청구생성→정산완료 → 같은 업체 앞 별도 정상 발주 입고완료 → 외주마감에서 전체선택 시 상계차감 자동제안(40,000원) 확인 → 마감등록 후 총액 100,000원에서 실지급 60,000원 계산 확인 → 청구 현황에 상계완료(마감번호) 표시 확인, 34~38차 회귀 스위트 재실행, 64개 전 화면 순회)을 통과해 실제 오류 0건을 확인했습니다.</td></tr>
         <tr><td>40차 라운드 — 품질검사 3화면 분할 개편 (2026-08-11, v0.72)</td><td>품질 카테고리를 <b>수입검사·공정검사·출하검사 3개의 독립된 메뉴</b>로 분할했습니다. ①수입검사(신설): 원재료는 대상에서 제외하고 외주발주 중 미입고(결재완료·입고대기) 건만 후보로 삼습니다. 매입처명·수주번호·품목명으로 조회하며, 합격이면 즉시 잔여수량 전량 입고완료 처리(기존 입고등록 로직 재사용), 불합격이면 <code>inspectFail</code> 플래그를 세워 외주생산 입고 진행현황에 "입고불합격" 배지로 표시됩니다. ②공정검사(개편): 상현님 지시대로 "다른 화면에 영향을 주지 않는 순수 이력" 화면으로 재설계 — 기업규모별(영세/소기업 등) 분기 로직을 전부 제거하고, 당일 생산중이거나 당일 생산일보가 있는 모든 수주 건을 기본 노출합니다(도중에 완료된 건도 포함). 저장해도 수주 상태는 전혀 바뀌지 않습니다. ③출하검사: 검사대기→출하대기 전환을 전담하는 유일한 게이트로 통일했습니다(수주관리에서 "검사 시작"을 누르면 검사대기로 전환). 세 화면 모두 환경설정에 사용여부 토글을 추가해(<code>S.qcModules</code>) 항상 메뉴는 노출하되, 미사용 설정 시 수입검사는 자동 입고완료, 출하검사는 검사 시작 즉시 자동으로 출하대기까지 전환되는 "검사생략" 동작을 하도록 만들었습니다(영세·소기업처럼 일부 검사 단계를 생략하는 회사도 메뉴 구조를 바꾸지 않고 대응). 구현 중 출하검사 자동생략이 상태는 정상 전환되는데 화면이 중간 상태(검사대기)에 멈춰 보이는 버그를 발견해, <code>passShipInspectionAuto()</code> 끝에 <code>recalc()</code> 호출을 추가해 해결했습니다. 마지막으로 수주→생산/외주→품질검사로 이어지는 연결 데모 데이터를 화면당 10건씩(공정검사 10·수입검사 10·출하검사 10, 합격/조건부합격/불합격 결과 혼합) 생성해 반영했습니다. node --check 구문 검증과 jsdom 기반 검증(3화면 후보/이력 렌더링, 수입검사 합격→자동입고 확인, 공정검사 저장 후 수주 상태 불변 확인, 출하검사 자동생략 전체 플로우 재현 및 버그 재현·수정 확인, 신규 시드데이터 프레시 로드 검증, 34~39차 회귀 스위트 재실행, 66개 전 화면 순회)을 통과해 실제 오류 0건을 확인했습니다.</td></tr>
-        <tr><td>41차 라운드 — 품질검사 3화면 표 다듬기 + 납품관리 수주번호 연결 (2026-08-11, v0.73)</td><td>40차에서 새로 만든 화면들을 상현님이 실제로 열어보신 뒤 나온 다듬기 요청입니다. <b>①품질검사 3화면 공통</b> — 수주번호·매입처명 열에 줄바꿈이 일어나 값이 깨져 보이던 문제를 <code>white-space:nowrap</code>으로 잡고, 판정·검사자(수입검사는 비고도)처럼 드롭박스가 들어가는 열은 "조건부합격"처럼 긴 옵션값과 화살표 아이콘이 잘리지 않도록 폭을 74~90px에서 96~104px로 넉넉히 넓혔습니다(공정검사 단계 열도 56→68px). <b>②수입검사 이력 조회 신설</b> — 그동안 미입고 후보 목록에만 있던 매입처명/수주번호/품목명 조회를 검사 이력 표에도 별도로 달았습니다(<code>lv('qcincoming-hist')</code> 독립 키 사용, 후보 조회와 서로 간섭하지 않음). <b>③납품관리 2개 표 개편</b> — 헤더를 전부 가운데정렬하고, 출하대기 표는 거래처 옆에 수주번호를, 품목명 옆에 규격명을 신설해 남는 폭을 두 열에 몰아줬습니다. 납품이력 표는 납품일 옆에 수주번호를 추가하고(과거 시드데이터 24건 중 21건은 <code>orderId</code>가 끊겨 있어 거래처+품목명으로 한 번 더 매칭하는 보정을 추가), 규격명 폰트를 품목명과 동일하게 맞추고 인수확인 열을 가운데정렬했습니다. <b>④검사이력 삭제 기능 검토</b>와 <b>⑤마감관리 재검토 분석</b>은 코드 변경 없이 대화로 결과를 보고드렸습니다(각각 삭제 시 부작용 분석과, 마감관리에 검사 미결 건수 경고가 없다는 리스크 분석 — 상세는 대화 참고). node --check 구문 검증과 jsdom 기반 검증(3화면 헤더 폭 확인, 수입검사 이력 조회 필터링, 납품관리 2개 표 렌더링·수주번호 매칭, 34~40차 회귀 스위트 재실행)을 통과해 실제 오류 0건을 확인했습니다.</td></tr>
+        <tr><td>41차 라운드 — 품질검사 3화면 표 다듬기 + 납품관리 수주번호 연결 (2026-08-11, v0.73)</td><td>40차에서 새로 만든 화면들을 상현님이 실제로 열어보신 뒤 나온 다듬기 요청입니다. <b>①품질검사 3화면 공통</b> — 수주번호·매입처명 열에 줄바꿈이 일어나 값이 깨져 보이던 문제를 <code>white-space:nowrap</code>으로 잡고, 판정·검사자(수입검사는 비고도)처럼 드롭박스가 들어가는 열은 "조건부합격"처럼 긴 옵션값과 화살표 아이콘이 잘리지 않도록 폭을 74~90px에서 96~104px로 넉넉히 넓혔습니다(공정검사 단계 열도 56→68px). <b>②수입검사 이력 조회 신설</b> — 그동안 미입고 후보 목록에만 있던 매입처명/수주번호/품목명 조회를 검사 이력 표에도 별도로 달았습니다(<code>lv('qcincoming-hist')</code> 독립 키 사용, 후보 조회와 서로 간섭하지 않음). <b>③납품관리 2개 표 개편</b> — 헤더를 전부 가운데정렬하고, 출하대기 표는 거래처 옆에 수주번호를, 품목명 옆에 규격명을 신설해 남는 폭을 두 열에 몰아줬습니다. 납품이력 표는 납품일 옆에 수주번호를 추가하고(과거 시드데이터 24건 중 21건은 <code>orderId</code>가 끊겨 있어 거래처+품목명으로 한 번 더 매칭하는 보정을 추가), 규격명 폰트를 품목명과 동일하게 맞추고 인수확인 열을 가운데정렬했습니다. <b>④검사이력 삭제 기능 개선</b> — 삭제가 이력만 지우고 그때 함께 반영된 상태변화(입고완료·원가반영·귀책청구·검사대기↔출하대기 전환)는 그대로 남아있던 문제를 분석해 상현님께 보고드렸고, "진짜 되돌리기"로 개선하는 방향을 확인받아 구현했습니다. 수입검사는 합격/조건부합격 이력 저장 시 <code>prevStage·prevReceivedQty·prevInspectFail</code> 스냅샷을 함께 남기고, 삭제하면 <code>receivedQty·stage</code>를 되돌리고 그 검사로 생긴 원가반영(<code>S.out</code>) 항목을 제거하며, 귀책업체 청구가 걸려있었다면 기존 <code>reverseVendorClaim()</code>으로 함께 취소합니다(불합격 이력은 <code>inspectFail</code> 플래그만 이전 값으로 복원). 출하검사는 합격 이력 저장 시 <code>prevStatus·prevWarehouseInQty</code>를 남기고, 삭제 시 검사대기로 되돌리되 <b>이미 납품이 등록된 건은 실물이 창고를 나간 뒤라 되돌릴 수 없어 삭제를 막고 안내 메시지를 띄웁니다</b>(공정검사는 원래부터 순수 로그라 변경 없음). <b>⑤마감관리 재검토 분석</b>은 코드 변경 없이 대화로 결과를 보고드렸습니다(마감관리에 검사 미결 건수 경고가 없다는 리스크 분석 — 상세는 대화 참고). node --check 구문 검증과 jsdom 기반 검증(3화면 헤더 폭 확인, 수입검사 이력 조회 필터링, 납품관리 2개 표 렌더링·수주번호 매칭, 수입검사 합격 삭제→입고완료·원가반영 되돌리기 확인, 출하검사 합격 삭제→검사대기 복귀 확인, 납품등록된 건 삭제 차단 확인, 34~40차 회귀 스위트 재실행)을 통과해 실제 오류 0건을 확인했습니다.</td></tr>
       </tbody> </div>
 </section>
 
@@ -13822,7 +13822,10 @@ function saveQcIncomingInspection(no){
   const inspector = $(`qcin-inspector-${no}`).value;
   const note = $(`qcin-note-${no}`).value;
   const remaining = (p.qty||0) - (p.receivedQty||0);
-  const rec = {id:S.incomingInspNextId++, date:todayMD(), sourcePoNo:p.no, orderNo:p.orderNo||'', vendor:p.vendor, item:p.item, specName:p.specName||'', qty:remaining, result, inspector, note};
+  // 2026-08-11(41차): 이 검사로 실제 상태를 바꾸기 직전 값을 기록해둡니다 — 이력을 삭제할 때
+  // 그대로 되돌리기 위한 스냅샷입니다(prevStage/prevReceivedQty/prevInspectFail).
+  const rec = {id:S.incomingInspNextId++, date:todayMD(), sourcePoNo:p.no, orderNo:p.orderNo||'', vendor:p.vendor, item:p.item, specName:p.specName||'', qty:remaining, result, inspector, note,
+    prevStage:p.stage, prevReceivedQty:p.receivedQty||0, prevInspectFail: !!p.inspectFail};
   S.incomingInspections.push(rec);
   if(result==='불합격'){
     p.inspectFail = true;
@@ -13834,7 +13837,35 @@ function saveQcIncomingInspection(no){
   }
   recalc();
 }
-function removeIncomingInspection(id){ S.incomingInspections = S.incomingInspections.filter(q=>q.id!==id); recalc(); }
+// 2026-08-11(41차): 삭제가 이력만 지우고 그때 함께 반영된 입고완료·원가·귀책청구·불합격표시는 그대로
+// 남아있던 문제(상현님 지적)를 고쳐, "진짜 되돌리기"로 만들었습니다. 합격/조건부합격 이력을 지우면
+// receivedQty·stage를 이 검사 이전 값으로 되돌리고, 그 검사로 원가에 반영된 S.out 항목을 제거하고,
+// 이 발주 건에 걸린 귀책업체 청구가 있었다면 reverseVendorClaim()으로 함께 취소합니다.
+// 불합격 이력을 지우면 inspectFail 플래그를 이전 값으로 되돌립니다.
+function removeIncomingInspection(id){
+  const q = S.incomingInspections.find(x=>x.id===id);
+  if(!q) return;
+  const p = S.outsourcePOs.find(x=>x.no===q.sourcePoNo);
+  const isReceiptResult = q.result!=='불합격';
+  const msg = isReceiptResult
+    ? '이 검사 이력을 삭제하면 이때 함께 처리된 입고완료·원가반영도 함께 되돌립니다(귀책업체 청구가 있었다면 그것도 취소됩니다). 삭제하시겠습니까?'
+    : '이 검사 이력을 삭제하면 불합격 표시도 함께 해제됩니다. 삭제하시겠습니까?';
+  if(!confirm(msg)) return;
+  if(p){
+    if(!isReceiptResult){
+      p.inspectFail = (q.prevInspectFail===undefined) ? false : q.prevInspectFail;
+    } else {
+      p.receivedQty = q.prevReceivedQty!=null ? q.prevReceivedQty : Math.max(0, (p.receivedQty||0)-(q.qty||0));
+      p.stage = q.prevStage || '결재완료';
+      p.inspectFail = (q.prevInspectFail===undefined) ? false : q.prevInspectFail;
+      // 이 검사로 생성된 원가반영(S.out) 항목 제거 — 같은 발주건(sourcePoNo)의 가장 최근 건을 되돌립니다.
+      for(let i=S.out.length-1;i>=0;i--){ if(S.out[i].sourcePoNo===p.no){ S.out.splice(i,1); break; } }
+      if(p.claimCreated) reverseVendorClaim(p);
+    }
+  }
+  S.incomingInspections = S.incomingInspections.filter(x=>x.id!==id);
+  recalc();
+}
 function editIncomingInspection(id){ S.qcInEditId = id; recalc(); }
 function cancelEditIncomingInspection(){ S.qcInEditId = null; recalc(); }
 function saveEditIncomingInspection(id){
@@ -13909,7 +13940,9 @@ function qcShipCandidateRowHTML(o){
 // 2026-08-11(40차 신설): 출하검사 미사용 설정 시, 검사대기 도달 즉시 자동으로 출하대기 전환합니다.
 // 담당자 입력 없이 처리되지만 추적 가능하도록 최소한의 이력(auto:true)은 남깁니다.
 function passShipInspectionAuto(oi){
-  const rec = {id:S.shipInspNextId++, date:todayMD(), orderItemId:oi.id, qty:oi.doneQty||0, defectQty:0, result:'합격', inspector:'(자동-검사생략)', note:'출하검사 미사용 설정으로 자동 통과', auto:true};
+  // 2026-08-11(41차): 되돌리기를 위해 전환 직전 상태를 기록해둡니다.
+  const rec = {id:S.shipInspNextId++, date:todayMD(), orderItemId:oi.id, qty:oi.doneQty||0, defectQty:0, result:'합격', inspector:'(자동-검사생략)', note:'출하검사 미사용 설정으로 자동 통과', auto:true,
+    prevStatus:oi.status, prevWarehouseInQty:oi.warehouseInQty};
   S.shipInspections.push(rec);
   oi.status = '출하대기';
   oi.warehouseInQty = oi.doneQty;
@@ -13926,7 +13959,8 @@ function submitShipInspection(orderItemId){
   const qty = +qtyEl.value, defectQty = +$(`qcship-defect-${orderItemId}`).value, result = $(`qcship-result-${orderItemId}`).value;
   if(!qty){ alert('검사수량을 입력하세요.'); return; }
   const inspector = $(`qcship-inspector-${orderItemId}`).value, note = $(`qcship-note-${orderItemId}`).value;
-  const rec = {id:S.shipInspNextId++, date:todayMD(), orderItemId, qty, defectQty, result, inspector, note};
+  // 2026-08-11(41차): 되돌리기를 위해 전환 직전 상태를 기록해둡니다.
+  const rec = {id:S.shipInspNextId++, date:todayMD(), orderItemId, qty, defectQty, result, inspector, note, prevStatus:oi.status, prevWarehouseInQty:oi.warehouseInQty};
   S.shipInspections.push(rec);
   if(result==='합격' && oi.status==='검사대기'){
     oi.status = '출하대기';
@@ -13937,7 +13971,32 @@ function submitShipInspection(orderItemId){
   }
   recalc();
 }
-function removeShipInspection(id){ S.shipInspections = S.shipInspections.filter(q=>q.id!==id); recalc(); }
+// 2026-08-11(41차): 삭제가 이력만 지우고 검사대기→출하대기 전환은 그대로 남던 문제(상현님 지적)를
+// 고쳐 "진짜 되돌리기"로 만들었습니다. 합격 이력을 지우면 수주 상태를 검사대기로 되돌립니다 — 단,
+// 이미 납품이 등록된 건은 창고에서 실제로 나간 뒤라 되돌리면 데이터가 어긋나므로 삭제를 막습니다.
+function removeShipInspection(id){
+  const q = S.shipInspections.find(x=>x.id===id);
+  if(!q) return;
+  const oi = S.orderItems.find(o=>o.id===q.orderItemId);
+  const wasReceiptResult = q.result==='합격' && q.prevStatus==='검사대기';
+  if(wasReceiptResult && oi){
+    const delivered = orderDeliveredQty(oi.id);
+    if(delivered > 0){
+      alert('이미 납품이 등록된 건이라 검사 이력을 삭제할 수 없습니다. 납품관리에서 해당 납품 건을 먼저 확인해주세요.');
+      return;
+    }
+  }
+  const msg = wasReceiptResult
+    ? '이 검사 이력을 삭제하면 출하대기로 전환됐던 것도 검사대기로 되돌립니다. 삭제하시겠습니까?'
+    : '이 검사 이력을 삭제하시겠습니까?';
+  if(!confirm(msg)) return;
+  if(wasReceiptResult && oi){
+    oi.status = q.prevStatus;
+    oi.warehouseInQty = q.prevWarehouseInQty;
+  }
+  S.shipInspections = S.shipInspections.filter(x=>x.id!==id);
+  recalc();
+}
 function editShipInspection(id){ S.qcShipEditId = id; recalc(); }
 function cancelEditShipInspection(){ S.qcShipEditId = null; recalc(); }
 function saveEditShipInspection(id){
