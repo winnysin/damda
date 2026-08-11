@@ -551,7 +551,7 @@ table.mr-table input.form-control.ro{background:var(--bg);color:var(--muted)}
 <body>
 <div class="wrap">
 <aside class="side">
-  <div class="brand"><div class="brand-row"><img src="/icon-192.png" alt="DAMDA" class="brand-logo"><span class="brand-word">DAMDA</span></div><small>프로토타입 v0.76 · 납품 인수확인 알림대상 정정 + 영업 역할 신설 — 44차 라운드</small></div>
+  <div class="brand"><div class="brand-row"><img src="/icon-192.png" alt="DAMDA" class="brand-logo"><span class="brand-word">DAMDA</span></div><small>프로토타입 v0.77 · 납품·마감 열 폭 정비 + 고객사별 마감내역서 개선 — 45차 라운드</small></div>
   <nav class="nav">
     <!-- 2026-07-21(항목11) 대분류 재구성: 운영 모니터링-기본정보-영업,수주-구매-생산-납품,마감-자재-인사,급여-품질-원가관리-가이드-환경설정 (12개, 상현님 지시안) -->
     <div class="grp">운영 모니터링</div>
@@ -1363,8 +1363,8 @@ table.mr-table input.form-control.ro{background:var(--bg);color:var(--muted)}
     </div>
     <div style="overflow-x:auto"><table class="th-center" style="table-layout:fixed">
       <thead><tr><th style="width:90px">거래처</th><th style="width:86px">수주번호</th><th>품목명</th><th>규격명</th>
-        <th class="num" style="width:74px">수주수량</th><th class="num" style="width:74px">기납품</th><th class="num" style="width:74px">잔량</th>
-        <th class="num" style="width:74px">단가</th><th class="num" style="width:90px">잔량 공급가</th><th style="width:84px"></th></tr></thead>
+        <th class="num" style="width:82px">수주수량</th><th class="num" style="width:82px">기납품</th><th class="num" style="width:82px">잔량</th>
+        <th class="num" style="width:82px">단가</th><th class="num" style="width:112px">잔량 공급가</th><th style="width:84px"></th></tr></thead>
       <tbody id="t-delivery-pending"></tbody>
     </table></div>
   </div>
@@ -1387,7 +1387,7 @@ table.mr-table input.form-control.ro{background:var(--bg);color:var(--muted)}
     </div>
     <div style="overflow-x:auto"><table class="th-center" style="table-layout:fixed">
       <thead><tr><th style="width:92px">납품일</th><th style="width:84px">수주번호</th><th style="width:84px">거래처</th><th>품목명</th><th>규격명</th>
-        <th class="num" style="width:80px">수량</th><th class="num" style="width:104px">공급가</th><th style="width:88px">인수확인</th></tr></thead>
+        <th class="num" style="width:84px">수량</th><th class="num" style="width:112px">공급가</th><th style="width:88px">인수확인</th></tr></thead>
       <tbody id="t-delivery-hist"></tbody>
       <tfoot><tr><td colspan="6">합계</td><td class="num" id="dv-sum"></td><td></td></tr></tfoot>
     </table></div>
@@ -1459,8 +1459,8 @@ table.mr-table input.form-control.ro{background:var(--bg);color:var(--muted)}
     </div>
     <div style="overflow-x:auto"><table class="th-center" style="table-layout:fixed">
       <thead><tr>
-        <th style="width:32px"></th><th style="width:80px">납품일</th><th>품목명</th><th style="width:140px">규격명</th>
-        <th class="num" style="width:80px">수량</th><th class="num" style="width:90px">단가</th><th class="num" style="width:100px">공급가</th>
+        <th style="width:32px"></th><th style="width:80px">납품일</th><th style="width:90px">고객사명</th><th>품목명</th><th>규격명</th>
+        <th class="num" style="width:82px">수량</th><th class="num" style="width:92px">단가</th><th class="num" style="width:112px">공급가</th>
       </tr></thead>
       <tbody id="t-custclosing-candidates"></tbody>
     </table></div>
@@ -1471,10 +1471,17 @@ table.mr-table input.form-control.ro{background:var(--bg);color:var(--muted)}
   </div>
   <div class="card">
     <h2 style="margin-top:0">마감내역서 발행 이력</h2>
+    <div class="lv-search">
+      <div><label>발행월</label><input type="text" placeholder="예: 08" oninput="lvSetSearch('custclosing-hist','ym',this.value)"></div>
+      <div><label>거래처</label><input type="text" placeholder="거래처명" oninput="lvSetSearch('custclosing-hist','cust',this.value)"></div>
+      <button class="btn gh sm" onclick="lvResetSearch('custclosing-hist');this.parentElement.querySelectorAll('input').forEach(i=>i.value='')">검색 초기화</button>
+      <span class="lv-count" id="custclosing-hist-count"></span>
+    </div>
     <table>
       <thead><tr><th style="width:14%">발행번호</th><th style="width:18%">거래처</th><th style="width:20%">대상기간</th>
         <th class="num" style="width:10%">건수</th><th class="num" style="width:16%">합계금액</th><th style="width:12%">발행일</th><th style="width:10%"></th></tr></thead>
       <tbody id="t-custclosing-hist"></tbody>
+      <tfoot><tr><td colspan="4">합계</td><td class="num" id="custclosing-hist-sum"></td><td colspan="2"></td></tr></tfoot>
     </table>
   </div>
 
@@ -2703,6 +2710,7 @@ BEP 매출  = 월 고정비 ÷ 공헌이익률
         <tr><td>41차 라운드 — 품질검사 3화면 표 다듬기 + 납품관리 수주번호 연결 (2026-08-11, v0.73)</td><td>40차에서 새로 만든 화면들을 상현님이 실제로 열어보신 뒤 나온 다듬기 요청입니다. <b>①품질검사 3화면 공통</b> — 수주번호·매입처명 열에 줄바꿈이 일어나 값이 깨져 보이던 문제를 <code>white-space:nowrap</code>으로 잡고, 판정·검사자(수입검사는 비고도)처럼 드롭박스가 들어가는 열은 "조건부합격"처럼 긴 옵션값과 화살표 아이콘이 잘리지 않도록 폭을 74~90px에서 96~104px로 넉넉히 넓혔습니다(공정검사 단계 열도 56→68px). <b>②수입검사 이력 조회 신설</b> — 그동안 미입고 후보 목록에만 있던 매입처명/수주번호/품목명 조회를 검사 이력 표에도 별도로 달았습니다(<code>lv('qcincoming-hist')</code> 독립 키 사용, 후보 조회와 서로 간섭하지 않음). <b>③납품관리 2개 표 개편</b> — 헤더를 전부 가운데정렬하고, 출하대기 표는 거래처 옆에 수주번호를, 품목명 옆에 규격명을 신설해 남는 폭을 두 열에 몰아줬습니다. 납품이력 표는 납품일 옆에 수주번호를 추가하고(과거 시드데이터 24건 중 21건은 <code>orderId</code>가 끊겨 있어 거래처+품목명으로 한 번 더 매칭하는 보정을 추가), 규격명 폰트를 품목명과 동일하게 맞추고 인수확인 열을 가운데정렬했습니다. <b>④검사이력 삭제 기능 개선</b> — 삭제가 이력만 지우고 그때 함께 반영된 상태변화(입고완료·원가반영·귀책청구·검사대기↔출하대기 전환)는 그대로 남아있던 문제를 분석해 상현님께 보고드렸고, "진짜 되돌리기"로 개선하는 방향을 확인받아 구현했습니다. 수입검사는 합격/조건부합격 이력 저장 시 <code>prevStage·prevReceivedQty·prevInspectFail</code> 스냅샷을 함께 남기고, 삭제하면 <code>receivedQty·stage</code>를 되돌리고 그 검사로 생긴 원가반영(<code>S.out</code>) 항목을 제거하며, 귀책업체 청구가 걸려있었다면 기존 <code>reverseVendorClaim()</code>으로 함께 취소합니다(불합격 이력은 <code>inspectFail</code> 플래그만 이전 값으로 복원). 출하검사는 합격 이력 저장 시 <code>prevStatus·prevWarehouseInQty</code>를 남기고, 삭제 시 검사대기로 되돌리되 <b>이미 납품이 등록된 건은 실물이 창고를 나간 뒤라 되돌릴 수 없어 삭제를 막고 안내 메시지를 띄웁니다</b>(공정검사는 원래부터 순수 로그라 변경 없음). <b>⑤마감관리 재검토 분석</b>은 코드 변경 없이 대화로 결과를 보고드렸습니다(마감관리에 검사 미결 건수 경고가 없다는 리스크 분석 — 상세는 대화 참고). node --check 구문 검증과 jsdom 기반 검증(3화면 헤더 폭 확인, 수입검사 이력 조회 필터링, 납품관리 2개 표 렌더링·수주번호 매칭, 수입검사 합격 삭제→입고완료·원가반영 되돌리기 확인, 출하검사 합격 삭제→검사대기 복귀 확인, 납품등록된 건 삭제 차단 확인, 34~40차 회귀 스위트 재실행)을 통과해 실제 오류 0건을 확인했습니다.</td></tr>
         <tr><td>43차 라운드 — 납품 인수확인 완료 알림 연동 (2026-08-11, v0.75)</td><td>42차에서 분석만 드렸던 "인수확인 이후 조회·알림 흐름"을 상현님이 두 방향 모두("1,2번을 모두 적용해줘") 반영하기로 확정해주셔서 함께 구현했습니다. ①<b>매출 마감관리 카드 확장</b> — 기존 3칸 경고카드(수입검사 대기·불합격 보류·출하검사 대기)에 <b>납품 인수확인 대기</b> 건수를 4번째 칸으로 추가했습니다(<code>.grid4</code> 신설). 앞 3칸과 달리 이 칸은 매출 마감을 막는 항목이 아니라 "체크리스트성 확인 항목"이라 카드 설명 문구로 그 차이를 명확히 안내했습니다. ②<b>알림센터 연동</b> — 납품이력에서 확인대기→확인완료로 바뀌는 순간 <code>toggleDeliveryReceived()</code> 함수를 신설해 기존 인라인 토글을 대체하고, <code>pushNotification('납품인수확인', ...)</code>을 호출해 화면 안 알림센터 기록과 실제 기기 푸시를 함께 남기도록 했습니다(반대로 확인완료→확인대기로 되돌릴 때는 담당자의 단순 실수 수정일 뿐이라 알림을 보내지 않습니다). node --check 구문 검증과 jsdom 기반 검증(경고카드 4번째 칸 표시조건·건수, 확인완료 토글 시 알림 기록 생성 확인, 34~42차 회귀 스위트 재실행)을 통과해 실제 오류 0건을 확인했습니다. 이 라운드에서 지정한 알림 대상(사장·경리)이 실제 업무 흐름과 맞지 않아 44차에서 바로 정정합니다.</td></tr>
         <tr><td>44차 라운드 — 납품 인수확인 알림대상 정정 + 영업 역할 신설 + 추가인원 지정 (2026-08-11, v0.76)</td><td>43차에서 제가 임의로 정한 알림 대상(사장·경리)이 실제 업무 흐름과 맞지 않는다는 상현님 지적("알림이 가는 대상은 사장, 경리가 아니야. 영업, 생산관리+ 추가인원이야")을 반영해 대상을 다시 설계했습니다. ①<b>영업(SALES) 역할 신설</b> — 그동안 이 앱에는 영업 담당자를 가리키는 역할이 없어(수주·납품 화면은 있었지만 그걸 다루는 전용 역할이 없었음), 상현님 확인을 거쳐 <code>permRoleLabels</code>·<code>permMatrix</code>(13개 그룹 전체에 SALES 열 추가, "영업,수주"·"납품,마감" 2곳만 기본 허용)·<code>notifyRoleLabels</code>에 새 역할을 추가하고 데모 직원(정영업)을 등록했습니다. 화면 접근권한표·알림설정표·직원 역할 드롭다운은 모두 <code>Object.keys()</code> 기반으로 이미 범용화되어 있어 이 두 군데만 고치면 앱 전체에 자동 반영됩니다. ②<b>notifyRules 정정</b> — <code>납품인수확인</code> 알림 대상을 사장·경리(false)에서 영업·생산관리(true)로 교체했습니다. ③<b>"추가인원" 지정 기능 신설</b> — 상현님이 "직원이 될 수도 있고 임원이 될 수도 있어"라고 하신 대로, 역할과 무관하게 특정 개인을 지정할 수 있어야 해서 기존 "구매 결재 대리인"과 동일한 패턴(<code>S.deliveryConfirmExtraEmpIds</code> 배열)으로 별도 설계했습니다. 환경설정에 새 카드(납품 인수확인 추가 알림대상)를 만들어 재직 중인 전 직원(임원 포함) 중 누구든 체크로 지정할 수 있고, <code>pushNotification()</code> 함수에 5번째 인자(<code>extraEmpIds</code>)를 추가해 알림 기록에 <code>empIds</code> 필드로 함께 남도록 확장했습니다. 직원용 모니터링 앱의 "내게 온 알림" 필터도 역할 일치뿐 아니라 지정된 개인 ID 일치도 함께 보도록 넓혔고, 알림센터 피드에는 지정된 사람 이름을 👤 태그로 별도 표시했습니다. 단, 실제 기기 푸시(<code>sendRealPush</code>)는 아직 역할 단위 구독만 지원해 추가인원 지정은 화면 안 알림센터 기록에만 반영되고 실제 푸시알림은 받지 못한다는 한계를 코드 주석으로 남겨두었습니다(1개 테스트베드 업체 파일럿 범위, 추후 개인별 구독 도입 시 확장). node --check 구문 검증과 jsdom 기반 검증(SALES 역할이 권한표·알림설정표에 정상 노출, 납품인수확인 알림이 영업·생산관리에만 가고 사장·경리에는 안 가는지 확인, 추가인원으로 경리 직원 1명을 지정한 뒤 실제로 알림에 포함되고 👤 태그로 표시되는지 확인, 34~42차 회귀 스위트 재실행)을 통과해 실제 오류 0건을 확인했습니다.</td></tr>
+        <tr><td>45차 라운드 — 납품·마감 열 폭 정비 + 고객사별 마감내역서 개선 (2026-08-11, v0.77)</td><td>상현님이 7가지를 지시하셨고, 이번 라운드는 그중 구체적으로 지시하신 4가지(①~④)를 반영했습니다(⑤~⑦은 매출 마감관리 화면 전체 재설계와 관련된 판단이 필요한 사안이라 분석·제안으로 별도 보고드립니다). <b>①②출하대기 표 폭 조정</b> — 수주수량·기납품·잔량·단가 4개 열을 999,999(6자리)까지 안 잘리게 74→82px로, 잔량 공급가 열을 ₩ 99,999,999(8자리)까지 줄바꿈 없이 표시되도록 90→112px로 넓히고 <code>white-space:nowrap</code>을 추가했습니다(₩ 기호와 숫자 사이 공백에서 줄바꿈이 일어나던 게 실제 잘림의 원인이었습니다). <b>③납품이력 표 폭 조정</b> — 같은 논리로 수량 80→84px, 공급가 104→112px+nowrap으로 재조정했습니다. <b>④고객사별 마감내역서 발행 개선</b> — 후보 표에 납품일 우측 고객사명 열을 신설하고, 품목명·규격명 열의 고정폭을 없애 <code>table-layout:fixed</code>가 남는 공간을 두 열에 균등 배분하도록 했습니다(출하대기 표와 동일한 패턴 재사용 — 이전에는 규격명만 140px 고정이라 품목명이 과도하게 넓어 보였습니다). 수량·단가는 82~92px로, 공급가는 112px+nowrap으로 맞췄습니다. 발행 이력 표에는 발행월·거래처 조회조건과 합계금액 표시를 새로 달았습니다(<code>lv('custclosing-hist')</code> 독립 키 사용). node --check 구문 검증과 jsdom 기반 검증(3개 표 헤더 폭 실측, 고객사명 열 렌더링 확인, 발행 이력 조회 필터링·합계금액 재계산 확인, 34~44차 회귀 스위트 재실행)을 통과해 실제 오류 0건을 확인했습니다.</td></tr>
       </tbody>
     </table>
   </div>
@@ -7769,7 +7777,7 @@ function renderProduction(){
         <td class="num">${o.qty.toLocaleString()}</td>
         <td class="num">${delivered?delivered.toLocaleString():'—'}</td>
         <td class="num" style="font-weight:700">${remaining.toLocaleString()}</td>
-        <td class="num">${o.unitPrice.toLocaleString()}</td><td class="num">${W(remaining*o.unitPrice)}</td>
+        <td class="num">${o.unitPrice.toLocaleString()}</td><td class="num" style="white-space:nowrap">${W(remaining*o.unitPrice)}</td>
         <td style="text-align:center"><button class="btn sm" onclick="openDeliveryModal(${o.id})">납품 등록</button></td></tr>`;
   }).join('')
     : '<tr><td colspan="10" style="color:var(--muted)">출하대기 중인 라인이 없습니다</td></tr>';
@@ -7797,7 +7805,7 @@ function renderProduction(){
     return `<tr style="${rowStyle}"><td style="white-space:nowrap">2026-${d.date}${carriedTag}</td>
         <td style="text-align:center;font-size:11.5px;color:var(--ink-soft);white-space:nowrap">${dOrder?dOrder.orderNo:'—'}</td>
         <td style="white-space:nowrap">${d.cust}</td><td style="text-align:left">${d.item}</td><td style="text-align:left;color:var(--ink-soft)">${deliverySpecName(d)}</td>
-        <td class="num">${d.qty.toLocaleString()}</td><td class="num">${W(d.qty*d.unitPrice)}</td>
+        <td class="num">${d.qty.toLocaleString()}</td><td class="num" style="white-space:nowrap">${W(d.qty*d.unitPrice)}</td>
         <td style="text-align:center"><button class="btn ${d.received?'gh':''} sm" onclick="toggleDeliveryReceived(${idx})">${d.received?'확인완료':'확인대기'}</button></td></tr>`;
   }).join('');
   $('dv-sum').textContent = W(dvFiltered.reduce((s,d)=>s+d.qty*d.unitPrice,0));
@@ -8403,13 +8411,14 @@ function renderClosingSection(kind){
       return `<tr>
         <td style="text-align:center"><input type="checkbox" ${checked?'checked':''} onchange="toggleClosingSelect('${kind}','${r.id}')"></td>
         <td style="text-align:center">${r.date}</td>
+        <td style="text-align:center;white-space:nowrap">${r.partner}</td>
         <td>${r.name}</td>
-        <td style="text-align:center;font-size:11.5px;color:var(--ink-soft)">${r.spec||'—'}</td>
+        <td style="text-align:left;color:var(--ink-soft)">${r.spec||'—'}</td>
         <td class="num">${(r.qty||0).toLocaleString()}</td>
         <td class="num">${(r.unitPrice||0).toLocaleString()}</td>
-        <td class="num">${W((r.qty||0)*(r.unitPrice||0))}</td>
+        <td class="num" style="white-space:nowrap">${W((r.qty||0)*(r.unitPrice||0))}</td>
       </tr>`;
-    }).join('') : `<tr><td colspan="${kind==='out'?9:(kind==='mat'?8:7)}" style="color:var(--muted)">조건에 맞는 ${kind==='cust'?'미마감 납품':'입고완료'} 건이 없습니다</td></tr>`;
+    }).join('') : `<tr><td colspan="${kind==='out'?9:(kind==='mat'?8:(kind==='cust'?8:7))}" style="color:var(--muted)">조건에 맞는 ${kind==='cust'?'미마감 납품':'입고완료'} 건이 없습니다</td></tr>`;
   }
   const cntEl = $(kind==='cust' ? 'custclosing-count' : `${kind}closing-count`);
   if(cntEl) cntEl.textContent = `${rows.length}건`;
@@ -8425,7 +8434,15 @@ function renderClosingSection(kind){
   const histTblId = kind==='cust' ? 't-custclosing-hist' : `t-${kind}closing-hist`;
   const histTbl = $(histTblId);
   if(histTbl){
-    const hist = listMap[kind].slice().sort((a,b)=>a.no<b.no?1:-1);
+    let hist = listMap[kind].slice().sort((a,b)=>a.no<b.no?1:-1);
+    // 2026-08-11(45차 신설): 매출 마감내역서 발행 이력에 발행월·거래처 조회 + 합계금액을 추가했습니다
+    // (상현님 지시). issuedAt이 MM-DD 형식이라 lvMatch로 "08"을 넣으면 8월 발행분만 부분일치됩니다.
+    if(kind==='cust'){
+      const chq = lv('custclosing-hist').search || {};
+      hist = hist.filter(x=>lvMatch(x.issuedAt,chq.ym) && lvMatch(x.partner,chq.cust));
+      const chCntEl = $('custclosing-hist-count'); if(chCntEl) chCntEl.textContent = `${hist.length}건`;
+      const chSumEl = $('custclosing-hist-sum'); if(chSumEl) chSumEl.textContent = W(hist.reduce((s,x)=>s+(x.totalAmount||0),0));
+    }
     // 2026-08-11(38차): 외주 마감내역서 중 상계차감이 반영된 건은 합계금액 아래에 총액/상계차감/
     // 실지급액을 함께 표시합니다(mat/cust는 상계 개념이 없어 기존과 동일).
     histTbl.innerHTML = hist.length ? hist.map(c=>{
