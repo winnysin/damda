@@ -551,7 +551,7 @@ table.mr-table input.form-control.ro{background:var(--bg);color:var(--muted)}
 <body>
 <div class="wrap">
 <aside class="side">
-  <div class="brand"><div class="brand-row"><img src="/icon-192.png" alt="DAMDA" class="brand-logo"><span class="brand-word">DAMDA</span></div><small>프로토타입 v0.79 · 매출 마감관리 정렬·조회 강화 + 마감내역서 디자인 + 수금관리 고도화 — 47차 라운드</small></div>
+  <div class="brand"><div class="brand-row"><img src="/icon-192.png" alt="DAMDA" class="brand-logo"><span class="brand-word">DAMDA</span></div><small>프로토타입 v0.80 · 마감내역서 3종 디자인/가로형 + 재고관리 보완 + 자재화면 정리 — 48차 라운드</small></div>
   <nav class="nav">
     <!-- 2026-07-21(항목11) 대분류 재구성: 운영 모니터링-기본정보-영업,수주-구매-생산-납품,마감-자재-인사,급여-품질-원가관리-가이드-환경설정 (12개, 상현님 지시안) -->
     <div class="grp">운영 모니터링</div>
@@ -606,7 +606,7 @@ table.mr-table input.form-control.ro{background:var(--bg);color:var(--muted)}
     <a data-p="ar"><span class="nav-ic">💰</span> 수금관리</a>
     <a data-p="docissue"><span class="nav-ic">🧾</span> 거래명세서 발행</a>
     <div class="grp">자재</div>
-    <a data-p="mattx"><span class="nav-ic">🔁</span> 자재 입출고 내역</a>
+    <a data-p="mattx"><span class="nav-ic">🔁</span> 원재료 입출고 내역</a>
     <a data-p="inventory"><span class="nav-ic">🗃</span> 재고관리</a>
     <a data-p="stockcheck"><span class="nav-ic">🔍</span> 재고실사</a>
     <a data-p="warehousegap"><span class="nav-ic">🚚</span> 창고 입고마감 갭 추적</a>
@@ -2080,10 +2080,10 @@ table.mr-table input.form-control.ro{background:var(--bg);color:var(--muted)}
   </div>
 </section>
 
-<!-- ══════════ 자재 입출고 내역 — 2026-08-06 신설, 31차 라운드 ══════════ -->
+<!-- ══════════ 원재료 입출고 내역 — 2026-08-06 신설(31차), 2026-08-12(48차) 화면명 "자재"→"원재료"로 명확화 ══════════ -->
 <section class="page" id="p-mattx">
-  <h1>자재 입출고 내역</h1>
-  <div class="sub">원재료 발주(입고완료)나 생산일보 백플러시로 자동 반영되지 않는 <b>개별 입고·출고</b>를 직접 등록하는 화면입니다. 구분(입고/출고)을 고르고 한 건씩 등록하면 즉시 저장되며, <a href="#" onclick="event.preventDefault();navTo('inventory')" style="color:var(--blue-d)">재고관리</a>의 현재고와 재료비에 바로 반영됩니다.</div>
+  <h1>원재료 입출고 내역</h1>
+  <div class="sub">원재료 발주(입고완료)나 생산일보 백플러시로 자동 반영되지 않는 <b>원재료 개별 입고·출고</b>를 직접 등록하는 화면입니다. 구분(입고/출고)을 고르고 한 건씩 등록하면 즉시 저장되며, <a href="#" onclick="event.preventDefault();navTo('inventory')" style="color:var(--blue-d)">재고관리</a>의 현재고와 재료비에 바로 반영됩니다. <b>제품(완제품)의 기타입고·기타출고는 별도 화면입니다</b> — <a href="#" onclick="event.preventDefault();navTo('inventory');setTimeout(()=>switchInvTab('fg'),0)" style="color:var(--blue-d)">재고관리 &gt; 제품 재고관리 탭</a> 하단의 "완제품 기타입고·기타출고" 카드에서 등록·조회합니다(2026-08-12, 48차 — 원재료는 전용 메뉴, 제품은 재고관리 탭 내 카드로 위치가 달라 헷갈리기 쉬워 화면명을 "자재"에서 "원재료"로 바꾸고 이 안내를 추가했습니다).</div>
   <div class="note">예시 — <b>출고</b>: 컬러 교체 퍼징(Purge)손실, 신규 수주 시험사출/샘플 소모. <b>입고</b>: 불량 반출 후 대체품 반품입고, 재고실사에서 발견된 여유분 반영. 정식 구매입고는 <a href="#" onclick="event.preventDefault();navTo('matrecv')" style="color:var(--blue-d)">원재료 입고등록</a>에서, 정식 생산투입은 생산일보 백플러시가 자동 처리하므로 여기서 중복 등록하지 않습니다.</div>
   <div class="card">
     <h2 style="margin-top:0">입출고 등록</h2>
@@ -2157,9 +2157,9 @@ table.mr-table input.form-control.ro{background:var(--bg);color:var(--muted)}
       </div>
       <div class="sub" style="margin:-4px 0 12px">창고입고 확정수량(warehouseInQty) − 누적 납품수량 + 기타입출고 조정으로 계산됩니다(2026-08-07부터 생산완료 기준 대신 창고입고 확정 기준 적용).</div>
       <table class="th-center">
-        <thead><tr><th style="width:18%">거래처</th><th style="width:24%">품목명</th>
-          <th class="num" style="width:15%">계산값(기본)</th><th class="num" style="width:13%">조정 반영</th>
-          <th class="num" style="width:15%">현재고</th><th style="width:15%"></th></tr></thead>
+        <thead><tr><th style="width:15%">거래처</th><th style="width:20%">품목명</th><th style="width:17%">규격명</th>
+          <th class="num" style="width:13%">계산값(기본)</th><th class="num" style="width:11%">조정 반영</th>
+          <th class="num" style="width:12%">현재고</th><th style="width:12%"></th></tr></thead>
         <tbody id="t-fg"></tbody>
       </table>
     </div>
@@ -2762,7 +2762,8 @@ BEP 매출  = 월 고정비 ÷ 공헌이익률
         <tr><td>43차 라운드 — 납품 인수확인 완료 알림 연동 (2026-08-11, v0.75)</td><td>42차에서 분석만 드렸던 "인수확인 이후 조회·알림 흐름"을 상현님이 두 방향 모두("1,2번을 모두 적용해줘") 반영하기로 확정해주셔서 함께 구현했습니다. ①<b>매출 마감관리 카드 확장</b> — 기존 3칸 경고카드(수입검사 대기·불합격 보류·출하검사 대기)에 <b>납품 인수확인 대기</b> 건수를 4번째 칸으로 추가했습니다(<code>.grid4</code> 신설). 앞 3칸과 달리 이 칸은 매출 마감을 막는 항목이 아니라 "체크리스트성 확인 항목"이라 카드 설명 문구로 그 차이를 명확히 안내했습니다. ②<b>알림센터 연동</b> — 납품이력에서 확인대기→확인완료로 바뀌는 순간 <code>toggleDeliveryReceived()</code> 함수를 신설해 기존 인라인 토글을 대체하고, <code>pushNotification('납품인수확인', ...)</code>을 호출해 화면 안 알림센터 기록과 실제 기기 푸시를 함께 남기도록 했습니다(반대로 확인완료→확인대기로 되돌릴 때는 담당자의 단순 실수 수정일 뿐이라 알림을 보내지 않습니다). node --check 구문 검증과 jsdom 기반 검증(경고카드 4번째 칸 표시조건·건수, 확인완료 토글 시 알림 기록 생성 확인, 34~42차 회귀 스위트 재실행)을 통과해 실제 오류 0건을 확인했습니다. 이 라운드에서 지정한 알림 대상(사장·경리)이 실제 업무 흐름과 맞지 않아 44차에서 바로 정정합니다.</td></tr>
         <tr><td>44차 라운드 — 납품 인수확인 알림대상 정정 + 영업 역할 신설 + 추가인원 지정 (2026-08-11, v0.76)</td><td>43차에서 제가 임의로 정한 알림 대상(사장·경리)이 실제 업무 흐름과 맞지 않는다는 상현님 지적("알림이 가는 대상은 사장, 경리가 아니야. 영업, 생산관리+ 추가인원이야")을 반영해 대상을 다시 설계했습니다. ①<b>영업(SALES) 역할 신설</b> — 그동안 이 앱에는 영업 담당자를 가리키는 역할이 없어(수주·납품 화면은 있었지만 그걸 다루는 전용 역할이 없었음), 상현님 확인을 거쳐 <code>permRoleLabels</code>·<code>permMatrix</code>(13개 그룹 전체에 SALES 열 추가, "영업,수주"·"납품,마감" 2곳만 기본 허용)·<code>notifyRoleLabels</code>에 새 역할을 추가하고 데모 직원(정영업)을 등록했습니다. 화면 접근권한표·알림설정표·직원 역할 드롭다운은 모두 <code>Object.keys()</code> 기반으로 이미 범용화되어 있어 이 두 군데만 고치면 앱 전체에 자동 반영됩니다. ②<b>notifyRules 정정</b> — <code>납품인수확인</code> 알림 대상을 사장·경리(false)에서 영업·생산관리(true)로 교체했습니다. ③<b>"추가인원" 지정 기능 신설</b> — 상현님이 "직원이 될 수도 있고 임원이 될 수도 있어"라고 하신 대로, 역할과 무관하게 특정 개인을 지정할 수 있어야 해서 기존 "구매 결재 대리인"과 동일한 패턴(<code>S.deliveryConfirmExtraEmpIds</code> 배열)으로 별도 설계했습니다. 환경설정에 새 카드(납품 인수확인 추가 알림대상)를 만들어 재직 중인 전 직원(임원 포함) 중 누구든 체크로 지정할 수 있고, <code>pushNotification()</code> 함수에 5번째 인자(<code>extraEmpIds</code>)를 추가해 알림 기록에 <code>empIds</code> 필드로 함께 남도록 확장했습니다. 직원용 모니터링 앱의 "내게 온 알림" 필터도 역할 일치뿐 아니라 지정된 개인 ID 일치도 함께 보도록 넓혔고, 알림센터 피드에는 지정된 사람 이름을 👤 태그로 별도 표시했습니다. 단, 실제 기기 푸시(<code>sendRealPush</code>)는 아직 역할 단위 구독만 지원해 추가인원 지정은 화면 안 알림센터 기록에만 반영되고 실제 푸시알림은 받지 못한다는 한계를 코드 주석으로 남겨두었습니다(1개 테스트베드 업체 파일럿 범위, 추후 개인별 구독 도입 시 확장). node --check 구문 검증과 jsdom 기반 검증(SALES 역할이 권한표·알림설정표에 정상 노출, 납품인수확인 알림이 영업·생산관리에만 가고 사장·경리에는 안 가는지 확인, 추가인원으로 경리 직원 1명을 지정한 뒤 실제로 알림에 포함되고 👤 태그로 표시되는지 확인, 34~42차 회귀 스위트 재실행)을 통과해 실제 오류 0건을 확인했습니다.</td></tr>
         <tr><td>45차 라운드 — 납품·마감 열 폭 정비 + 고객사별 마감내역서 개선 (2026-08-11, v0.77)</td><td>상현님이 7가지를 지시하셨고, 이번 라운드는 그중 구체적으로 지시하신 4가지(①~④)를 반영했습니다(⑤~⑦은 매출 마감관리 화면 전체 재설계와 관련된 판단이 필요한 사안이라 분석·제안으로 별도 보고드립니다). <b>①②출하대기 표 폭 조정</b> — 수주수량·기납품·잔량·단가 4개 열을 999,999(6자리)까지 안 잘리게 74→82px로, 잔량 공급가 열을 ₩ 99,999,999(8자리)까지 줄바꿈 없이 표시되도록 90→112px로 넓히고 <code>white-space:nowrap</code>을 추가했습니다(₩ 기호와 숫자 사이 공백에서 줄바꿈이 일어나던 게 실제 잘림의 원인이었습니다). <b>③납품이력 표 폭 조정</b> — 같은 논리로 수량 80→84px, 공급가 104→112px+nowrap으로 재조정했습니다. <b>④고객사별 마감내역서 발행 개선</b> — 후보 표에 납품일 우측 고객사명 열을 신설하고, 품목명·규격명 열의 고정폭을 없애 <code>table-layout:fixed</code>가 남는 공간을 두 열에 균등 배분하도록 했습니다(출하대기 표와 동일한 패턴 재사용 — 이전에는 규격명만 140px 고정이라 품목명이 과도하게 넓어 보였습니다). 수량·단가는 82~92px로, 공급가는 112px+nowrap으로 맞췄습니다. 발행 이력 표에는 발행월·거래처 조회조건과 합계금액 표시를 새로 달았습니다(<code>lv('custclosing-hist')</code> 독립 키 사용). node --check 구문 검증과 jsdom 기반 검증(3개 표 헤더 폭 실측, 고객사명 열 렌더링 확인, 발행 이력 조회 필터링·합계금액 재계산 확인, 34~44차 회귀 스위트 재실행)을 통과해 실제 오류 0건을 확인했습니다.</td></tr>
-        <tr><td>47차 라운드 — 매출 마감관리 정렬·조회 + 마감내역서 디자인 + 수금관리 고도화 (2026-08-12, v0.79)</td><td>46차에서 재설계한 매출 마감관리·수금관리를 다듬는 5가지 보완입니다. <b>①매출 표에 수주번호 열 추가 + 정렬 기능</b> — 통합된 매출·마감내역서 후보 표의 고객사명 오른쪽에 수주번호 열을 추가했고, 검색바에 "납품일 최신순/오래된순" 정렬 셀렉트를 달아 <code>closingCandidateRows('cust')</code>에서 바로 정렬해 내려줍니다. <b>②마감내역서 발행 이력 조회를 연도/월 분리</b> — 기존 "발행월" 텍스트 입력 한 칸을 연도 셀렉트(등록된 이력 연도를 자동 수집)와 월 셀렉트 두 칸으로 나눴습니다. <b>③매출 마감내역서 엑셀 디자인 고급화</b> — 고객사에 실제로 전달되는 문서인데 스타일이 전혀 없다는 지적을 반영해, 기존 xlsx.full.min.js(셀 스타일을 파일에 못 쓰는 무료판)와 별도로 ExcelJS를 도입했습니다. 제목 배너, 공급자/공급받는자 정보 박스, 브랜드 색상 헤더, 홀짝 밴딩 표, 합계는 하드코딩이 아닌 실제 SUM 수식으로 채운 새 엑셀 양식(<code>exportCustClosingExcelStyled()</code>)을 만들어 고객사 제출용 마감내역서에만 적용했습니다(원재료·외주 마감내역서는 기존 방식 유지). <b>④마감 확정 내역 미리보기 2분할</b> — 비용 항목만 보이던 카드를 2단 그리드로 나눠 왼쪽에 "매출(거래처별)", 오른쪽에 "비용(항목별)"을 동시에 보여줘, 잠그기 전에 매출·비용을 한눈에 비교할 수 있게 했습니다. <b>⑤수금관리 업무 분석 + 보완</b> — 상현님 질문에 답변드리면, 수금이 완료돼도 리스트에서 삭제되지 않습니다. <code>S.collections</code>는 이력이 계속 쌓이는 원장(ledger)이고, 거래처별 현황 표는 "청구누계 − 수금누계"를 매번 다시 계산하는 살아있는 잔액이라 완료된 건도 그대로 남습니다. 여기에 최근 수금일 열을 추가해 거래처별로 마지막 입금이 언제였는지 보이게 했고, 수금 등록 시 "귀속월(몇월분)" 셀렉트를 추가해 어느 달 청구분에 대한 입금인지 남기도록 했습니다. 이 과정에서 수금 등록일이 실제 진행 월과 무관하게 "07-"로 고정 하드코딩되어 있던 버그도 함께 발견해 고쳤습니다(<code>closeCurrentMonth()</code>로 실제 8월로 넘어간 뒤에도 "2026-08-25"처럼 정확히 찍히는지 확인). 수금 이력도 최근 10건 하드캡 목록에서 거래처·귀속월 검색과 페이지네이션이 되는 전체 이력 표로 확장했습니다. node --check 구문 검증, ExcelJS 워크북 생성 로직 검증(제목·병합 22개·SUM 수식·23행 정상 생성 확인), 34~46차 회귀 스위트 재실행, 67개 전 화면 순회 콘솔에러 0건을 모두 통과했습니다.</td></tr>
+        <tr><td>48차 라운드 — 마감내역서 3종 디자인 통일 + 재고관리 보완 + 자재화면 명확화 (2026-08-12, v0.80)</td><td>상현님 6가지 요청 중 즉시 실행 가능한 3가지를 반영하고, 나머지는 조사 후 의견을 드렸습니다. <b>①마감내역서 3종 전부 디자인 + A4 가로형</b> — 47차에서 매출 마감내역서(cust)에만 적용했던 ExcelJS 디자인(브랜드 색상 헤더·병합·밴딩·SUM 수식)을 원재료(mat)·외주비(out) 매입 마감내역서까지 확장해 <code>exportClosingExcelStyled(kind, no)</code> 하나로 통합했고, 3종 모두 세로형에서 가로형(landscape)으로 전환했습니다. 옛 SheetJS 기반 <code>exportClosingExcel()</code>(색상 저장 불가)은 더 이상 쓰이지 않아 제거했습니다. <b>②재고관리 화면 보완</b> — 원재료 재고관리 탭의 "구분" 열을 가운데정렬했고, 제품 재고관리 탭 품목명 우측에 규격명 열을 추가했습니다(엑셀 다운로드도 동일하게 갱신). 상현님이 질문하신 "기타입출고 기능이 있는지"에 대한 답은 <b>이미 있습니다</b> — 제품 재고관리 탭 하단 "완제품 기타입고·기타출고" 카드가 그 기능이며, 다만 원재료용 전용 메뉴(자재 입출고 내역)와 위치가 달라 못 찾으셨던 것으로 보여 화면명을 "원재료 입출고 내역"으로 명확히 하고 상호 안내 링크를 추가했습니다. 로트별 매입단가 차이(재고관리 반영 여부)는 코드 변경 없이 의견만 드립니다(본문 참고). <b>③제품 입출고 예시 10건</b> — 기존 1건뿐이던 <code>S.fgAdjustments</code> 시드를 7개 거래처에 걸친 10건(기타입고 6건, 기타출고 4건)으로 확충해 화면이 빈 표가 아니라 실제 동작하는 예시로 보이도록 했습니다. <b>④~⑥ 의견 제시(코드 변경 없음)</b> — 납품관리·거래명세서 발행 통합, 자재 입출고 내역의 원재료/제품 구조(탭 vs 하위메뉴), 자재관리자 역할 신설과 월간보고 연동, 창고 입고마감 갭 추적 화면 설명은 채팅 답변으로 의견을 드리고 다음 진행 여부를 여쭤봤습니다. node --check 구문 검증과 jsdom 기반 검증(mat/out/cust 3종 모두 landscape·병합 22개·SUM 수식 확인, 재고관리 구분열 가운데정렬·규격명 열·10건 시드 확인, 원재료입출고 화면명 변경 확인, 34~47차 회귀 스위트 재실행, 67개 전 화면 순회 콘솔에러 0건)을 통과했습니다.</td></tr>
+<tr><td>47차 라운드 — 매출 마감관리 정렬·조회 + 마감내역서 디자인 + 수금관리 고도화 (2026-08-12, v0.79)</td><td>46차에서 재설계한 매출 마감관리·수금관리를 다듬는 5가지 보완입니다. <b>①매출 표에 수주번호 열 추가 + 정렬 기능</b> — 통합된 매출·마감내역서 후보 표의 고객사명 오른쪽에 수주번호 열을 추가했고, 검색바에 "납품일 최신순/오래된순" 정렬 셀렉트를 달아 <code>closingCandidateRows('cust')</code>에서 바로 정렬해 내려줍니다. <b>②마감내역서 발행 이력 조회를 연도/월 분리</b> — 기존 "발행월" 텍스트 입력 한 칸을 연도 셀렉트(등록된 이력 연도를 자동 수집)와 월 셀렉트 두 칸으로 나눴습니다. <b>③매출 마감내역서 엑셀 디자인 고급화</b> — 고객사에 실제로 전달되는 문서인데 스타일이 전혀 없다는 지적을 반영해, 기존 xlsx.full.min.js(셀 스타일을 파일에 못 쓰는 무료판)와 별도로 ExcelJS를 도입했습니다. 제목 배너, 공급자/공급받는자 정보 박스, 브랜드 색상 헤더, 홀짝 밴딩 표, 합계는 하드코딩이 아닌 실제 SUM 수식으로 채운 새 엑셀 양식(<code>exportCustClosingExcelStyled()</code>)을 만들어 고객사 제출용 마감내역서에만 적용했습니다(원재료·외주 마감내역서는 기존 방식 유지). <b>④마감 확정 내역 미리보기 2분할</b> — 비용 항목만 보이던 카드를 2단 그리드로 나눠 왼쪽에 "매출(거래처별)", 오른쪽에 "비용(항목별)"을 동시에 보여줘, 잠그기 전에 매출·비용을 한눈에 비교할 수 있게 했습니다. <b>⑤수금관리 업무 분석 + 보완</b> — 상현님 질문에 답변드리면, 수금이 완료돼도 리스트에서 삭제되지 않습니다. <code>S.collections</code>는 이력이 계속 쌓이는 원장(ledger)이고, 거래처별 현황 표는 "청구누계 − 수금누계"를 매번 다시 계산하는 살아있는 잔액이라 완료된 건도 그대로 남습니다. 여기에 최근 수금일 열을 추가해 거래처별로 마지막 입금이 언제였는지 보이게 했고, 수금 등록 시 "귀속월(몇월분)" 셀렉트를 추가해 어느 달 청구분에 대한 입금인지 남기도록 했습니다. 이 과정에서 수금 등록일이 실제 진행 월과 무관하게 "07-"로 고정 하드코딩되어 있던 버그도 함께 발견해 고쳤습니다(<code>closeCurrentMonth()</code>로 실제 8월로 넘어간 뒤에도 "2026-08-25"처럼 정확히 찍히는지 확인). 수금 이력도 최근 10건 하드캡 목록에서 거래처·귀속월 검색과 페이지네이션이 되는 전체 이력 표로 확장했습니다. node --check 구문 검증, ExcelJS 워크북 생성 로직 검증(제목·병합 22개·SUM 수식·23행 정상 생성 확인), 34~46차 회귀 스위트 재실행, 67개 전 화면 순회 콘솔에러 0건을 모두 통과했습니다.</td></tr>
 <tr><td>46차 라운드 — 매출 마감관리 화면 재설계 (2026-08-11, v0.78)</td><td>45차에서 분석만 드렸던 매출 마감관리 개편(5~7번)을 상현님이 3가지 모두 진행하기로 확정해주셔서 반영했습니다. <b>①매출 이력·마감내역서 표 통합</b> — "매출—이번달 납품이력"과 "고객사별 마감내역서 발행" 두 표가 둘 다 <code>S.deliveries</code>를 읽는 사실상 같은 표라는 지적을 반영해 하나로 합쳤습니다. <code>closingCandidateRows('cust')</code>가 더 이상 이미 발행된 건을 숨기지 않고 <code>closedStmtNo</code>를 함께 내려주면, 화면에서는 "발행됨(번호)"/"미발행" 배지로 구분하고 발행된 행은 체크박스 자체를 없애 중복 발행을 원천 차단합니다(혹시 모를 경우를 대비해 <code>registerClosing()</code>에도 발행 건 재필터링을 한 번 더 넣었습니다). 이전 이력 표에 있던 페이지네이션(50/100/200)도 <code>lv('custclosing')</code>으로 그대로 이어받았고, 검색에 품목명 조건을 추가했습니다. <b>②비용구성·마감이력 카드 정리</b> — 원가관리 화면에 이미 더 정교한 "월별 비용 총액 추이"·"비용 항목별 추이"가 있다는 걸 확인해, 매출 마감관리의 "비용 구성" 카드는 "마감 확정 내역 미리보기"로 성격을 명확히 하고(분석이 아니라 잠그기 직전 확인용), "마감 이력"에는 "이건 기록일 뿐 분석이 필요하면 원가관리로"라는 안내 링크를 달았습니다. 열이나 데이터를 지우지는 않고 두 화면의 역할만 분리했습니다. <b>③수금관리 화면 분리</b> — 미수금 현황·수금 등록·최근 수금 이력을 매출 마감관리에서 통째로 떼어 "납품,마감" 그룹에 새 화면(<code>#p-ar</code>)으로 옮겼습니다. 청구누계·수금누계·미수 잔액 표와 수금 진도율 KPI 등 기존 로직(<code>renderAR()</code>)은 그대로 재사용했고, 화면 위치만 옮겼기 때문에 데이터·계산에는 변화가 없습니다. 매출 마감관리에는 새 화면으로 가는 안내 링크만 남겼습니다. node --check 구문 검증과 jsdom 기반 검증(통합 표 발행 전/후 배지 전환 확인, 발행된 건 재선택 시도 시 0건으로 막히는지 확인, 페이지네이션·검색 필터 동작 확인, 새 수금관리 화면 KPI·표·등록 동작 확인, 67개 전 화면 순회 콘솔에러 0건, 34~45차 회귀 스위트 재실행)을 통과해 실제 오류 0건을 확인했습니다.</td></tr>
       </tbody>
     </table>
@@ -3601,8 +3602,19 @@ const S = {
   },
 
   // 완제품 재고 — 생산완료(doneQty)-납품(deliveries) 계산값에 수동 조정(기타입고/출고)을 더해 관리
+  // 2026-08-12(48차): 상현님 지시로 시드 예시를 1건→10건으로 확충(실제 원재료 기타입출고와 데이터
+  // 밀도를 맞춰, "제품 입출고 내역" 화면 논의 시 빈 표가 아니라 실제 동작하는 예시로 보여드리기 위함).
   fgAdjustments:[
-    {date:'07-16', cust:'한빛정밀산업', item:'브라켓 커버', type:'기타입고', qty:120, reason:'불량 반품(재선별 예정)'}
+    {date:'07-05', cust:'대한전자부품', item:'커넥터 하우징 A', type:'기타출고', qty:80, reason:'재선별 후 폐기'},
+    {date:'07-08', cust:'동양오토파츠', item:'기어박스 캡', type:'기타입고', qty:150, reason:'불량 반품(재선별 예정)'},
+    {date:'07-10', cust:'코스텍전자', item:'힌지 브라켓', type:'기타출고', qty:60, reason:'실사 차이 보정'},
+    {date:'07-12', cust:'동양오토파츠', item:'60ml 오버캡', type:'기타입고', qty:200, reason:'불량 반품(재선별 예정)'},
+    {date:'07-14', cust:'한빛정밀산업', item:'3cc 주사기 밀대(신형)', type:'기타출고', qty:45, reason:'재선별 후 폐기'},
+    {date:'07-16', cust:'한빛정밀산업', item:'브라켓 커버', type:'기타입고', qty:120, reason:'불량 반품(재선별 예정)'},
+    {date:'07-17', cust:'코스텍전자', item:'방열 커버', type:'기타입고', qty:90, reason:'불량 반품(재선별 예정)'},
+    {date:'07-19', cust:'우성모빌리티', item:'24파이 아로마티카 단캡', type:'기타출고', qty:35, reason:'실사 차이 보정'},
+    {date:'07-21', cust:'신성테크', item:'5.5ml 주사기 오버캡', type:'기타입고', qty:110, reason:'기타'},
+    {date:'07-23', cust:'한빛정밀산업', item:'커버 플레이트', type:'기타출고', qty:25, reason:'재선별 후 폐기'}
   ],
   fixed:[
     {n:'대표이사 보수 (판관비)', a:6000000},
@@ -7981,6 +7993,12 @@ function deliveryOrderNo(d){
   const oi = S.orderItems.find(x=>x.id===d.orderId) || S.orderItems.find(x=>x.cust===d.cust && x.item===d.item);
   return oi ? oi.orderNo : null;
 }
+// 2026-08-12(48차 신설): 제품 재고관리 표에 규격명 열을 추가하기 위한 헬퍼 — 거래처+품목명 조합으로
+// 수주현황(S.orderItems)에서 규격명을 찾아옵니다(deliverySpecName과 동일한 매칭 방식).
+function fgSpecName(cust, item){
+  const oi = S.orderItems.find(o=>o.cust===cust && o.item===item && o.specName);
+  return oi ? oi.specName : '—';
+}
 // 2026-07-21 신설: (2026-07-31, 26차 보완) 양품수량+불량수량 × 연결된 수주 라인의 개당총중량(calcWeights,
 // 런너/스프루 포함, 견적 사양 그대로 승계)으로 투입 원재료(kg)를 자동 산출합니다 — 불량도 원재료를 먹었으므로
 // 양품만으로 계산하면 과소산출됩니다(상현님 지시). 품목 미지정이면 산출 근거가 없어 0으로 두고(원가배분에서도
@@ -8370,28 +8388,32 @@ function registerClosing(kind){
   pushNotification('마감등록', `${partner} ${kindLabel} 마감내역서(${no})가 등록되었습니다 — ${rows.length}건, ${W(totalAmount)}원.${netNote}`);
   recalc();
 }
-// 엑셀 다운로드 — SheetJS 무료판(xlsx@0.18.5)은 셀 색상·폰트 스타일을 파일에 저장하지 못한다는 제약이
-// 이미 확인되어 있어(제품정보 일괄등록 양식 개발 시 검증), 색상 대신 셀 병합(!merges, 구조 정보라 정상
-// 저장됨)·열너비·행높이·자동필터로 "고급스러운" 문서 레이아웃을 구성합니다(상현님 요청 — 디자인은 재량).
-// 2026-08-04(30차 보완): 마감내역서 엑셀을 매입처/거래처에 실제로 전달하는 A4 문서로 다시 디자인했습니다.
-// SheetJS 무료판은 셀 색상·글꼴을 저장하지 못하는 기존 제약(다른 화면에서도 이미 확인) 안에서, 병합·
-// 열너비·여백만으로 공급자/공급받는자 박스를 갖춘 격식 있는 레이아웃을 구성했습니다. cust(매출)는 우리
-// 회사(S.company)가 공급자·거래처가 공급받는자이고, mat/out(매입)은 반대로 매입처가 공급자·우리 회사가
-// 공급받는자입니다(세금계산서·거래명세서의 통상적인 표기 방향을 따랐습니다). 매입처(외주/원재료
-// 협력업체)는 2026-08-07(마스터데이터 단일화)부터 거래처마스터(S.customers)의 7개 협력사명(A~G 협력사)을
-// 그대로 씁니다(임의 상호명 예시는 폐기). 다만 사업자번호 등 상세정보를 엑셀에 자동으로 채우는 기능은
-// 이번 라운드 범위 밖이라 상호명만 계속 표기합니다 — 추정 데이터를 넣지 않습니다.
-function exportClosingExcel(kind, no){
+// 2026-08-12(48차): 마감내역서 3종(매출/원재료매입/외주비매입) 엑셀은 이제 모두 exportClosingExcelStyled()
+// (ExcelJS 기반, 색상·병합·서식 전부 실제로 파일에 저장)로 통일했습니다. 예전 SheetJS 무료판 기반이던
+// exportClosingExcel()은 셀 색상·글꼴을 저장하지 못하는 제약이 있어 폐기했습니다(제약 자체는 이 파일의
+// 다른 SheetJS 사용처 — 거래명세서 등 — 에는 여전히 유효하며 그쪽은 변경하지 않았습니다).
+// 2026-08-12(47차 신설, 48차에서 3종 전체로 확장): 상현님 지시("고객사에 제출해야 하는 문서니까
+// 신경 좀 써서 디자인") — xlsx.full.min.js(SheetJS 무료판)는 셀 색상·테두리를 파일에 저장하지 못해
+// 디자인에 한계가 뚜렷했습니다. ExcelJS는 무료 버전에서도 배경색·글꼴색·테두리·병합·서식을 전부 파일에
+// 정상 저장하는 별도 라이브러리입니다. 47차에서는 고객사에 실제로 전달되는 매출 마감내역서(cust)만
+// 우선 적용했었는데, 48차에서 "세 파일 모두" 지시를 받아 원재료(mat)·외주비(out) 매입 마감내역서까지
+// 같은 함수로 확장하고 A4 가로형(landscape)으로 통일했습니다.
+async function exportClosingExcelStyled(kind, no){
   const listMap = {cust:S.custClosings, mat:S.matClosings, out:S.outClosings};
   const c = listMap[kind].find(x=>x.no===no);
   if(!c) return;
+  if(typeof ExcelJS === 'undefined'){
+    alert('디자인 엑셀 라이브러리를 아직 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.');
+    return;
+  }
   const titleMap = {cust:'매출 마감내역서', mat:'원재료 매입 마감내역서', out:'외주비 매입 마감내역서'};
   const specLabelMap = {cust:'규격', mat:'조달구분', out:'규격'};
   const qtyUnitMap = {cust:'개', mat:'kg', out:'개'};
   const title = titleMap[kind];
   const specLabel = specLabelMap[kind];
   const qtyUnit = qtyUnitMap[kind];
-  // cust는 우리 회사가 공급자, mat/out은 매입처가 공급자입니다.
+  // cust(매출)는 우리 회사가 공급자·거래처가 공급받는자, mat/out(매입)은 반대로 매입처가 공급자·우리
+  // 회사가 공급받는자입니다(exportClosingExcel의 기존 방향 규칙을 그대로 승계).
   const weAreSupplier = kind === 'cust';
   const supplier = weAreSupplier
     ? {name:S.company.name, bizNo:S.company.bizNo, ceo:S.company.ceo, addr:S.company.addr, tel:S.company.tel}
@@ -8399,86 +8421,6 @@ function exportClosingExcel(kind, no){
   const receiver = weAreSupplier
     ? {name:c.partner, bizNo:'—', ceo:'—', addr:'—', tel:'—'}
     : {name:S.company.name, bizNo:S.company.bizNo, ceo:S.company.ceo, addr:S.company.addr, tel:S.company.tel};
-
-  // 2026-08-06(31차): SheetJS 무료판은 셀 색상·글꼴·테두리 스타일을 전혀 저장하지 못한다는 제약을
-  // 직접 재확인했습니다(스타일 객체를 넣고 다시 읽어보면 patternType 외에는 전부 사라짐). 대신 이번
-  // 라운드부터 두 가지를 구조적으로 보강했습니다: ①금액·수량 칸을 문자열이 아닌 실제 숫자 + 셀
-  // 서식(z, 예: #,##0"원")으로 넣어 엑셀에서 우측정렬·천단위콤마·재계산이 정상 동작하도록 했고,
-  // ②합계 칸은 고정값이 아니라 실제 SUM 수식으로 넣어 나중에 금액을 고치면 합계도 자동으로 따라가게
-  // 했습니다. 색·굵기 대신 "─" 구분선 행과 여백만으로 문서를 구획했습니다(색상 스타일은 여전히 불가).
-  const aoa = [];
-  const merges = [];
-  const pushMergedRow = (text) => { aoa.push([text, '', '', '', '', '', '']); merges.push({s:{r:aoa.length-1,c:0}, e:{r:aoa.length-1,c:6}}); };
-  const pushRule = () => pushMergedRow('─'.repeat(74));
-
-  pushMergedRow(S.company.name);
-  pushMergedRow(title);
-  pushRule();
-  aoa.push(['발행번호', c.no, '', '', '발행일', '2026-' + (c.issuedAt||'—'), '']);
-  aoa.push(['대상기간', `${c.from||'전체'} ~ ${c.to||'전체'}`, '', '', '건수', c.rows.length, '']);
-  aoa.push(['', '', '', '', '', '', '']);
-  pushMergedRow('■ 공급자');
-  aoa.push(['상호', supplier.name, '', '사업자번호', supplier.bizNo, '', '']);
-  aoa.push(['대표자', supplier.ceo, '', '연락처', supplier.tel, '', '']);
-  aoa.push(['주소', supplier.addr, '', '', '', '', '']);
-  aoa.push(['', '', '', '', '', '', '']);
-  pushMergedRow('■ 공급받는자');
-  aoa.push(['상호', receiver.name, '', '사업자번호', receiver.bizNo, '', '']);
-  aoa.push(['대표자', receiver.ceo, '', '연락처', receiver.tel, '', '']);
-  aoa.push(['주소', receiver.addr, '', '', '', '', '']);
-  pushRule();
-  const headerRowIdx = aoa.length;
-  aoa.push(['No', '일자', '품목', specLabel, `수량(${qtyUnit})`, '단가(원)', '금액(원)']);
-  const dataStartRow = aoa.length; // 0-based row index of the first data row
-  c.rows.forEach((r,i)=>{
-    aoa.push([i+1, r.date, r.name, r.spec||'—', r.qty, r.unitPrice, r.qty*r.unitPrice]);
-  });
-  const dataEndRow = aoa.length - 1;
-  const sumRowIdx = aoa.length;
-  aoa.push(['', '', '', '', '', '▶ 합계', c.totalAmount]);
-  aoa.push(['', '', '', '', '', '', '']);
-  pushMergedRow(`본 내역서는 ${S.company.name} 전산시스템에서 자동 생성되었습니다.`);
-
-  const ws = XLSX.utils.aoa_to_sheet(aoa);
-  // 숫자 컬럼(수량 C=index4, 단가/금액 index5~6)에 실제 셀 서식을 입혀 엑셀에서 숫자로 인식·정렬되게 합니다.
-  const qtyFmt = qtyUnit==='kg' ? '#,##0.00"kg"' : '#,##0"개"';
-  for(let r=dataStartRow; r<=dataEndRow; r++){
-    const rowNum = r+1;
-    const qCell = ws[`E${rowNum}`], pCell = ws[`F${rowNum}`], aCell = ws[`G${rowNum}`];
-    if(qCell) qCell.z = qtyFmt;
-    if(pCell) pCell.z = '#,##0"원"';
-    if(aCell) aCell.z = '#,##0"원"';
-  }
-  // 합계는 고정값이 아니라 실제 SUM 수식으로 — 나중에 금액을 손으로 고쳐도 합계가 따라갑니다.
-  ws[`G${sumRowIdx+1}`] = {t:'n', f:`SUM(G${dataStartRow+1}:G${dataEndRow+1})`, z:'#,##0"원"'};
-  // A4 세로(210×297mm) 인쇄 폭에 맞춘 7개 열 구성 — kind별로 품목·규격 실제 글자 길이가 달라(외주는
-  // 매입처·공정명이 섞여 이름이 길어짐) 열 폭을 kind에 맞게 재배분했습니다.
-  ws['!cols'] = kind==='mat'
-    ? [{wch:6},{wch:10},{wch:24},{wch:12},{wch:11},{wch:11},{wch:14}]
-    : [{wch:6},{wch:10},{wch:20},{wch:16},{wch:10},{wch:11},{wch:14}];
-  ws['!rows'] = [{hpt:28},{hpt:20}];
-  ws['!margins'] = {left:0.5, right:0.5, top:0.6, bottom:0.6, header:0.3, footer:0.3};
-  ws['!merges'] = merges;
-  ws['!autofilter'] = {ref: XLSX.utils.encode_range({s:{r:headerRowIdx,c:0}, e:{r:dataEndRow,c:6}})};
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, '마감내역서');
-  XLSX.writeFile(wb, `${title}_${c.partner}_${c.no}.xlsx`);
-}
-// 2026-08-12(47차 신설, 상현님 지시): "고객사에 제출해야 하는 문서니까 신경 좀 써서 디자인" —
-// 위 exportClosingExcel()이 쓰는 xlsx.full.min.js(SheetJS 무료판)는 셀 색상·테두리를 파일에 저장하지
-// 못해 디자인에 한계가 뚜렷했습니다(코드 상단 주석에 이미 기록된 제약). ExcelJS는 같은 자바스크립트
-// 생태계의 별도 라이브러리로, 무료 버전에서도 배경색·글꼴색·테두리·병합·서식을 전부 파일에 정상
-// 저장합니다. 매입처용 마감내역서(mat/out)는 사내 정산용 문서라 기존 함수를 그대로 두고, 고객사에
-// 실제로 전달되는 매출 마감내역서(kind='cust')만 이 함수로 새로 디자인했습니다.
-async function exportCustClosingExcelStyled(no){
-  const c = S.custClosings.find(x=>x.no===no);
-  if(!c) return;
-  if(typeof ExcelJS === 'undefined'){
-    alert('디자인 엑셀 라이브러리를 아직 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.');
-    return;
-  }
-  const supplier = {name:S.company.name, bizNo:S.company.bizNo, ceo:S.company.ceo, addr:S.company.addr, tel:S.company.tel};
-  const receiver = {name:c.partner, bizNo:'—', ceo:'—', addr:'—', tel:'—'};
 
   // 담다 브랜드 팔레트(:root --blue/--blue-d/--blue-l)를 그대로 재사용해 화면과 문서의 색이 일치하게 했습니다.
   const BRAND='FF0F7A72', BRAND_D='FF0B5F58', BRAND_L='FFE4F3F1', INK='FF1C2B2A', MUTED='FF6B7B7A', BORDER='FFB9D4D0', WHITE='FFFFFFFF', BAND='FFF3F9F8';
@@ -8490,15 +8432,18 @@ async function exportCustClosingExcelStyled(no){
   const wb = new ExcelJS.Workbook();
   wb.creator = S.company.name;
   wb.created = new Date();
-  const ws = wb.addWorksheet('매출 마감내역서', {
-    pageSetup: {paperSize:9, orientation:'portrait', fitToPage:true, fitToWidth:1, fitToHeight:0, margins:{left:0.5,right:0.5,top:0.6,bottom:0.6,header:0.3,footer:0.3}}
+  // 2026-08-12(48차): 3종(매출/원재료매입/외주비매입) 마감내역서 모두 A4 가로형(landscape)으로
+  // 통일했습니다 — 세로형에서는 품목명이 긴 외주 건 등에서 줄바꿈이 잦았는데, 가로형이 인쇄·PDF
+  // 변환 시 표 가독성이 더 좋다는 판단입니다.
+  const ws = wb.addWorksheet(title, {
+    pageSetup: {paperSize:9, orientation:'landscape', fitToPage:true, fitToWidth:1, fitToHeight:0, margins:{left:0.5,right:0.5,top:0.6,bottom:0.6,header:0.3,footer:0.3}}
   });
-  ws.columns = [{width:6},{width:12},{width:24},{width:16},{width:10},{width:12},{width:15}];
+  ws.columns = [{width:6},{width:12},{width:30},{width:18},{width:12},{width:14},{width:16}];
 
   let r = 1;
   ws.mergeCells(`A${r}:G${r}`);
   let cell = ws.getCell(`A${r}`);
-  cell.value = '매출 마감내역서';
+  cell.value = title;
   cell.font = {name:'맑은 고딕', size:20, bold:true, color:{argb:BRAND_D}};
   cell.alignment = {horizontal:'center', vertical:'middle'};
   ws.getRow(r).height = 34;
@@ -8542,7 +8487,7 @@ async function exportCustClosingExcelStyled(no){
   });
   r++;
 
-  const headers = ['No','일자','품목','규격','수량(개)','단가(원)','금액(원)'];
+  const headers = ['No','일자','품목',specLabel,`수량(${qtyUnit})`,'단가(원)','금액(원)'];
   headers.forEach((h,i)=>{
     cell = ws.getCell(r, i+1);
     cell.value = h;
@@ -8555,6 +8500,7 @@ async function exportCustClosingExcelStyled(no){
   r++;
 
   const dataStart = r;
+  const qtyFmt = qtyUnit==='kg' ? '#,##0.00"kg"' : '#,##0"개"';
   c.rows.forEach((row,i)=>{
     const band = i%2===1;
     const vals = [i+1, '2026-'+row.date, row.name, row.spec||'—', row.qty, row.unitPrice, row.qty*row.unitPrice];
@@ -8566,7 +8512,7 @@ async function exportCustClosingExcelStyled(no){
       cell.alignment = ci===2 ? {horizontal:'left', vertical:'middle', indent:1}
         : {horizontal: ci<=1 ? 'center' : (ci===3 ? 'center' : 'right'), vertical:'middle', indent: ci>=5?1:0};
       if(band) cell.fill = {type:'pattern', pattern:'solid', fgColor:{argb:BAND}};
-      if(ci===4) cell.numFmt = '#,##0"개"';
+      if(ci===4) cell.numFmt = qtyFmt;
       if(ci===5 || ci===6) cell.numFmt = '#,##0"원"';
     });
     r++;
@@ -8602,7 +8548,7 @@ async function exportCustClosingExcelStyled(no){
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `매출 마감내역서_${c.partner}_${c.no}.xlsx`;
+  a.download = `${title}_${c.partner}_${c.no}.xlsx`;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
@@ -8737,7 +8683,7 @@ function renderClosingSection(kind){
         : W(c.totalAmount);
       return `<tr><td>${c.no}</td><td>${c.partner}</td><td style="font-size:11.5px">${c.from||'전체'} ~ ${c.to||'전체'}</td>
         <td class="num">${c.rows.length}</td><td class="num">${amountCell}</td><td>2026-${c.issuedAt||'—'}</td>
-        <td><button class="btn gh sm" onclick="${kind==='cust' ? `exportCustClosingExcelStyled('${c.no}')` : `exportClosingExcel('${kind}','${c.no}')`}">⬇ 엑셀</button></td></tr>`;
+        <td><button class="btn gh sm" onclick="exportClosingExcelStyled('${kind}','${c.no}')">⬇ 엑셀</button></td></tr>`;
     }).join('')
       : `<tr><td colspan="7" style="color:var(--muted)">발행된 마감내역서가 없습니다</td></tr>`;
   }
@@ -14581,7 +14527,7 @@ function renderInventoryRaw(){
     tbl.innerHTML = rows.length ? rows.map(m=>{
       const nameEsc = m.name.replace(/'/g,"\\'");
       if(m.type==='무상사급'){
-        return `<tr style="color:var(--muted)"><td>${m.name}</td><td><span class="tag sup">무상사급</span></td>
+        return `<tr style="color:var(--muted)"><td>${m.name}</td><td style="text-align:center"><span class="tag sup">무상사급</span></td>
           <td colspan="3" style="text-align:center">비용 제외 대상 — 수량 관리 대상 아님</td>
           <td><button class="btn gh sm" onclick="openMatHistoryModal('${nameEsc}')">이력</button></td></tr>`;
       }
@@ -14589,7 +14535,7 @@ function renderInventoryRaw(){
       const amount = cur.qty * (m.price||0);
       const typeTag = m.type==='유상사급' ? '<span class="tag fix">유상사급</span>' : (m.kind==='분쇄' ? '<span class="tag">분쇄재</span>' : '<span class="tag own">자사구매</span>');
       const stockNote = cur.isActual ? '<span style="font-size:9px;color:var(--muted)">(실사값)</span>' : '<span style="font-size:9px;color:var(--amber)">(이론값·미실사)</span>';
-      return `<tr><td>${m.name}</td><td>${typeTag}</td>
+      return `<tr><td>${m.name}</td><td style="text-align:center">${typeTag}</td>
         <td class="num">${cur.qty.toLocaleString()}kg ${stockNote}</td>
         <td class="num">${(m.price||0).toLocaleString()}원</td>
         <td class="num">${W(amount)}</td>
@@ -14746,29 +14692,29 @@ function exportInventoryExcel(tab, filteredOnly){
       const [cust,item] = k.split('|');
       return lvMatch(cust,q) || lvMatch(item,q);
     });
-    pushMergedRow(S.company.name, 5); pushMergedRow('제품 재고 현황', 5);
-    pushMergedRow(`기준일 2026-${todayMD()}${q?` · 검색어 "${q}"`:' · 전체'} · ${keys.length}건`, 5);
-    aoa.push(['', '', '', '', '']);
+    pushMergedRow(S.company.name, 6); pushMergedRow('제품 재고 현황', 6);
+    pushMergedRow(`기준일 2026-${todayMD()}${q?` · 검색어 "${q}"`:' · 전체'} · ${keys.length}건`, 6);
+    aoa.push(['', '', '', '', '', '']);
     const headerRowIdx = aoa.length;
-    aoa.push(['거래처', '품목', '계산값(기본)', '조정 반영', '현재고(개)']);
+    aoa.push(['거래처', '품목', '규격명', '계산값(기본)', '조정 반영', '현재고(개)']);
     const dataStart = aoa.length;
     keys.forEach(k=>{
       const [cust,item] = k.split('|');
       const b = base[k]||0, a = adjusted[k];
-      aoa.push([cust, item, b, a-b, a]);
+      aoa.push([cust, item, fgSpecName(cust,item), b, a-b, a]);
     });
     const dataEnd = aoa.length-1;
     const sumRow = aoa.length;
-    aoa.push(['', '', '', '합계', keys.reduce((s,k)=>s+(adjusted[k]||0),0)]);
+    aoa.push(['', '', '', '', '합계', keys.reduce((s,k)=>s+(adjusted[k]||0),0)]);
     const ws = XLSX.utils.aoa_to_sheet(aoa);
     for(let r=dataStart; r<=dataEnd; r++){
       const rowNum = r+1;
-      ['C','D','E'].forEach(col=>{ if(ws[`${col}${rowNum}`]) ws[`${col}${rowNum}`].z = '#,##0"개"'; });
+      ['D','E','F'].forEach(col=>{ if(ws[`${col}${rowNum}`]) ws[`${col}${rowNum}`].z = '#,##0"개"'; });
     }
-    ws[`E${sumRow+1}`] = {t:'n', f:`SUM(E${dataStart+1}:E${dataEnd+1})`, z:'#,##0"개"'};
-    ws['!cols'] = [{wch:16},{wch:22},{wch:13},{wch:11},{wch:12}];
+    ws[`F${sumRow+1}`] = {t:'n', f:`SUM(F${dataStart+1}:F${dataEnd+1})`, z:'#,##0"개"'};
+    ws['!cols'] = [{wch:16},{wch:22},{wch:20},{wch:13},{wch:11},{wch:12}];
     ws['!merges'] = merges;
-    ws['!autofilter'] = {ref: XLSX.utils.encode_range({s:{r:headerRowIdx,c:0}, e:{r:dataEnd,c:4}})};
+    ws['!autofilter'] = {ref: XLSX.utils.encode_range({s:{r:headerRowIdx,c:0}, e:{r:dataEnd,c:5}})};
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, '제품 재고');
     XLSX.writeFile(wb, `제품_재고현황_${todayMD()}.xlsx`);
@@ -14991,11 +14937,11 @@ function renderFinishedGoods(){
       const [cust,item] = k.split('|');
       const b = base[k]||0, a = adjusted[k];
       const adjDiff = a - b;
-      return `<tr><td>${cust}</td><td>${item}</td><td class="num">${b.toLocaleString()}</td>
+      return `<tr><td>${cust}</td><td>${item}</td><td style="color:var(--ink-soft)">${fgSpecName(cust,item)}</td><td class="num">${b.toLocaleString()}</td>
         <td class="num" style="${adjDiff?'':'color:var(--muted)'}">${adjDiff?(adjDiff>0?'+':'')+adjDiff.toLocaleString():'—'}</td>
         <td class="num" style="font-weight:700">${a.toLocaleString()}개</td>
         <td><button class="btn gh sm" onclick="openFgHistoryModal('${cust.replace(/'/g,"\\'")}','${item.replace(/'/g,"\\'")}')">이력</button></td></tr>`;
-    }).join('') : `<tr><td colspan="6" style="color:var(--muted)">${fgQ?'검색 결과가 없습니다':'현재 창고에 남아있는 완제품 없음'}</td></tr>`;
+    }).join('') : `<tr><td colspan="7" style="color:var(--muted)">${fgQ?'검색 결과가 없습니다':'현재 창고에 남아있는 완제품 없음'}</td></tr>`;
   }
   const invFgCntEl = $('inv-fg-count');
   if(invFgCntEl) invFgCntEl.textContent = `${keys.length}건`;
