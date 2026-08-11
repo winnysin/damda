@@ -551,7 +551,7 @@ table.mr-table input.form-control.ro{background:var(--bg);color:var(--muted)}
 <body>
 <div class="wrap">
 <aside class="side">
-  <div class="brand"><div class="brand-row"><img src="/icon-192.png" alt="DAMDA" class="brand-logo"><span class="brand-word">DAMDA</span></div><small>프로토타입 v0.80 · 마감내역서 3종 디자인/가로형 + 재고관리 보완 + 자재화면 정리 — 48차 라운드</small></div>
+  <div class="brand"><div class="brand-row"><img src="/icon-192.png" alt="DAMDA" class="brand-logo"><span class="brand-word">DAMDA</span></div><small>프로토타입 v0.81 · 마감내역서 3종 디자인 + 자재관리자 역할 신설 + 납품→거래명세서 연결 — 48차 라운드</small></div>
   <nav class="nav">
     <!-- 2026-07-21(항목11) 대분류 재구성: 운영 모니터링-기본정보-영업,수주-구매-생산-납품,마감-자재-인사,급여-품질-원가관리-가이드-환경설정 (12개, 상현님 지시안) -->
     <div class="grp">운영 모니터링</div>
@@ -2762,7 +2762,7 @@ BEP 매출  = 월 고정비 ÷ 공헌이익률
         <tr><td>43차 라운드 — 납품 인수확인 완료 알림 연동 (2026-08-11, v0.75)</td><td>42차에서 분석만 드렸던 "인수확인 이후 조회·알림 흐름"을 상현님이 두 방향 모두("1,2번을 모두 적용해줘") 반영하기로 확정해주셔서 함께 구현했습니다. ①<b>매출 마감관리 카드 확장</b> — 기존 3칸 경고카드(수입검사 대기·불합격 보류·출하검사 대기)에 <b>납품 인수확인 대기</b> 건수를 4번째 칸으로 추가했습니다(<code>.grid4</code> 신설). 앞 3칸과 달리 이 칸은 매출 마감을 막는 항목이 아니라 "체크리스트성 확인 항목"이라 카드 설명 문구로 그 차이를 명확히 안내했습니다. ②<b>알림센터 연동</b> — 납품이력에서 확인대기→확인완료로 바뀌는 순간 <code>toggleDeliveryReceived()</code> 함수를 신설해 기존 인라인 토글을 대체하고, <code>pushNotification('납품인수확인', ...)</code>을 호출해 화면 안 알림센터 기록과 실제 기기 푸시를 함께 남기도록 했습니다(반대로 확인완료→확인대기로 되돌릴 때는 담당자의 단순 실수 수정일 뿐이라 알림을 보내지 않습니다). node --check 구문 검증과 jsdom 기반 검증(경고카드 4번째 칸 표시조건·건수, 확인완료 토글 시 알림 기록 생성 확인, 34~42차 회귀 스위트 재실행)을 통과해 실제 오류 0건을 확인했습니다. 이 라운드에서 지정한 알림 대상(사장·경리)이 실제 업무 흐름과 맞지 않아 44차에서 바로 정정합니다.</td></tr>
         <tr><td>44차 라운드 — 납품 인수확인 알림대상 정정 + 영업 역할 신설 + 추가인원 지정 (2026-08-11, v0.76)</td><td>43차에서 제가 임의로 정한 알림 대상(사장·경리)이 실제 업무 흐름과 맞지 않는다는 상현님 지적("알림이 가는 대상은 사장, 경리가 아니야. 영업, 생산관리+ 추가인원이야")을 반영해 대상을 다시 설계했습니다. ①<b>영업(SALES) 역할 신설</b> — 그동안 이 앱에는 영업 담당자를 가리키는 역할이 없어(수주·납품 화면은 있었지만 그걸 다루는 전용 역할이 없었음), 상현님 확인을 거쳐 <code>permRoleLabels</code>·<code>permMatrix</code>(13개 그룹 전체에 SALES 열 추가, "영업,수주"·"납품,마감" 2곳만 기본 허용)·<code>notifyRoleLabels</code>에 새 역할을 추가하고 데모 직원(정영업)을 등록했습니다. 화면 접근권한표·알림설정표·직원 역할 드롭다운은 모두 <code>Object.keys()</code> 기반으로 이미 범용화되어 있어 이 두 군데만 고치면 앱 전체에 자동 반영됩니다. ②<b>notifyRules 정정</b> — <code>납품인수확인</code> 알림 대상을 사장·경리(false)에서 영업·생산관리(true)로 교체했습니다. ③<b>"추가인원" 지정 기능 신설</b> — 상현님이 "직원이 될 수도 있고 임원이 될 수도 있어"라고 하신 대로, 역할과 무관하게 특정 개인을 지정할 수 있어야 해서 기존 "구매 결재 대리인"과 동일한 패턴(<code>S.deliveryConfirmExtraEmpIds</code> 배열)으로 별도 설계했습니다. 환경설정에 새 카드(납품 인수확인 추가 알림대상)를 만들어 재직 중인 전 직원(임원 포함) 중 누구든 체크로 지정할 수 있고, <code>pushNotification()</code> 함수에 5번째 인자(<code>extraEmpIds</code>)를 추가해 알림 기록에 <code>empIds</code> 필드로 함께 남도록 확장했습니다. 직원용 모니터링 앱의 "내게 온 알림" 필터도 역할 일치뿐 아니라 지정된 개인 ID 일치도 함께 보도록 넓혔고, 알림센터 피드에는 지정된 사람 이름을 👤 태그로 별도 표시했습니다. 단, 실제 기기 푸시(<code>sendRealPush</code>)는 아직 역할 단위 구독만 지원해 추가인원 지정은 화면 안 알림센터 기록에만 반영되고 실제 푸시알림은 받지 못한다는 한계를 코드 주석으로 남겨두었습니다(1개 테스트베드 업체 파일럿 범위, 추후 개인별 구독 도입 시 확장). node --check 구문 검증과 jsdom 기반 검증(SALES 역할이 권한표·알림설정표에 정상 노출, 납품인수확인 알림이 영업·생산관리에만 가고 사장·경리에는 안 가는지 확인, 추가인원으로 경리 직원 1명을 지정한 뒤 실제로 알림에 포함되고 👤 태그로 표시되는지 확인, 34~42차 회귀 스위트 재실행)을 통과해 실제 오류 0건을 확인했습니다.</td></tr>
         <tr><td>45차 라운드 — 납품·마감 열 폭 정비 + 고객사별 마감내역서 개선 (2026-08-11, v0.77)</td><td>상현님이 7가지를 지시하셨고, 이번 라운드는 그중 구체적으로 지시하신 4가지(①~④)를 반영했습니다(⑤~⑦은 매출 마감관리 화면 전체 재설계와 관련된 판단이 필요한 사안이라 분석·제안으로 별도 보고드립니다). <b>①②출하대기 표 폭 조정</b> — 수주수량·기납품·잔량·단가 4개 열을 999,999(6자리)까지 안 잘리게 74→82px로, 잔량 공급가 열을 ₩ 99,999,999(8자리)까지 줄바꿈 없이 표시되도록 90→112px로 넓히고 <code>white-space:nowrap</code>을 추가했습니다(₩ 기호와 숫자 사이 공백에서 줄바꿈이 일어나던 게 실제 잘림의 원인이었습니다). <b>③납품이력 표 폭 조정</b> — 같은 논리로 수량 80→84px, 공급가 104→112px+nowrap으로 재조정했습니다. <b>④고객사별 마감내역서 발행 개선</b> — 후보 표에 납품일 우측 고객사명 열을 신설하고, 품목명·규격명 열의 고정폭을 없애 <code>table-layout:fixed</code>가 남는 공간을 두 열에 균등 배분하도록 했습니다(출하대기 표와 동일한 패턴 재사용 — 이전에는 규격명만 140px 고정이라 품목명이 과도하게 넓어 보였습니다). 수량·단가는 82~92px로, 공급가는 112px+nowrap으로 맞췄습니다. 발행 이력 표에는 발행월·거래처 조회조건과 합계금액 표시를 새로 달았습니다(<code>lv('custclosing-hist')</code> 독립 키 사용). node --check 구문 검증과 jsdom 기반 검증(3개 표 헤더 폭 실측, 고객사명 열 렌더링 확인, 발행 이력 조회 필터링·합계금액 재계산 확인, 34~44차 회귀 스위트 재실행)을 통과해 실제 오류 0건을 확인했습니다.</td></tr>
-        <tr><td>48차 라운드 — 마감내역서 3종 디자인 통일 + 재고관리 보완 + 자재화면 명확화 (2026-08-12, v0.80)</td><td>상현님 6가지 요청 중 즉시 실행 가능한 3가지를 반영하고, 나머지는 조사 후 의견을 드렸습니다. <b>①마감내역서 3종 전부 디자인 + A4 가로형</b> — 47차에서 매출 마감내역서(cust)에만 적용했던 ExcelJS 디자인(브랜드 색상 헤더·병합·밴딩·SUM 수식)을 원재료(mat)·외주비(out) 매입 마감내역서까지 확장해 <code>exportClosingExcelStyled(kind, no)</code> 하나로 통합했고, 3종 모두 세로형에서 가로형(landscape)으로 전환했습니다. 옛 SheetJS 기반 <code>exportClosingExcel()</code>(색상 저장 불가)은 더 이상 쓰이지 않아 제거했습니다. <b>②재고관리 화면 보완</b> — 원재료 재고관리 탭의 "구분" 열을 가운데정렬했고, 제품 재고관리 탭 품목명 우측에 규격명 열을 추가했습니다(엑셀 다운로드도 동일하게 갱신). 상현님이 질문하신 "기타입출고 기능이 있는지"에 대한 답은 <b>이미 있습니다</b> — 제품 재고관리 탭 하단 "완제품 기타입고·기타출고" 카드가 그 기능이며, 다만 원재료용 전용 메뉴(자재 입출고 내역)와 위치가 달라 못 찾으셨던 것으로 보여 화면명을 "원재료 입출고 내역"으로 명확히 하고 상호 안내 링크를 추가했습니다. 로트별 매입단가 차이(재고관리 반영 여부)는 코드 변경 없이 의견만 드립니다(본문 참고). <b>③제품 입출고 예시 10건</b> — 기존 1건뿐이던 <code>S.fgAdjustments</code> 시드를 7개 거래처에 걸친 10건(기타입고 6건, 기타출고 4건)으로 확충해 화면이 빈 표가 아니라 실제 동작하는 예시로 보이도록 했습니다. <b>④~⑥ 의견 제시(코드 변경 없음)</b> — 납품관리·거래명세서 발행 통합, 자재 입출고 내역의 원재료/제품 구조(탭 vs 하위메뉴), 자재관리자 역할 신설과 월간보고 연동, 창고 입고마감 갭 추적 화면 설명은 채팅 답변으로 의견을 드리고 다음 진행 여부를 여쭤봤습니다. node --check 구문 검증과 jsdom 기반 검증(mat/out/cust 3종 모두 landscape·병합 22개·SUM 수식 확인, 재고관리 구분열 가운데정렬·규격명 열·10건 시드 확인, 원재료입출고 화면명 변경 확인, 34~47차 회귀 스위트 재실행, 67개 전 화면 순회 콘솔에러 0건)을 통과했습니다.</td></tr>
+        <tr><td>48차 라운드 — 마감내역서 3종 디자인 통일 + 재고관리 보완 + 자재화면 명확화 (2026-08-12, v0.80)</td><td>상현님 6가지 요청 중 즉시 실행 가능한 3가지를 반영하고, 나머지는 조사 후 의견을 드렸습니다. <b>①마감내역서 3종 전부 디자인 + A4 가로형</b> — 47차에서 매출 마감내역서(cust)에만 적용했던 ExcelJS 디자인(브랜드 색상 헤더·병합·밴딩·SUM 수식)을 원재료(mat)·외주비(out) 매입 마감내역서까지 확장해 <code>exportClosingExcelStyled(kind, no)</code> 하나로 통합했고, 3종 모두 세로형에서 가로형(landscape)으로 전환했습니다. 옛 SheetJS 기반 <code>exportClosingExcel()</code>(색상 저장 불가)은 더 이상 쓰이지 않아 제거했습니다. <b>②재고관리 화면 보완</b> — 원재료 재고관리 탭의 "구분" 열을 가운데정렬했고, 제품 재고관리 탭 품목명 우측에 규격명 열을 추가했습니다(엑셀 다운로드도 동일하게 갱신). 상현님이 질문하신 "기타입출고 기능이 있는지"에 대한 답은 <b>이미 있습니다</b> — 제품 재고관리 탭 하단 "완제품 기타입고·기타출고" 카드가 그 기능이며, 다만 원재료용 전용 메뉴(자재 입출고 내역)와 위치가 달라 못 찾으셨던 것으로 보여 화면명을 "원재료 입출고 내역"으로 명확히 하고 상호 안내 링크를 추가했습니다. 로트별 매입단가 차이(재고관리 반영 여부)는 코드 변경 없이 의견만 드립니다(본문 참고). <b>③제품 입출고 예시 10건</b> — 기존 1건뿐이던 <code>S.fgAdjustments</code> 시드를 7개 거래처에 걸친 10건(기타입고 6건, 기타출고 4건)으로 확충해 화면이 빈 표가 아니라 실제 동작하는 예시로 보이도록 했습니다. <b>④~⑥ 의견 제시</b> — 납품관리·거래명세서 발행 통합, 자재 입출고 내역의 원재료/제품 구조(탭 vs 하위메뉴), 자재관리자 역할 신설과 월간보고 연동, 창고 입고마감 갭 추적 화면 설명은 먼저 채팅 답변으로 의견을 드렸고, 상현님이 "납품→거래명세서 확인창 연결"과 "자재관리자 역할 신설" 두 가지를 다음 라운드에서 진행하기로 골라주셔서 같은 라운드 안에서 이어서 반영했습니다. <b>⑦납품 등록→거래명세서 발행 확인창</b> — <code>saveDeliveryRegistration()</code>에서 납품 등록 직후 "거래명세서를 지금 발행하시겠습니까?" 확인창을 띄우고, "확인"을 누르면 그 거래처가 이미 선택된 거래명세서 발행 화면(<code>setDocIssueCustFilter()</code>+<code>navTo('docissue')</code>)으로 바로 이동합니다. "취소"를 눌러도 납품은 이미 정상 등록된 상태라 나중에 여러 건을 모아 발행(기존 최대 10건 묶음발행)할 수 있어, 즉시발행·모아서발행 두 방식을 다 지원합니다. 새 열을 추가하는 대신 납품이력 표의 납품일 칸에 이월 태그와 같은 자리로 "발행완료"/"미발행" 태그를 붙여 어떤 건이 아직 거래명세서 미발행 상태인지 표에서 바로 보이게 했습니다. <b>⑧자재관리자(MATMGR) 역할 신설</b> — PRODMGR(생산관리자) 신설 때와 동일한 방식으로 <code>permRoleLabels</code>·<code>permMatrix</code>(자재 그룹만 true인 최소 기본값)·<code>notifyRules</code>(자재입출고/재고실사/입고완료/완제품재고 4개 알림)·데모 직원(조자재)을 추가했습니다. 월간보고는 기존에 역할 단위 접근제한만 있고 부서 단위 접근제한이 없었는데(9~10차 라운드에서 명시적으로 미룬 과제), 이번에 MATMGR로 로그인하면 <code>renderMrDeptTabBar()</code>/<code>renderMrDashDeptTabBar()</code>가 입력화면·대시보드 모두 "자재부" 탭 하나만 보이도록 강제해(다른 역할은 기존처럼 8개 탭 그대로) 자재관리자가 자재 화면만으로 업무를 완결할 수 있게 했습니다. 다만 이 새 데모 직원(연봉 310만원, 정직원)이 노무비 계산에 자동으로 포함되면서 "이번 달 비용"·손익 관련 KPI 수치가 이전 라운드 대비 소폭 올라간 점은 자연스러운 결과입니다(실제 인원이 늘면 인건비도 느는 것과 동일한 로직이며, 계산 오류가 아닙니다). node --check 구문 검증과 jsdom 기반 검증(mat/out/cust 3종 모두 landscape·병합 22개·SUM 수식 확인, 재고관리 구분열 가운데정렬·규격명 열·10건 시드 확인, 원재료입출고 화면명 변경 확인, MATMGR 권한 매트릭스·월간보고 탭 단일화·타 역할 8탭 유지 확인, 납품등록→확인창→거래명세서 이동·미발행 태그 확인, 34~47차 회귀 스위트 재실행, 67개 전 화면 순회 콘솔에러 0건)을 통과했습니다.</td></tr>
 <tr><td>47차 라운드 — 매출 마감관리 정렬·조회 + 마감내역서 디자인 + 수금관리 고도화 (2026-08-12, v0.79)</td><td>46차에서 재설계한 매출 마감관리·수금관리를 다듬는 5가지 보완입니다. <b>①매출 표에 수주번호 열 추가 + 정렬 기능</b> — 통합된 매출·마감내역서 후보 표의 고객사명 오른쪽에 수주번호 열을 추가했고, 검색바에 "납품일 최신순/오래된순" 정렬 셀렉트를 달아 <code>closingCandidateRows('cust')</code>에서 바로 정렬해 내려줍니다. <b>②마감내역서 발행 이력 조회를 연도/월 분리</b> — 기존 "발행월" 텍스트 입력 한 칸을 연도 셀렉트(등록된 이력 연도를 자동 수집)와 월 셀렉트 두 칸으로 나눴습니다. <b>③매출 마감내역서 엑셀 디자인 고급화</b> — 고객사에 실제로 전달되는 문서인데 스타일이 전혀 없다는 지적을 반영해, 기존 xlsx.full.min.js(셀 스타일을 파일에 못 쓰는 무료판)와 별도로 ExcelJS를 도입했습니다. 제목 배너, 공급자/공급받는자 정보 박스, 브랜드 색상 헤더, 홀짝 밴딩 표, 합계는 하드코딩이 아닌 실제 SUM 수식으로 채운 새 엑셀 양식(<code>exportCustClosingExcelStyled()</code>)을 만들어 고객사 제출용 마감내역서에만 적용했습니다(원재료·외주 마감내역서는 기존 방식 유지). <b>④마감 확정 내역 미리보기 2분할</b> — 비용 항목만 보이던 카드를 2단 그리드로 나눠 왼쪽에 "매출(거래처별)", 오른쪽에 "비용(항목별)"을 동시에 보여줘, 잠그기 전에 매출·비용을 한눈에 비교할 수 있게 했습니다. <b>⑤수금관리 업무 분석 + 보완</b> — 상현님 질문에 답변드리면, 수금이 완료돼도 리스트에서 삭제되지 않습니다. <code>S.collections</code>는 이력이 계속 쌓이는 원장(ledger)이고, 거래처별 현황 표는 "청구누계 − 수금누계"를 매번 다시 계산하는 살아있는 잔액이라 완료된 건도 그대로 남습니다. 여기에 최근 수금일 열을 추가해 거래처별로 마지막 입금이 언제였는지 보이게 했고, 수금 등록 시 "귀속월(몇월분)" 셀렉트를 추가해 어느 달 청구분에 대한 입금인지 남기도록 했습니다. 이 과정에서 수금 등록일이 실제 진행 월과 무관하게 "07-"로 고정 하드코딩되어 있던 버그도 함께 발견해 고쳤습니다(<code>closeCurrentMonth()</code>로 실제 8월로 넘어간 뒤에도 "2026-08-25"처럼 정확히 찍히는지 확인). 수금 이력도 최근 10건 하드캡 목록에서 거래처·귀속월 검색과 페이지네이션이 되는 전체 이력 표로 확장했습니다. node --check 구문 검증, ExcelJS 워크북 생성 로직 검증(제목·병합 22개·SUM 수식·23행 정상 생성 확인), 34~46차 회귀 스위트 재실행, 67개 전 화면 순회 콘솔에러 0건을 모두 통과했습니다.</td></tr>
 <tr><td>46차 라운드 — 매출 마감관리 화면 재설계 (2026-08-11, v0.78)</td><td>45차에서 분석만 드렸던 매출 마감관리 개편(5~7번)을 상현님이 3가지 모두 진행하기로 확정해주셔서 반영했습니다. <b>①매출 이력·마감내역서 표 통합</b> — "매출—이번달 납품이력"과 "고객사별 마감내역서 발행" 두 표가 둘 다 <code>S.deliveries</code>를 읽는 사실상 같은 표라는 지적을 반영해 하나로 합쳤습니다. <code>closingCandidateRows('cust')</code>가 더 이상 이미 발행된 건을 숨기지 않고 <code>closedStmtNo</code>를 함께 내려주면, 화면에서는 "발행됨(번호)"/"미발행" 배지로 구분하고 발행된 행은 체크박스 자체를 없애 중복 발행을 원천 차단합니다(혹시 모를 경우를 대비해 <code>registerClosing()</code>에도 발행 건 재필터링을 한 번 더 넣었습니다). 이전 이력 표에 있던 페이지네이션(50/100/200)도 <code>lv('custclosing')</code>으로 그대로 이어받았고, 검색에 품목명 조건을 추가했습니다. <b>②비용구성·마감이력 카드 정리</b> — 원가관리 화면에 이미 더 정교한 "월별 비용 총액 추이"·"비용 항목별 추이"가 있다는 걸 확인해, 매출 마감관리의 "비용 구성" 카드는 "마감 확정 내역 미리보기"로 성격을 명확히 하고(분석이 아니라 잠그기 직전 확인용), "마감 이력"에는 "이건 기록일 뿐 분석이 필요하면 원가관리로"라는 안내 링크를 달았습니다. 열이나 데이터를 지우지는 않고 두 화면의 역할만 분리했습니다. <b>③수금관리 화면 분리</b> — 미수금 현황·수금 등록·최근 수금 이력을 매출 마감관리에서 통째로 떼어 "납품,마감" 그룹에 새 화면(<code>#p-ar</code>)으로 옮겼습니다. 청구누계·수금누계·미수 잔액 표와 수금 진도율 KPI 등 기존 로직(<code>renderAR()</code>)은 그대로 재사용했고, 화면 위치만 옮겼기 때문에 데이터·계산에는 변화가 없습니다. 매출 마감관리에는 새 화면으로 가는 안내 링크만 남겼습니다. node --check 구문 검증과 jsdom 기반 검증(통합 표 발행 전/후 배지 전환 확인, 발행된 건 재선택 시도 시 0건으로 막히는지 확인, 페이지네이션·검색 필터 동작 확인, 새 수금관리 화면 KPI·표·등록 동작 확인, 67개 전 화면 순회 콘솔에러 0건, 34~45차 회귀 스위트 재실행)을 통과해 실제 오류 0건을 확인했습니다.</td></tr>
       </tbody>
@@ -3446,7 +3446,9 @@ const S = {
     // 영업과 생산 사이에서 생산계획을 수립하고 작업지시를 내리는 역할(알림트리거 마스터리스트 v1.2 감사에서 확정).
     {id:8, name:'노현우', role:'PRODMGR', roleLabel:'생산관리자',            empType:'정직원', payType:'연봉', wageYear:2026, monthlySalary:3400000, hireDate:'2025-06-01', active:true, hasAccount:true, annualLeaveTotal:15},
     // 2026-08-11(44차 신설) — "영업"(SALES) 역할 미리보기·테스트용 데모 직원(상현님 지시, PRODMGR 신설 때와 동일한 패턴).
-    {id:9, name:'정영업', role:'SALES', roleLabel:'영업담당',              empType:'정직원', payType:'연봉', wageYear:2026, monthlySalary:3200000, hireDate:'2023-11-01', active:true, hasAccount:true, annualLeaveTotal:15}
+    {id:9, name:'정영업', role:'SALES', roleLabel:'영업담당',              empType:'정직원', payType:'연봉', wageYear:2026, monthlySalary:3200000, hireDate:'2023-11-01', active:true, hasAccount:true, annualLeaveTotal:15},
+    // 2026-08-12(48차 신설) — MATMGR(자재관리자) 역할의 예시 직원. PRODMGR(노현우) 추가 방식을 그대로 승계.
+    {id:10, name:'조자재', role:'MATMGR', roleLabel:'자재관리자',            empType:'정직원', payType:'연봉', wageYear:2026, monthlySalary:3100000, hireDate:'2025-09-01', active:true, hasAccount:true, annualLeaveTotal:15}
   ],
   // 2026-08-05(31차) 신설 — 마스터계정 권한설정 화면(상현님 지시)의 배경 설명용 상태입니다.
   // 이 SaaS(담다)를 공급하는 지투아이넷(SI사)의 유지보수용 관리자 계정입니다. 세아전자 같은
@@ -3566,7 +3568,7 @@ const S = {
   // 도달하는 즉시 자동으로 출하대기 전환됩니다. process(공정검사)는 애초에 다른 화면에 영향을 주지 않는
   // 순수 이력이라 꺼도 막히는 동작은 없고, 화면에 "미사용" 안내만 표시됩니다.
   qcModules:{incoming:true, process:true, ship:true},
-  permRoleLabels:{OWNER:'사장', EXEC:'임원', ACCOUNT:'경리(직원)', FACTORY:'공장장(직원)', OPERATION:'생산·품질(직원)', DRIVER:'납품기사(직원)', WORKER:'생산직(직원)', PRODMGR:'생산관리자(직원)', SALES:'영업(직원)'}, // 2026-08-11(44차 신설) — 상현님 지시: 납품 인수확인 알림 등 '영업' 전용 대상이 필요해 신설. PRODMGR와 동일한 최소 기본값 원칙 적용.
+  permRoleLabels:{OWNER:'사장', EXEC:'임원', ACCOUNT:'경리(직원)', FACTORY:'공장장(직원)', OPERATION:'생산·품질(직원)', DRIVER:'납품기사(직원)', WORKER:'생산직(직원)', PRODMGR:'생산관리자(직원)', SALES:'영업(직원)', MATMGR:'자재관리자(직원)'}, // 2026-08-11(44차 신설) — 상현님 지시: 납품 인수확인 알림 등 '영업' 전용 대상이 필요해 신설. PRODMGR와 동일한 최소 기본값 원칙 적용. 2026-08-12(48차) MATMGR(자재관리자) 추가 — 자재 그룹 화면만으로 본연의 업무가 끝나도록 하는 전용 역할, 동일한 최소 기본값 원칙 적용.
   // 2026-07-21(항목11) 대분류 재구성에 맞춰 permGroups/permMatrix도 새 12개 그룹 기준으로 다시 정의합니다.
   // 여러 기존 그룹이 하나로 합쳐진 곳(예: 운영 모니터링=사장화면+알림, 원가관리=원가분석+월고정비+전력비 등)은
   // 판단하여 보완: 손익처럼 민감한 화면이 포함된 그룹은 기존의 더 엄격한 쪽 권한을 유지하고(운영 모니터링 —
@@ -3584,21 +3586,26 @@ const S = {
     // 2026-08-07(30차): "생산관리자"(PRODMGR) 신규 역할 추가 — 영업과 생산 사이에서 생산계획·작업지시를
     // 담당하는 역할(알림트리거 마스터리스트 v1.2 감사에서 확정). 상현님 지시대로 최소 기본값(생산+영업,수주만
     // true)으로 시작하고, 나머지 그룹은 필요시 환경설정 > 권한관리에서 직접 열 수 있습니다.
-    '운영 모니터링': {OWNER:true, EXEC:true,  ACCOUNT:false, FACTORY:false, OPERATION:false, DRIVER:false, WORKER:false, PRODMGR:false, SALES:false},
-    '기본정보':     {OWNER:true, EXEC:true,  ACCOUNT:true,  FACTORY:true,  OPERATION:true,  DRIVER:false, WORKER:false, PRODMGR:false, SALES:false},
-    '영업,수주':    {OWNER:true, EXEC:true,  ACCOUNT:true,  FACTORY:false, OPERATION:false, DRIVER:false, WORKER:false, PRODMGR:true, SALES:true},
-    '구매':        {OWNER:true, EXEC:true,  ACCOUNT:true,  FACTORY:true,  OPERATION:false, DRIVER:false, WORKER:false, PRODMGR:false, SALES:false},
-    '생산':        {OWNER:true, EXEC:true,  ACCOUNT:false, FACTORY:true,  OPERATION:true,  DRIVER:false, WORKER:false, PRODMGR:true, SALES:false},
-    '납품,마감':    {OWNER:true, EXEC:true,  ACCOUNT:true,  FACTORY:false, OPERATION:true,  DRIVER:true,  WORKER:false, PRODMGR:false, SALES:true},
-    '자재':        {OWNER:true, EXEC:true,  ACCOUNT:true,  FACTORY:true,  OPERATION:false, DRIVER:false, WORKER:false, PRODMGR:false, SALES:false},
-    '인사,급여':    {OWNER:true, EXEC:true,  ACCOUNT:true,  FACTORY:true,  OPERATION:false, DRIVER:false, WORKER:false, PRODMGR:false, SALES:false},
-    '품질':        {OWNER:true, EXEC:true,  ACCOUNT:true,  FACTORY:false, OPERATION:true,  DRIVER:false, WORKER:false, PRODMGR:false, SALES:false},
-    '원가관리':     {OWNER:true, EXEC:true,  ACCOUNT:true,  FACTORY:true,  OPERATION:false, DRIVER:false, WORKER:false, PRODMGR:false, SALES:false},
+    // 2026-08-12(48차): "자재관리자"(MATMGR) 신규 역할 추가 — 자재 그룹 화면(원재료 입출고 내역/재고관리/
+    // 재고실사/창고 입고마감 갭 추적)만으로 본연의 업무가 끝나도록 하는 전용 역할. PRODMGR와 동일하게
+    // 자재 그룹 하나만 true인 최소 기본값으로 시작합니다.
+    '운영 모니터링': {OWNER:true, EXEC:true,  ACCOUNT:false, FACTORY:false, OPERATION:false, DRIVER:false, WORKER:false, PRODMGR:false, SALES:false, MATMGR:false},
+    '기본정보':     {OWNER:true, EXEC:true,  ACCOUNT:true,  FACTORY:true,  OPERATION:true,  DRIVER:false, WORKER:false, PRODMGR:false, SALES:false, MATMGR:false},
+    '영업,수주':    {OWNER:true, EXEC:true,  ACCOUNT:true,  FACTORY:false, OPERATION:false, DRIVER:false, WORKER:false, PRODMGR:true, SALES:true, MATMGR:false},
+    '구매':        {OWNER:true, EXEC:true,  ACCOUNT:true,  FACTORY:true,  OPERATION:false, DRIVER:false, WORKER:false, PRODMGR:false, SALES:false, MATMGR:false},
+    '생산':        {OWNER:true, EXEC:true,  ACCOUNT:false, FACTORY:true,  OPERATION:true,  DRIVER:false, WORKER:false, PRODMGR:true, SALES:false, MATMGR:false},
+    '납품,마감':    {OWNER:true, EXEC:true,  ACCOUNT:true,  FACTORY:false, OPERATION:true,  DRIVER:true,  WORKER:false, PRODMGR:false, SALES:true, MATMGR:false},
+    '자재':        {OWNER:true, EXEC:true,  ACCOUNT:true,  FACTORY:true,  OPERATION:false, DRIVER:false, WORKER:false, PRODMGR:false, SALES:false, MATMGR:true},
+    '인사,급여':    {OWNER:true, EXEC:true,  ACCOUNT:true,  FACTORY:true,  OPERATION:false, DRIVER:false, WORKER:false, PRODMGR:false, SALES:false, MATMGR:false},
+    '품질':        {OWNER:true, EXEC:true,  ACCOUNT:true,  FACTORY:false, OPERATION:true,  DRIVER:false, WORKER:false, PRODMGR:false, SALES:false, MATMGR:false},
+    '원가관리':     {OWNER:true, EXEC:true,  ACCOUNT:true,  FACTORY:true,  OPERATION:false, DRIVER:false, WORKER:false, PRODMGR:false, SALES:false, MATMGR:false},
     // 월간 보고(2026-07-27) — 부서 담당자(품질/생산 등 실무 역할 포함)도 자기 부서 입력화면은 볼 수 있어야 하므로
     // 원가관리보다 넓게 열어둡니다. 부서 단위 세부 접근제한(자기 부서만 입력)은 아직 role 모델에 없어 후속 과제로 남깁니다.
-    '월간 보고':    {OWNER:true, EXEC:true,  ACCOUNT:true,  FACTORY:true,  OPERATION:true,  DRIVER:false, WORKER:false, PRODMGR:false, SALES:false},
-    '환경설정':     {OWNER:true, EXEC:false, ACCOUNT:false, FACTORY:false, OPERATION:false, DRIVER:false, WORKER:false, PRODMGR:false, SALES:false},
-    '검증':        {OWNER:true, EXEC:false, ACCOUNT:false, FACTORY:false, OPERATION:false, DRIVER:false, WORKER:false, PRODMGR:false, SALES:false}
+    // 2026-08-12(48차): MATMGR도 true로 열되, renderMrDeptTabBar()/renderMrDashDeptTabBar()에서 MATMGR
+    // 로그인 시 부서 탭을 "자재부" 하나로만 강제 고정해(자기 부서만 접근) 사실상의 부서 단위 접근제한을 구현했습니다.
+    '월간 보고':    {OWNER:true, EXEC:true,  ACCOUNT:true,  FACTORY:true,  OPERATION:true,  DRIVER:false, WORKER:false, PRODMGR:false, SALES:false, MATMGR:true},
+    '환경설정':     {OWNER:true, EXEC:false, ACCOUNT:false, FACTORY:false, OPERATION:false, DRIVER:false, WORKER:false, PRODMGR:false, SALES:false, MATMGR:false},
+    '검증':        {OWNER:true, EXEC:false, ACCOUNT:false, FACTORY:false, OPERATION:false, DRIVER:false, WORKER:false, PRODMGR:false, SALES:false, MATMGR:false}
   },
 
   // 완제품 재고 — 생산완료(doneQty)-납품(deliveries) 계산값에 수동 조정(기타입고/출고)을 더해 관리
@@ -4321,23 +4328,23 @@ const S = {
     '불량반출':            {OWNER:false, ACCOUNT:true,  FACTORY:true,  OPERATION:false, DRIVER:false, WORKER:false, PRODMGR:false},
     '연쇄불량 재작업':      {OWNER:false, ACCOUNT:true,  FACTORY:false, OPERATION:false, DRIVER:false, WORKER:false, PRODMGR:false},
     '연쇄불량 비용청구':    {OWNER:false, ACCOUNT:true,  FACTORY:false, OPERATION:false, DRIVER:false, WORKER:false, PRODMGR:false},
-    '입고완료':            {OWNER:false, ACCOUNT:false, FACTORY:true,  OPERATION:false, DRIVER:false, WORKER:false, PRODMGR:false},
+    '입고완료':            {OWNER:false, ACCOUNT:false, FACTORY:true,  OPERATION:false, DRIVER:false, WORKER:false, PRODMGR:false, MATMGR:true},
     '분할납품':            {OWNER:false, ACCOUNT:true,  FACTORY:false, OPERATION:false, DRIVER:true,  WORKER:false, PRODMGR:false},
     '마감등록':            {OWNER:false, ACCOUNT:true,  FACTORY:false, OPERATION:false, DRIVER:false, WORKER:false, PRODMGR:false},
     '수금등록':            {OWNER:true,  ACCOUNT:true,  FACTORY:false, OPERATION:false, DRIVER:false, WORKER:false, PRODMGR:false},
     '과거월재정산':        {OWNER:true,  ACCOUNT:true,  FACTORY:false, OPERATION:false, DRIVER:false, WORKER:false, PRODMGR:false},
-    '자재입출고':          {OWNER:false, ACCOUNT:false, FACTORY:true,  OPERATION:false, DRIVER:false, WORKER:false, PRODMGR:false},
-    '재고실사':            {OWNER:false, ACCOUNT:true,  FACTORY:true,  OPERATION:false, DRIVER:false, WORKER:false, PRODMGR:false},
+    '자재입출고':          {OWNER:false, ACCOUNT:false, FACTORY:true,  OPERATION:false, DRIVER:false, WORKER:false, PRODMGR:false, MATMGR:true},
+    '재고실사':            {OWNER:false, ACCOUNT:true,  FACTORY:true,  OPERATION:false, DRIVER:false, WORKER:false, PRODMGR:false, MATMGR:true},
     '업무전달':            {OWNER:false, ACCOUNT:true,  FACTORY:false, OPERATION:false, DRIVER:false, WORKER:false, PRODMGR:false}, // 자동발송(confirmMrLiteSnapshot) 무음 버그 수정 — 수동등록(submitDeptNotify)은 대상을 직접 지정해 이 표와 무관
     // ↓ 감사문서 범위 밖, 이번에 코드 대조 중 추가로 발견해 상현님 승인받은 2건(합리적 제안)
-    '완제품재고':          {OWNER:false, ACCOUNT:true,  FACTORY:true,  OPERATION:false, DRIVER:false, WORKER:false, PRODMGR:false},
+    '완제품재고':          {OWNER:false, ACCOUNT:true,  FACTORY:true,  OPERATION:false, DRIVER:false, WORKER:false, PRODMGR:false, MATMGR:true},
     '수주정보변경':        {OWNER:false, ACCOUNT:false, FACTORY:true,  OPERATION:true,  DRIVER:false, WORKER:false, PRODMGR:false},
     // 2026-08-11(43차 신설, 44차 정정): 납품관리 인수확인 완료 시 영업·생산관리에게 알림 —
     // 상현님이 43차의 사장/경리 대상 설정을 정정해주셨습니다(사장·경리가 아니라 영업·생산관리 담당).
     // '추가인원'(직원·임원 무관 특정 개인 지정)은 역할표만으로는 표현이 안 돼, 별도 empIds 방식으로 함께 발송합니다.
     '납품인수확인':        {OWNER:false, ACCOUNT:false, FACTORY:false, OPERATION:false, DRIVER:false, WORKER:false, PRODMGR:true, SALES:true}
   },
-  notifyRoleLabels:{OWNER:'사장', ACCOUNT:'경리', FACTORY:'공장장', OPERATION:'생산·품질', DRIVER:'납품기사', WORKER:'생산직', PRODMGR:'생산관리자', SALES:'영업'},
+  notifyRoleLabels:{OWNER:'사장', ACCOUNT:'경리', FACTORY:'공장장', OPERATION:'생산·품질', DRIVER:'납품기사', WORKER:'생산직', PRODMGR:'생산관리자', SALES:'영업', MATMGR:'자재관리자'},
   notifyTypeLabels:{
     '월마감완료':'월 마감 완료', '납기임박지연':'납기 임박·지연', '적자전환':'그 달 적자 전환',
     '수주등록':'수주 등록', '납품완료':'납품 완료', '생산완료':'생산 완료',
@@ -7871,9 +7878,13 @@ function renderProduction(){
     const carried = d.ym && d.ym!==S.ym;
     const rowStyle = carried ? 'background:#FFF7E8' : '';
     const carriedTag = carried ? ` <span class="tag" style="background:#FDF3E0;color:#B7791F;font-size:9.5px">이월(${d.ym})</span>` : '';
+    // 2026-08-12(48차 신설): 새 열을 추가하는 대신(이미 열이 빽빽함) 이월 태그와 같은 자리에 거래명세서
+    // 발행 여부 태그를 붙였습니다 — 납품 등록 직후 뜨는 확인창에서 "취소"를 눌러 나중으로 미룬 건이
+    // 이 표에서 바로 눈에 띄도록 하기 위함입니다(d.issued는 거래명세서 발행 화면에서 실제 발행 처리될 때 true로 바뀝니다).
+    const issuedTag = d.issued ? ` <span class="tag own" style="font-size:9.5px">발행완료</span>` : ` <span class="tag" style="background:#FDF3E0;color:#B7791F;font-size:9.5px">미발행</span>`;
     // 2026-08-11(41차): orderId로 못 찾으면(오래된 시드데이터 등) 거래처+품목명 조합으로 한 번 더 시도합니다(표시 전용, 최선노력 매칭).
     const dOrderNo = deliveryOrderNo(d);
-    return `<tr style="${rowStyle}"><td style="white-space:nowrap">2026-${d.date}${carriedTag}</td>
+    return `<tr style="${rowStyle}"><td style="white-space:nowrap">2026-${d.date}${carriedTag}${issuedTag}</td>
         <td style="text-align:center;font-size:11.5px;color:var(--ink-soft);white-space:nowrap">${dOrderNo||'—'}</td>
         <td style="white-space:nowrap">${d.cust}</td><td style="text-align:left">${d.item}</td><td style="text-align:left;color:var(--ink-soft)">${deliverySpecName(d)}</td>
         <td class="num">${d.qty.toLocaleString()}</td><td class="num" style="white-space:nowrap">${W(d.qty*d.unitPrice)}</td>
@@ -7966,8 +7977,18 @@ function saveDeliveryRegistration(){
   } else {
     pushNotification('분할납품', `${o.cust} ${o.item} ${qty.toLocaleString()}개 분할납품 등록(잔량 ${newRemaining.toLocaleString()} 남음).`);
   }
+  const custForDocIssue = o.cust;
   S.deliveryModal = null;
   recalc();
+  // 2026-08-12(48차 신설): 상현님 지시 — "납품관리에 출하대기 영역에서 납품 등록을 누르면 거래명세서
+  // 발행 영역으로 넘어가고" 의견을 반영해, 납품등록 직후 바로 거래명세서를 발행할지 확인창으로 묻고
+  // "예"를 누르면 그 거래처가 이미 선택된 거래명세서 발행 화면으로 이동합니다. "아니오"를 눌러도 납품은
+  // 이미 정상 등록된 상태이므로, 나중에 거래명세서 발행 화면에서 여러 건을 모아 한 번에 발행할 수 있는
+  // 기존 방식(최대 10건 묶음 발행)도 그대로 유지됩니다 — 즉시발행과 모아서발행 두 방식을 모두 지원합니다.
+  if(confirm(`${custForDocIssue} 거래명세서를 지금 발행하시겠습니까?\n\n"확인"을 누르면 거래명세서 발행 화면으로 이동하며, 방금 등록한 납품 건이 자동으로 선택되어 있습니다.\n"취소"를 눌러도 납품은 이미 등록되었고, 나중에 거래명세서 발행 화면에서 다른 건과 모아 발행할 수 있습니다.`)){
+    setDocIssueCustFilter(custForDocIssue);
+    navTo('docissue');
+  }
 }
 // (구) 전량 즉시 납품 — 더 이상 UI에서 호출되지 않지만, 과거 흐름을 참조하는 코드가 있을 수 있어 남겨둡니다.
 function registerDelivery(orderId){
@@ -15408,10 +15429,17 @@ function mrSwitchPurSub(id){ S.mrPurSub = id; recalc(); }
 function renderMrDeptTabBar(){
   const el = $('mr-dept-tab-bar');
   if(!el) return;
-  const tabs = [
+  let tabs = [
     ['SALES','💼 1. 영업부'], ['DEV','🛠️ 2. 개발부'], ['PROD','⚙️ 3. 생산부'], ['PRODMGT','📊 4. 생산관리부'],
     ['QA','🧪 5. 품질부'], ['MAT','📦 6. 자재부'], ['PUR','🛒 7. 구매부'], ['ADMIN','🏛️ 8. 경영지원부']
   ];
+  // 2026-08-12(48차 신설): 자재관리자(MATMGR)로 로그인(S.viewAs)하면 자재 그룹 화면만으로 업무가 끝나야
+  // 한다는 상현님 지시에 따라, 월간보고 입력화면도 "자재부" 탭 하나만 보이도록 강제합니다(다른 역할은
+  // role 모델상 부서 단위 접근제한이 없어 8개 탭 전부 그대로 — 이 화면에서만 예외적으로 role→부서 매핑).
+  if(S.viewAs === 'MATMGR'){
+    tabs = [['MAT','📦 자재부']];
+    if(S.mrSelectedDept !== 'MAT') S.mrSelectedDept = 'MAT';
+  }
   el.innerHTML = tabs.map(([id,label])=>`<button type="button" class="mr-dept-tab-btn ${S.mrSelectedDept===id?'on':''}" onclick="mrSwitchDept('${id}')">${label}</button>`).join('');
   document.querySelectorAll('.mr-dept-panel').forEach(p=>p.classList.toggle('on', p.id === 'mrp-'+S.mrSelectedDept));
 }
@@ -16056,10 +16084,15 @@ function mrBepLabel(bepDay){
 function renderMrDashDeptTabBar(){
   const el = $('mr-dash-dept-tab-bar');
   if(!el) return;
-  const tabs = [
+  let tabs = [
     ['SALES','💼 1. 영업부'], ['DEV','🛠️ 2. 개발부'], ['PROD','⚙️ 3. 생산부'], ['PRODMGT','📊 4. 생산관리부'],
     ['QA','🧪 5. 품질부'], ['MAT','📦 6. 자재부'], ['PUR','🛒 7. 구매부'], ['ADMIN','🏛️ 8. 경영지원부']
   ];
+  // 2026-08-12(48차 신설): 입력화면(renderMrDeptTabBar)과 동일하게 MATMGR는 대시보드도 자재부 탭 하나만.
+  if(S.viewAs === 'MATMGR'){
+    tabs = [['MAT','📦 자재부']];
+    if(S.mrDashDept !== 'MAT') S.mrDashDept = 'MAT';
+  }
   el.innerHTML = tabs.map(([id,label])=>`<button type="button" class="mr-dept-tab-btn ${S.mrDashDept===id?'on':''}" onclick="mrSwitchDashDept('${id}')">${label}</button>`).join('');
   document.querySelectorAll('.mr-dash-panel').forEach(p=>p.classList.toggle('on', p.id === 'mrdp-'+S.mrDashDept));
 }
