@@ -551,7 +551,7 @@ table.mr-table input.form-control.ro{background:var(--bg);color:var(--muted)}
 <body>
 <div class="wrap">
 <aside class="side">
-  <div class="brand"><div class="brand-row"><img src="/icon-192.png" alt="DAMDA" class="brand-logo"><span class="brand-word">DAMDA</span></div><small>프로토타입 v0.78 · 매출 마감관리 화면 재설계(통합·수금관리 분리) — 46차 라운드</small></div>
+  <div class="brand"><div class="brand-row"><img src="/icon-192.png" alt="DAMDA" class="brand-logo"><span class="brand-word">DAMDA</span></div><small>프로토타입 v0.79 · 매출 마감관리 정렬·조회 강화 + 마감내역서 디자인 + 수금관리 고도화 — 47차 라운드</small></div>
   <nav class="nav">
     <!-- 2026-07-21(항목11) 대분류 재구성: 운영 모니터링-기본정보-영업,수주-구매-생산-납품,마감-자재-인사,급여-품질-원가관리-가이드-환경설정 (12개, 상현님 지시안) -->
     <div class="grp">운영 모니터링</div>
@@ -1441,16 +1441,19 @@ table.mr-table input.form-control.ro{background:var(--bg);color:var(--muted)}
       <div><label>품목명</label><input type="text" placeholder="품목명" oninput="setClosingSearchField('cust','item',this.value)"></div>
       <div><label>기간(시작)</label><input type="date" oninput="setClosingSearchField('cust','from',this.value)"></div>
       <div><label>기간(종료)</label><input type="date" oninput="setClosingSearchField('cust','to',this.value)"></div>
+      <div><label>정렬</label><select onchange="setClosingSearchField('cust','sortDir',this.value)">
+        <option value="desc">납품일 최신순</option><option value="asc">납품일 오래된순</option>
+      </select></div>
       <button class="btn gh sm" onclick="resetCustClosingSearch(this)">검색 초기화</button>
       <span class="lv-count" id="custclosing-count"></span>
     </div>
     <div style="overflow-x:auto"><table class="th-center" style="table-layout:fixed">
       <thead><tr>
-        <th style="width:32px"></th><th style="width:80px">납품일</th><th style="width:90px">고객사명</th><th>품목명</th><th>규격명</th>
+        <th style="width:32px"></th><th style="width:80px">납품일</th><th style="width:90px">고객사명</th><th style="width:84px">수주번호</th><th>품목명</th><th>규격명</th>
         <th class="num" style="width:82px">수량</th><th class="num" style="width:92px">단가</th><th class="num" style="width:112px">공급가</th><th style="width:88px">발행상태</th>
       </tr></thead>
       <tbody id="t-custclosing-candidates"></tbody>
-      <tfoot><tr><td colspan="7">표시 건 합계</td><td class="num" id="custclosing-total-sum"></td><td></td></tr></tfoot>
+      <tfoot><tr><td colspan="8">표시 건 합계</td><td class="num" id="custclosing-total-sum"></td><td></td></tr></tfoot>
     </table></div>
     <div id="custclosing-pager"></div>
     <div style="margin-top:13px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
@@ -1465,9 +1468,17 @@ table.mr-table input.form-control.ro{background:var(--bg);color:var(--muted)}
   <div class="card">
     <h2 style="margin-top:0">마감내역서 발행 이력</h2>
     <div class="lv-search">
-      <div><label>발행월</label><input type="text" placeholder="예: 08" oninput="lvSetSearch('custclosing-hist','ym',this.value)"></div>
+      <div><label>발행연도</label><select id="custclosing-hist-year-select" onchange="lvSetSearch('custclosing-hist','year',this.value)">
+        <option value="">전체</option>
+      </select></div>
+      <div><label>발행월</label><select onchange="lvSetSearch('custclosing-hist','month',this.value)">
+        <option value="">전체</option>
+        <option value="01">1월</option><option value="02">2월</option><option value="03">3월</option><option value="04">4월</option>
+        <option value="05">5월</option><option value="06">6월</option><option value="07">7월</option><option value="08">8월</option>
+        <option value="09">9월</option><option value="10">10월</option><option value="11">11월</option><option value="12">12월</option>
+      </select></div>
       <div><label>거래처</label><input type="text" placeholder="거래처명" oninput="lvSetSearch('custclosing-hist','cust',this.value)"></div>
-      <button class="btn gh sm" onclick="lvResetSearch('custclosing-hist');this.parentElement.querySelectorAll('input').forEach(i=>i.value='')">검색 초기화</button>
+      <button class="btn gh sm" onclick="resetCustClosingHistSearch(this)">검색 초기화</button>
       <span class="lv-count" id="custclosing-hist-count"></span>
     </div>
     <table>
@@ -1480,12 +1491,25 @@ table.mr-table input.form-control.ro{background:var(--bg);color:var(--muted)}
 
   <div class="card">
     <h2 style="margin-top:0">마감 확정 내역 미리보기</h2>
-    <div class="note" style="margin:-4px 0 12px">아래 "이번 달 마감하기"를 누르면 이 항목별 금액 그대로 이번 달 확정 비용으로 얼어붙습니다 — 분석용이 아니라 <b>잠그기 직전 최종 확인용</b>입니다. 항목별 비용 추이·원가율처럼 여러 달을 비교하는 분석이 필요하면 <a href="#" onclick="event.preventDefault();navTo('costmgmt')" style="color:var(--blue-d)">원가관리 &gt; 월별 비용 총액 추이</a>에서 확인하세요(2026-08-11, 45차 — 매출 마감관리와 원가관리에 비슷한 표가 중복돼 있다는 지적을 반영해 역할을 나눴습니다).</div>
-    <table>
-      <thead><tr><th>항목</th><th class="num">금액</th></tr></thead>
-      <tbody id="t-closing-cost"></tbody>
-      <tfoot><tr><td>합계</td><td class="num" id="cl-cost-sum"></td></tr></tfoot>
-    </table>
+    <div class="note" style="margin:-4px 0 12px">아래 "이번 달 마감하기"를 누르면 이 금액 그대로 이번 달 매출·비용으로 얼어붙습니다 — 분석용이 아니라 <b>잠그기 직전 최종 확인용</b>입니다(2026-08-12, 47차 — 비용만 보이던 걸 매출과 나란히 볼 수 있도록 좌우로 나눴습니다). 항목별 비용 추이·원가율처럼 여러 달을 비교하는 분석이 필요하면 <a href="#" onclick="event.preventDefault();navTo('costmgmt')" style="color:var(--blue-d)">원가관리 &gt; 월별 비용 총액 추이</a>에서 확인하세요.</div>
+    <div class="grid2">
+      <div>
+        <div class="sub" style="margin:0 0 8px;font-weight:700;color:var(--ink)">매출 (거래처별)</div>
+        <table>
+          <thead><tr><th>거래처</th><th class="num">금액</th></tr></thead>
+          <tbody id="t-closing-rev-bycust"></tbody>
+          <tfoot><tr><td>합계</td><td class="num" id="cl-rev-bycust-sum"></td></tr></tfoot>
+        </table>
+      </div>
+      <div>
+        <div class="sub" style="margin:0 0 8px;font-weight:700;color:var(--ink)">비용 (항목별)</div>
+        <table>
+          <thead><tr><th>항목</th><th class="num">금액</th></tr></thead>
+          <tbody id="t-closing-cost"></tbody>
+          <tfoot><tr><td>합계</td><td class="num" id="cl-cost-sum"></td></tr></tfoot>
+        </table>
+      </div>
+    </div>
   </div>
 
   <div class="card">
@@ -1535,19 +1559,23 @@ table.mr-table input.form-control.ro{background:var(--bg);color:var(--muted)}
 
   <div class="card">
     <h2 style="margin-top:0">거래처별 청구·수금 현황</h2>
+    <div class="sub" style="margin:-4px 0 12px">미수 잔액이 남아있는데 <b>최근 수금일</b>이 오래됐거나 아예 없는 거래처는 독촉이 필요한 곳입니다(잔액 큰 순으로 정렬됩니다).</div>
     <table>
-      <thead><tr><th>거래처</th><th class="num">청구누계</th><th class="num">수금누계</th><th class="num">미수 잔액</th></tr></thead>
+      <thead><tr><th>거래처</th><th class="num">청구누계</th><th class="num">수금누계</th><th class="num">미수 잔액</th><th>최근 수금일</th></tr></thead>
       <tbody id="t-ar-summary"></tbody>
     </table>
   </div>
 
   <div class="card">
     <h2 style="margin-top:0">수금 등록</h2>
+    <div class="note" style="margin:-4px 0 12px">2026-08-12(47차) — <b>귀속월</b>은 이 입금이 어느 달 매출(청구)에 대한 것인지 표시하는 참고용 메모입니다. 이 앱은 거래처별 잔액을 하나로 합쳐 관리해서(인보이스 단위 매칭이 아님) 시스템이 자동으로 맞혀주지 않으니, 통장에 찍힌 입금 건이 어느 달 매출을 갚는 것인지 직접 골라 두면 나중에 "몇 월분이 아직 안 들어왔는지" 확인할 때 참고할 수 있습니다.</div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end">
       <div style="flex:1;min-width:160px"><label style="font-size:11px;color:var(--muted);font-weight:700;display:block;margin-bottom:4px">거래처</label>
         <input type="text" id="ar-cust-input" list="dl-ar-customers" placeholder="거래처명"></div>
       <div style="width:150px"><label style="font-size:11px;color:var(--muted);font-weight:700;display:block;margin-bottom:4px">수금액</label>
         <input type="number" id="ar-amount-input" placeholder="0"></div>
+      <div style="width:150px"><label style="font-size:11px;color:var(--muted);font-weight:700;display:block;margin-bottom:4px">귀속월(몇월분)</label>
+        <select id="ar-billingym-select"></select></div>
       <div style="flex:1;min-width:160px"><label style="font-size:11px;color:var(--muted);font-weight:700;display:block;margin-bottom:4px">비고</label>
         <input type="text" id="ar-note-input" placeholder="선택 입력"></div>
       <button class="btn" onclick="registerCollection()">수금 등록</button>
@@ -1556,11 +1584,22 @@ table.mr-table input.form-control.ro{background:var(--bg);color:var(--muted)}
   </div>
 
   <div class="card">
-    <h2 style="margin-top:0">최근 수금 이력</h2>
+    <div class="lv-toolbar">
+      <h2 style="margin-top:0">수금 이력</h2>
+      <div class="lv-sizebar" id="ar-collections-sizebar"></div>
+    </div>
+    <div class="lv-search">
+      <div><label>거래처</label><input type="text" placeholder="거래처명" oninput="lvSetSearch('ar-collections','cust',this.value)"></div>
+      <div><label>귀속월</label><input type="text" placeholder="예: 2026-07" oninput="lvSetSearch('ar-collections','billingYm',this.value)"></div>
+      <button class="btn gh sm" onclick="lvResetSearch('ar-collections');this.parentElement.querySelectorAll('input').forEach(i=>i.value='')">검색 초기화</button>
+      <span class="lv-count" id="ar-collections-count"></span>
+    </div>
     <table>
-      <thead><tr><th style="width:16%">일자</th><th style="width:24%">거래처</th><th class="num" style="width:24%">수금액</th><th>비고</th></tr></thead>
+      <thead><tr><th style="width:14%">등록일</th><th style="width:20%">거래처</th><th class="num" style="width:16%">수금액</th><th style="width:14%">귀속월</th><th>비고</th></tr></thead>
       <tbody id="t-ar-collections"></tbody>
+      <tfoot><tr><td colspan="2">합계</td><td class="num" id="ar-collections-sum"></td><td colspan="2"></td></tr></tfoot>
     </table>
+    <div id="ar-collections-pager"></div>
   </div>
 </section>
 
@@ -2723,7 +2762,8 @@ BEP 매출  = 월 고정비 ÷ 공헌이익률
         <tr><td>43차 라운드 — 납품 인수확인 완료 알림 연동 (2026-08-11, v0.75)</td><td>42차에서 분석만 드렸던 "인수확인 이후 조회·알림 흐름"을 상현님이 두 방향 모두("1,2번을 모두 적용해줘") 반영하기로 확정해주셔서 함께 구현했습니다. ①<b>매출 마감관리 카드 확장</b> — 기존 3칸 경고카드(수입검사 대기·불합격 보류·출하검사 대기)에 <b>납품 인수확인 대기</b> 건수를 4번째 칸으로 추가했습니다(<code>.grid4</code> 신설). 앞 3칸과 달리 이 칸은 매출 마감을 막는 항목이 아니라 "체크리스트성 확인 항목"이라 카드 설명 문구로 그 차이를 명확히 안내했습니다. ②<b>알림센터 연동</b> — 납품이력에서 확인대기→확인완료로 바뀌는 순간 <code>toggleDeliveryReceived()</code> 함수를 신설해 기존 인라인 토글을 대체하고, <code>pushNotification('납품인수확인', ...)</code>을 호출해 화면 안 알림센터 기록과 실제 기기 푸시를 함께 남기도록 했습니다(반대로 확인완료→확인대기로 되돌릴 때는 담당자의 단순 실수 수정일 뿐이라 알림을 보내지 않습니다). node --check 구문 검증과 jsdom 기반 검증(경고카드 4번째 칸 표시조건·건수, 확인완료 토글 시 알림 기록 생성 확인, 34~42차 회귀 스위트 재실행)을 통과해 실제 오류 0건을 확인했습니다. 이 라운드에서 지정한 알림 대상(사장·경리)이 실제 업무 흐름과 맞지 않아 44차에서 바로 정정합니다.</td></tr>
         <tr><td>44차 라운드 — 납품 인수확인 알림대상 정정 + 영업 역할 신설 + 추가인원 지정 (2026-08-11, v0.76)</td><td>43차에서 제가 임의로 정한 알림 대상(사장·경리)이 실제 업무 흐름과 맞지 않는다는 상현님 지적("알림이 가는 대상은 사장, 경리가 아니야. 영업, 생산관리+ 추가인원이야")을 반영해 대상을 다시 설계했습니다. ①<b>영업(SALES) 역할 신설</b> — 그동안 이 앱에는 영업 담당자를 가리키는 역할이 없어(수주·납품 화면은 있었지만 그걸 다루는 전용 역할이 없었음), 상현님 확인을 거쳐 <code>permRoleLabels</code>·<code>permMatrix</code>(13개 그룹 전체에 SALES 열 추가, "영업,수주"·"납품,마감" 2곳만 기본 허용)·<code>notifyRoleLabels</code>에 새 역할을 추가하고 데모 직원(정영업)을 등록했습니다. 화면 접근권한표·알림설정표·직원 역할 드롭다운은 모두 <code>Object.keys()</code> 기반으로 이미 범용화되어 있어 이 두 군데만 고치면 앱 전체에 자동 반영됩니다. ②<b>notifyRules 정정</b> — <code>납품인수확인</code> 알림 대상을 사장·경리(false)에서 영업·생산관리(true)로 교체했습니다. ③<b>"추가인원" 지정 기능 신설</b> — 상현님이 "직원이 될 수도 있고 임원이 될 수도 있어"라고 하신 대로, 역할과 무관하게 특정 개인을 지정할 수 있어야 해서 기존 "구매 결재 대리인"과 동일한 패턴(<code>S.deliveryConfirmExtraEmpIds</code> 배열)으로 별도 설계했습니다. 환경설정에 새 카드(납품 인수확인 추가 알림대상)를 만들어 재직 중인 전 직원(임원 포함) 중 누구든 체크로 지정할 수 있고, <code>pushNotification()</code> 함수에 5번째 인자(<code>extraEmpIds</code>)를 추가해 알림 기록에 <code>empIds</code> 필드로 함께 남도록 확장했습니다. 직원용 모니터링 앱의 "내게 온 알림" 필터도 역할 일치뿐 아니라 지정된 개인 ID 일치도 함께 보도록 넓혔고, 알림센터 피드에는 지정된 사람 이름을 👤 태그로 별도 표시했습니다. 단, 실제 기기 푸시(<code>sendRealPush</code>)는 아직 역할 단위 구독만 지원해 추가인원 지정은 화면 안 알림센터 기록에만 반영되고 실제 푸시알림은 받지 못한다는 한계를 코드 주석으로 남겨두었습니다(1개 테스트베드 업체 파일럿 범위, 추후 개인별 구독 도입 시 확장). node --check 구문 검증과 jsdom 기반 검증(SALES 역할이 권한표·알림설정표에 정상 노출, 납품인수확인 알림이 영업·생산관리에만 가고 사장·경리에는 안 가는지 확인, 추가인원으로 경리 직원 1명을 지정한 뒤 실제로 알림에 포함되고 👤 태그로 표시되는지 확인, 34~42차 회귀 스위트 재실행)을 통과해 실제 오류 0건을 확인했습니다.</td></tr>
         <tr><td>45차 라운드 — 납품·마감 열 폭 정비 + 고객사별 마감내역서 개선 (2026-08-11, v0.77)</td><td>상현님이 7가지를 지시하셨고, 이번 라운드는 그중 구체적으로 지시하신 4가지(①~④)를 반영했습니다(⑤~⑦은 매출 마감관리 화면 전체 재설계와 관련된 판단이 필요한 사안이라 분석·제안으로 별도 보고드립니다). <b>①②출하대기 표 폭 조정</b> — 수주수량·기납품·잔량·단가 4개 열을 999,999(6자리)까지 안 잘리게 74→82px로, 잔량 공급가 열을 ₩ 99,999,999(8자리)까지 줄바꿈 없이 표시되도록 90→112px로 넓히고 <code>white-space:nowrap</code>을 추가했습니다(₩ 기호와 숫자 사이 공백에서 줄바꿈이 일어나던 게 실제 잘림의 원인이었습니다). <b>③납품이력 표 폭 조정</b> — 같은 논리로 수량 80→84px, 공급가 104→112px+nowrap으로 재조정했습니다. <b>④고객사별 마감내역서 발행 개선</b> — 후보 표에 납품일 우측 고객사명 열을 신설하고, 품목명·규격명 열의 고정폭을 없애 <code>table-layout:fixed</code>가 남는 공간을 두 열에 균등 배분하도록 했습니다(출하대기 표와 동일한 패턴 재사용 — 이전에는 규격명만 140px 고정이라 품목명이 과도하게 넓어 보였습니다). 수량·단가는 82~92px로, 공급가는 112px+nowrap으로 맞췄습니다. 발행 이력 표에는 발행월·거래처 조회조건과 합계금액 표시를 새로 달았습니다(<code>lv('custclosing-hist')</code> 독립 키 사용). node --check 구문 검증과 jsdom 기반 검증(3개 표 헤더 폭 실측, 고객사명 열 렌더링 확인, 발행 이력 조회 필터링·합계금액 재계산 확인, 34~44차 회귀 스위트 재실행)을 통과해 실제 오류 0건을 확인했습니다.</td></tr>
-        <tr><td>46차 라운드 — 매출 마감관리 화면 재설계 (2026-08-11, v0.78)</td><td>45차에서 분석만 드렸던 매출 마감관리 개편(5~7번)을 상현님이 3가지 모두 진행하기로 확정해주셔서 반영했습니다. <b>①매출 이력·마감내역서 표 통합</b> — "매출—이번달 납품이력"과 "고객사별 마감내역서 발행" 두 표가 둘 다 <code>S.deliveries</code>를 읽는 사실상 같은 표라는 지적을 반영해 하나로 합쳤습니다. <code>closingCandidateRows('cust')</code>가 더 이상 이미 발행된 건을 숨기지 않고 <code>closedStmtNo</code>를 함께 내려주면, 화면에서는 "발행됨(번호)"/"미발행" 배지로 구분하고 발행된 행은 체크박스 자체를 없애 중복 발행을 원천 차단합니다(혹시 모를 경우를 대비해 <code>registerClosing()</code>에도 발행 건 재필터링을 한 번 더 넣었습니다). 이전 이력 표에 있던 페이지네이션(50/100/200)도 <code>lv('custclosing')</code>으로 그대로 이어받았고, 검색에 품목명 조건을 추가했습니다. <b>②비용구성·마감이력 카드 정리</b> — 원가관리 화면에 이미 더 정교한 "월별 비용 총액 추이"·"비용 항목별 추이"가 있다는 걸 확인해, 매출 마감관리의 "비용 구성" 카드는 "마감 확정 내역 미리보기"로 성격을 명확히 하고(분석이 아니라 잠그기 직전 확인용), "마감 이력"에는 "이건 기록일 뿐 분석이 필요하면 원가관리로"라는 안내 링크를 달았습니다. 열이나 데이터를 지우지는 않고 두 화면의 역할만 분리했습니다. <b>③수금관리 화면 분리</b> — 미수금 현황·수금 등록·최근 수금 이력을 매출 마감관리에서 통째로 떼어 "납품,마감" 그룹에 새 화면(<code>#p-ar</code>)으로 옮겼습니다. 청구누계·수금누계·미수 잔액 표와 수금 진도율 KPI 등 기존 로직(<code>renderAR()</code>)은 그대로 재사용했고, 화면 위치만 옮겼기 때문에 데이터·계산에는 변화가 없습니다. 매출 마감관리에는 새 화면으로 가는 안내 링크만 남겼습니다. node --check 구문 검증과 jsdom 기반 검증(통합 표 발행 전/후 배지 전환 확인, 발행된 건 재선택 시도 시 0건으로 막히는지 확인, 페이지네이션·검색 필터 동작 확인, 새 수금관리 화면 KPI·표·등록 동작 확인, 67개 전 화면 순회 콘솔에러 0건, 34~45차 회귀 스위트 재실행)을 통과해 실제 오류 0건을 확인했습니다.</td></tr>
+        <tr><td>47차 라운드 — 매출 마감관리 정렬·조회 + 마감내역서 디자인 + 수금관리 고도화 (2026-08-12, v0.79)</td><td>46차에서 재설계한 매출 마감관리·수금관리를 다듬는 5가지 보완입니다. <b>①매출 표에 수주번호 열 추가 + 정렬 기능</b> — 통합된 매출·마감내역서 후보 표의 고객사명 오른쪽에 수주번호 열을 추가했고, 검색바에 "납품일 최신순/오래된순" 정렬 셀렉트를 달아 <code>closingCandidateRows('cust')</code>에서 바로 정렬해 내려줍니다. <b>②마감내역서 발행 이력 조회를 연도/월 분리</b> — 기존 "발행월" 텍스트 입력 한 칸을 연도 셀렉트(등록된 이력 연도를 자동 수집)와 월 셀렉트 두 칸으로 나눴습니다. <b>③매출 마감내역서 엑셀 디자인 고급화</b> — 고객사에 실제로 전달되는 문서인데 스타일이 전혀 없다는 지적을 반영해, 기존 xlsx.full.min.js(셀 스타일을 파일에 못 쓰는 무료판)와 별도로 ExcelJS를 도입했습니다. 제목 배너, 공급자/공급받는자 정보 박스, 브랜드 색상 헤더, 홀짝 밴딩 표, 합계는 하드코딩이 아닌 실제 SUM 수식으로 채운 새 엑셀 양식(<code>exportCustClosingExcelStyled()</code>)을 만들어 고객사 제출용 마감내역서에만 적용했습니다(원재료·외주 마감내역서는 기존 방식 유지). <b>④마감 확정 내역 미리보기 2분할</b> — 비용 항목만 보이던 카드를 2단 그리드로 나눠 왼쪽에 "매출(거래처별)", 오른쪽에 "비용(항목별)"을 동시에 보여줘, 잠그기 전에 매출·비용을 한눈에 비교할 수 있게 했습니다. <b>⑤수금관리 업무 분석 + 보완</b> — 상현님 질문에 답변드리면, 수금이 완료돼도 리스트에서 삭제되지 않습니다. <code>S.collections</code>는 이력이 계속 쌓이는 원장(ledger)이고, 거래처별 현황 표는 "청구누계 − 수금누계"를 매번 다시 계산하는 살아있는 잔액이라 완료된 건도 그대로 남습니다. 여기에 최근 수금일 열을 추가해 거래처별로 마지막 입금이 언제였는지 보이게 했고, 수금 등록 시 "귀속월(몇월분)" 셀렉트를 추가해 어느 달 청구분에 대한 입금인지 남기도록 했습니다. 이 과정에서 수금 등록일이 실제 진행 월과 무관하게 "07-"로 고정 하드코딩되어 있던 버그도 함께 발견해 고쳤습니다(<code>closeCurrentMonth()</code>로 실제 8월로 넘어간 뒤에도 "2026-08-25"처럼 정확히 찍히는지 확인). 수금 이력도 최근 10건 하드캡 목록에서 거래처·귀속월 검색과 페이지네이션이 되는 전체 이력 표로 확장했습니다. node --check 구문 검증, ExcelJS 워크북 생성 로직 검증(제목·병합 22개·SUM 수식·23행 정상 생성 확인), 34~46차 회귀 스위트 재실행, 67개 전 화면 순회 콘솔에러 0건을 모두 통과했습니다.</td></tr>
+<tr><td>46차 라운드 — 매출 마감관리 화면 재설계 (2026-08-11, v0.78)</td><td>45차에서 분석만 드렸던 매출 마감관리 개편(5~7번)을 상현님이 3가지 모두 진행하기로 확정해주셔서 반영했습니다. <b>①매출 이력·마감내역서 표 통합</b> — "매출—이번달 납품이력"과 "고객사별 마감내역서 발행" 두 표가 둘 다 <code>S.deliveries</code>를 읽는 사실상 같은 표라는 지적을 반영해 하나로 합쳤습니다. <code>closingCandidateRows('cust')</code>가 더 이상 이미 발행된 건을 숨기지 않고 <code>closedStmtNo</code>를 함께 내려주면, 화면에서는 "발행됨(번호)"/"미발행" 배지로 구분하고 발행된 행은 체크박스 자체를 없애 중복 발행을 원천 차단합니다(혹시 모를 경우를 대비해 <code>registerClosing()</code>에도 발행 건 재필터링을 한 번 더 넣었습니다). 이전 이력 표에 있던 페이지네이션(50/100/200)도 <code>lv('custclosing')</code>으로 그대로 이어받았고, 검색에 품목명 조건을 추가했습니다. <b>②비용구성·마감이력 카드 정리</b> — 원가관리 화면에 이미 더 정교한 "월별 비용 총액 추이"·"비용 항목별 추이"가 있다는 걸 확인해, 매출 마감관리의 "비용 구성" 카드는 "마감 확정 내역 미리보기"로 성격을 명확히 하고(분석이 아니라 잠그기 직전 확인용), "마감 이력"에는 "이건 기록일 뿐 분석이 필요하면 원가관리로"라는 안내 링크를 달았습니다. 열이나 데이터를 지우지는 않고 두 화면의 역할만 분리했습니다. <b>③수금관리 화면 분리</b> — 미수금 현황·수금 등록·최근 수금 이력을 매출 마감관리에서 통째로 떼어 "납품,마감" 그룹에 새 화면(<code>#p-ar</code>)으로 옮겼습니다. 청구누계·수금누계·미수 잔액 표와 수금 진도율 KPI 등 기존 로직(<code>renderAR()</code>)은 그대로 재사용했고, 화면 위치만 옮겼기 때문에 데이터·계산에는 변화가 없습니다. 매출 마감관리에는 새 화면으로 가는 안내 링크만 남겼습니다. node --check 구문 검증과 jsdom 기반 검증(통합 표 발행 전/후 배지 전환 확인, 발행된 건 재선택 시도 시 0건으로 막히는지 확인, 페이지네이션·검색 필터 동작 확인, 새 수금관리 화면 KPI·표·등록 동작 확인, 67개 전 화면 순회 콘솔에러 0건, 34~45차 회귀 스위트 재실행)을 통과해 실제 오류 0건을 확인했습니다.</td></tr>
       </tbody>
     </table>
   </div>
@@ -3370,6 +3410,12 @@ BEP 매출  = 월 고정비 ÷ 공헌이익률
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<!-- 2026-08-12(47차 신설): 매출 마감내역서(고객사 제출용)에 색상·테두리가 있는 디자인을 입히기 위해
+     ExcelJS를 추가했습니다. 기존 xlsx.full.min.js(SheetJS 무료판)는 셀 스타일을 파일에 쓰지 못하는
+     제약이 있어(이미 여러 라운드에 걸쳐 확인됨) 원재료·외주 마감내역서 등 다른 엑셀 기능은 그대로
+     xlsx.full.min.js를 씁니다 — 이번 스타일 적용은 고객사에 실제로 전달되는 매출 마감내역서(kind='cust')
+     한 곳에만 범위를 한정합니다. -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js"></script>
 <script>
 /* ══════════ 상태 ══════════ */
 const S = {
@@ -7814,9 +7860,9 @@ function renderProduction(){
     const rowStyle = carried ? 'background:#FFF7E8' : '';
     const carriedTag = carried ? ` <span class="tag" style="background:#FDF3E0;color:#B7791F;font-size:9.5px">이월(${d.ym})</span>` : '';
     // 2026-08-11(41차): orderId로 못 찾으면(오래된 시드데이터 등) 거래처+품목명 조합으로 한 번 더 시도합니다(표시 전용, 최선노력 매칭).
-    const dOrder = S.orderItems.find(x=>x.id===d.orderId) || S.orderItems.find(x=>x.cust===d.cust && x.item===d.item);
+    const dOrderNo = deliveryOrderNo(d);
     return `<tr style="${rowStyle}"><td style="white-space:nowrap">2026-${d.date}${carriedTag}</td>
-        <td style="text-align:center;font-size:11.5px;color:var(--ink-soft);white-space:nowrap">${dOrder?dOrder.orderNo:'—'}</td>
+        <td style="text-align:center;font-size:11.5px;color:var(--ink-soft);white-space:nowrap">${dOrderNo||'—'}</td>
         <td style="white-space:nowrap">${d.cust}</td><td style="text-align:left">${d.item}</td><td style="text-align:left;color:var(--ink-soft)">${deliverySpecName(d)}</td>
         <td class="num">${d.qty.toLocaleString()}</td><td class="num" style="white-space:nowrap">${W(d.qty*d.unitPrice)}</td>
         <td style="text-align:center"><button class="btn ${d.received?'gh':''} sm" onclick="toggleDeliveryReceived(${idx})">${d.received?'확인완료':'확인대기'}</button></td></tr>`;
@@ -7927,6 +7973,13 @@ function deliverySpecName(d){
   if(d.specName) return d.specName;
   const oi = S.orderItems.find(o=>o.cust===d.cust && o.item===d.item && o.specName);
   return oi ? oi.specName : '—';
+}
+// 2026-08-12(47차 신설): 납품 건의 수주번호를 찾는 로직 — 기존에 t-delivery-hist 렌더링에서만 쓰던
+// 매칭 규칙(orderId 우선, 못 찾으면 거래처+품목명 조합으로 최선노력 매칭)을 매출 마감관리의 통합
+// 매출 표에도 재사용하기 위해 공용 함수로 뺐습니다.
+function deliveryOrderNo(d){
+  const oi = S.orderItems.find(x=>x.id===d.orderId) || S.orderItems.find(x=>x.cust===d.cust && x.item===d.item);
+  return oi ? oi.orderNo : null;
 }
 // 2026-07-21 신설: (2026-07-31, 26차 보완) 양품수량+불량수량 × 연결된 수주 라인의 개당총중량(calcWeights,
 // 런너/스프루 포함, 견적 사양 그대로 승계)으로 투입 원재료(kg)를 자동 산출합니다 — 불량도 원재료를 먹었으므로
@@ -8079,6 +8132,13 @@ function nextYm(ym){
   const ny = m===12 ? y+1 : y;
   return `${ny}-${String(nm).padStart(2,'0')}`;
 }
+// 2026-08-12(47차 신설): 수금 등록의 "귀속월" select 옵션(최근 12개월) 구성에 사용합니다.
+function prevYm(ym){
+  const [y,m] = ym.split('-').map(Number);
+  const pm = m===1 ? 12 : m-1;
+  const py = m===1 ? y-1 : y;
+  return `${py}-${String(pm).padStart(2,'0')}`;
+}
 // 2026-08-03(T5): 마감을 눌러도 매출만 지워지고 비용은 그대로 남아 허위 적자가 표시되던 문제(이전 진단
 // 보고서 지적사항)와, "이번 달"(S.ym) 자체가 실제로 다음 달로 넘어가지 않던 문제를 함께 고칩니다.
 // - 거래명세서를 아직 발행하지 않은 납품 건(issued=false)은 이번 달 매출로 확정하지 않고 그대로
@@ -8136,6 +8196,16 @@ function resetCustClosingSearch(btn){
   scope.querySelectorAll('.lv-search input').forEach(i=>i.value='');
   recalc();
 }
+// 2026-08-12(47차 신설): 마감내역서 발행 이력 검색 초기화 — lv('custclosing-hist') 검색값과
+// 화면의 select·input 표시값을 함께 지웁니다(연도 select는 옵션 자체가 매번 다시 그려지므로
+// value=''만 지정해두면 다음 recalc에서 "전체"가 선택된 채로 다시 렌더링됩니다).
+function resetCustClosingHistSearch(btn){
+  lvResetSearch('custclosing-hist');
+  const scope = btn ? btn.closest('.card') : document;
+  scope.querySelectorAll('.lv-search input').forEach(i=>i.value='');
+  scope.querySelectorAll('.lv-search select').forEach(s=>s.value='');
+  recalc();
+}
 // 2026-08-11(38차 신설): 외주 입고 마감 등록 시, 조회 중인 매입처 앞으로 정산완료됐지만 아직
 // 상계/회수되지 않은 귀책업체 재작업비 청구금액을 마감 총액에서 실제로 차감하는 "상계차감액" —
 // 상현님 컨펌(마감등록 시 자동 제안 + 수정가능): 미상계 청구금액 합계와 선택된 발주 건 총액 중 작은
@@ -8173,9 +8243,11 @@ function closingCandidateRows(kind){
     // 2026-08-11(45차 개편): 예전에는 이미 발행된 건(closedStmtNo 있음)을 후보에서 완전히 숨겼지만,
     // 상현님 지시로 이 표가 "이번 달 매출 원장"을 겸하게 되면서 발행된 건도 함께 보여주고 "발행상태"
     // 배지로만 구분합니다(선택은 registerClosing에서 다시 한번 안전하게 걸러냅니다).
+    // 2026-08-12(47차): 수주번호 열, 납품일 정렬 방향(q.sortDir, 기본 desc=최신순) 추가.
+    const asc = q.sortDir === 'asc';
     return S.deliveries.filter(d=>lvMatch(d.cust,q.cust) && lvMatch(d.item,q.item) && lvMatch(d.date,q.date) && (!q.from||('2026-'+d.date)>=q.from) && (!q.to||('2026-'+d.date)<=q.to))
-      .map(d=>({id:d.id, date:d.date, partner:d.cust, name:d.item, spec:deliverySpecName(d), qty:d.qty, unitPrice:d.unitPrice, closedStmtNo:d.closedStmtNo||null}))
-      .sort((a,b)=>a.date<b.date?1:-1);
+      .map(d=>({id:d.id, date:d.date, partner:d.cust, orderNo:deliveryOrderNo(d), name:d.item, spec:deliverySpecName(d), qty:d.qty, unitPrice:d.unitPrice, closedStmtNo:d.closedStmtNo||null}))
+      .sort((a,b)=> asc ? (a.date<b.date?-1:(a.date>b.date?1:0)) : (a.date<b.date?1:(a.date>b.date?-1:0)));
   }
   const list = kind==='mat' ? S.materialPOs : S.outsourcePOs;
   const overrideMap = (S.closingQtyOverride && S.closingQtyOverride[kind]) || {};
@@ -8274,7 +8346,9 @@ function registerClosing(kind){
     S.closingSearch.out.netDeductionTouched = false; // 다음 조회 시 다시 자동 제안값으로 시작
   }
   const payableAmount = totalAmount - netDeduction;
-  listMap[kind].push({no, kind, partner, from:q.from||'', to:q.to||'', rows: storedRows, totalQty, totalAmount, netDeduction, nettedClaimIds, payableAmount, issuedAt:todayMD()});
+  // 2026-08-12(47차 신설): issuedYm(발행 연-월, 예: '2026-08') — issuedAt(MM-DD)은 연도 정보가 없어
+  // 발행 이력을 연도별로 조회할 방법이 없었습니다. 발행 시점의 S.ym을 그대로 함께 저장합니다.
+  listMap[kind].push({no, kind, partner, from:q.from||'', to:q.to||'', rows: storedRows, totalQty, totalAmount, netDeduction, nettedClaimIds, payableAmount, issuedAt:todayMD(), issuedYm:S.ym});
   if(kind==='cust'){
     rows.forEach(r=>{ const d = S.deliveries.find(x=>x.id===r.id); if(d) d.closedStmtNo = no; });
   } else {
@@ -8390,6 +8464,150 @@ function exportClosingExcel(kind, no){
   XLSX.utils.book_append_sheet(wb, ws, '마감내역서');
   XLSX.writeFile(wb, `${title}_${c.partner}_${c.no}.xlsx`);
 }
+// 2026-08-12(47차 신설, 상현님 지시): "고객사에 제출해야 하는 문서니까 신경 좀 써서 디자인" —
+// 위 exportClosingExcel()이 쓰는 xlsx.full.min.js(SheetJS 무료판)는 셀 색상·테두리를 파일에 저장하지
+// 못해 디자인에 한계가 뚜렷했습니다(코드 상단 주석에 이미 기록된 제약). ExcelJS는 같은 자바스크립트
+// 생태계의 별도 라이브러리로, 무료 버전에서도 배경색·글꼴색·테두리·병합·서식을 전부 파일에 정상
+// 저장합니다. 매입처용 마감내역서(mat/out)는 사내 정산용 문서라 기존 함수를 그대로 두고, 고객사에
+// 실제로 전달되는 매출 마감내역서(kind='cust')만 이 함수로 새로 디자인했습니다.
+async function exportCustClosingExcelStyled(no){
+  const c = S.custClosings.find(x=>x.no===no);
+  if(!c) return;
+  if(typeof ExcelJS === 'undefined'){
+    alert('디자인 엑셀 라이브러리를 아직 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.');
+    return;
+  }
+  const supplier = {name:S.company.name, bizNo:S.company.bizNo, ceo:S.company.ceo, addr:S.company.addr, tel:S.company.tel};
+  const receiver = {name:c.partner, bizNo:'—', ceo:'—', addr:'—', tel:'—'};
+
+  // 담다 브랜드 팔레트(:root --blue/--blue-d/--blue-l)를 그대로 재사용해 화면과 문서의 색이 일치하게 했습니다.
+  const BRAND='FF0F7A72', BRAND_D='FF0B5F58', BRAND_L='FFE4F3F1', INK='FF1C2B2A', MUTED='FF6B7B7A', BORDER='FFB9D4D0', WHITE='FFFFFFFF', BAND='FFF3F9F8';
+  const thin = {style:'thin', color:{argb:BORDER}};
+  const allBorder = {top:thin, left:thin, bottom:thin, right:thin};
+  const labelStyle = cell => { cell.font={bold:true,size:10.5,color:{argb:INK}}; cell.fill={type:'pattern',pattern:'solid',fgColor:{argb:BRAND_L}}; cell.alignment={horizontal:'center',vertical:'middle'}; cell.border=allBorder; };
+  const valueStyle = cell => { cell.font={size:10.5,color:{argb:INK}}; cell.alignment={horizontal:'left',vertical:'middle',indent:1}; cell.border=allBorder; };
+
+  const wb = new ExcelJS.Workbook();
+  wb.creator = S.company.name;
+  wb.created = new Date();
+  const ws = wb.addWorksheet('매출 마감내역서', {
+    pageSetup: {paperSize:9, orientation:'portrait', fitToPage:true, fitToWidth:1, fitToHeight:0, margins:{left:0.5,right:0.5,top:0.6,bottom:0.6,header:0.3,footer:0.3}}
+  });
+  ws.columns = [{width:6},{width:12},{width:24},{width:16},{width:10},{width:12},{width:15}];
+
+  let r = 1;
+  ws.mergeCells(`A${r}:G${r}`);
+  let cell = ws.getCell(`A${r}`);
+  cell.value = '매출 마감내역서';
+  cell.font = {name:'맑은 고딕', size:20, bold:true, color:{argb:BRAND_D}};
+  cell.alignment = {horizontal:'center', vertical:'middle'};
+  ws.getRow(r).height = 34;
+  r++;
+
+  ws.mergeCells(`A${r}:G${r}`);
+  cell = ws.getCell(`A${r}`);
+  cell.value = S.company.name;
+  cell.font = {name:'맑은 고딕', size:11, color:{argb:MUTED}};
+  cell.alignment = {horizontal:'center'};
+  r += 2;
+
+  ws.mergeCells(`A${r}:B${r}`); labelStyle(ws.getCell(`A${r}`)); ws.getCell(`A${r}`).value = '발행번호';
+  ws.mergeCells(`C${r}:D${r}`); valueStyle(ws.getCell(`C${r}`)); ws.getCell(`C${r}`).value = c.no;
+  labelStyle(ws.getCell(`E${r}`)); ws.getCell(`E${r}`).value = '발행일';
+  ws.mergeCells(`F${r}:G${r}`); valueStyle(ws.getCell(`F${r}`)); ws.getCell(`F${r}`).value = '2026-' + (c.issuedAt||'—');
+  r++;
+  ws.mergeCells(`A${r}:B${r}`); labelStyle(ws.getCell(`A${r}`)); ws.getCell(`A${r}`).value = '대상기간';
+  ws.mergeCells(`C${r}:D${r}`); valueStyle(ws.getCell(`C${r}`)); ws.getCell(`C${r}`).value = `${c.from||'전체'} ~ ${c.to||'전체'}`;
+  labelStyle(ws.getCell(`E${r}`)); ws.getCell(`E${r}`).value = '건수';
+  ws.mergeCells(`F${r}:G${r}`); valueStyle(ws.getCell(`F${r}`)); ws.getCell(`F${r}`).value = `${c.rows.length}건`;
+  r += 2;
+
+  ws.mergeCells(`A${r}:C${r}`);
+  cell = ws.getCell(`A${r}`); cell.value = '공급자';
+  cell.font = {bold:true, size:11, color:{argb:WHITE}}; cell.fill = {type:'pattern', pattern:'solid', fgColor:{argb:BRAND}};
+  cell.alignment = {horizontal:'center', vertical:'middle'}; cell.border = allBorder;
+  ws.mergeCells(`E${r}:G${r}`);
+  cell = ws.getCell(`E${r}`); cell.value = '공급받는자';
+  cell.font = {bold:true, size:11, color:{argb:WHITE}}; cell.fill = {type:'pattern', pattern:'solid', fgColor:{argb:BRAND}};
+  cell.alignment = {horizontal:'center', vertical:'middle'}; cell.border = allBorder;
+  r++;
+  [['상호',supplier.name,'상호',receiver.name],['대표자',supplier.ceo,'대표자',receiver.ceo],
+   ['사업자번호',supplier.bizNo,'사업자번호',receiver.bizNo],['연락처',supplier.tel,'연락처',receiver.tel],
+   ['주소',supplier.addr,'주소',receiver.addr]].forEach(([l1,v1,l2,v2])=>{
+    labelStyle(ws.getCell(`A${r}`)); ws.getCell(`A${r}`).value = l1;
+    ws.mergeCells(`B${r}:C${r}`); valueStyle(ws.getCell(`B${r}`)); ws.getCell(`B${r}`).value = v1;
+    labelStyle(ws.getCell(`E${r}`)); ws.getCell(`E${r}`).value = l2;
+    ws.mergeCells(`F${r}:G${r}`); valueStyle(ws.getCell(`F${r}`)); ws.getCell(`F${r}`).value = v2;
+    r++;
+  });
+  r++;
+
+  const headers = ['No','일자','품목','규격','수량(개)','단가(원)','금액(원)'];
+  headers.forEach((h,i)=>{
+    cell = ws.getCell(r, i+1);
+    cell.value = h;
+    cell.font = {bold:true, size:10.5, color:{argb:WHITE}};
+    cell.fill = {type:'pattern', pattern:'solid', fgColor:{argb:BRAND_D}};
+    cell.alignment = {horizontal:'center', vertical:'middle'};
+    cell.border = allBorder;
+  });
+  ws.getRow(r).height = 22;
+  r++;
+
+  const dataStart = r;
+  c.rows.forEach((row,i)=>{
+    const band = i%2===1;
+    const vals = [i+1, '2026-'+row.date, row.name, row.spec||'—', row.qty, row.unitPrice, row.qty*row.unitPrice];
+    vals.forEach((v,ci)=>{
+      cell = ws.getCell(r, ci+1);
+      cell.value = v;
+      cell.border = allBorder;
+      cell.font = {size:10.5, color:{argb:INK}};
+      cell.alignment = ci===2 ? {horizontal:'left', vertical:'middle', indent:1}
+        : {horizontal: ci<=1 ? 'center' : (ci===3 ? 'center' : 'right'), vertical:'middle', indent: ci>=5?1:0};
+      if(band) cell.fill = {type:'pattern', pattern:'solid', fgColor:{argb:BAND}};
+      if(ci===4) cell.numFmt = '#,##0"개"';
+      if(ci===5 || ci===6) cell.numFmt = '#,##0"원"';
+    });
+    r++;
+  });
+  const dataEnd = r - 1;
+
+  ws.mergeCells(`A${r}:E${r}`);
+  cell = ws.getCell(`A${r}`);
+  cell.value = '▶ 합계';
+  cell.font = {bold:true, size:11, color:{argb:BRAND_D}};
+  cell.alignment = {horizontal:'right', vertical:'middle', indent:1};
+  cell.border = {top:{style:'double',color:{argb:BRAND_D}}, bottom:thin, left:thin};
+  cell = ws.getCell(`F${r}`);
+  cell.border = {top:{style:'double',color:{argb:BRAND_D}}, bottom:thin};
+  // 합계는 고정값이 아니라 실제 SUM 수식으로 — 나중에 금액을 손으로 고쳐도 합계가 자동으로 따라갑니다.
+  cell = ws.getCell(`G${r}`);
+  cell.value = {formula: `SUM(G${dataStart}:G${dataEnd})`};
+  cell.numFmt = '#,##0"원"';
+  cell.font = {bold:true, size:12, color:{argb:BRAND_D}};
+  cell.alignment = {horizontal:'right', vertical:'middle', indent:1};
+  cell.border = {top:{style:'double',color:{argb:BRAND_D}}, bottom:thin, right:thin};
+  ws.getRow(r).height = 24;
+  r += 2;
+
+  ws.mergeCells(`A${r}:G${r}`);
+  cell = ws.getCell(`A${r}`);
+  cell.value = `본 내역서는 ${S.company.name} 전산시스템에서 자동 생성되었습니다.`;
+  cell.font = {italic:true, size:9, color:{argb:MUTED}};
+  cell.alignment = {horizontal:'center'};
+
+  const buf = await wb.xlsx.writeBuffer();
+  const blob = new Blob([buf], {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `매출 마감내역서_${c.partner}_${c.no}.xlsx`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
 function renderClosingSection(kind){
   const rows = closingCandidateRows(kind);
   const sel = S.closingSelected[kind] || [];
@@ -8450,6 +8668,7 @@ function renderClosingSection(kind){
         <td style="text-align:center">${issued?'':`<input type="checkbox" ${checked?'checked':''} onchange="toggleClosingSelect('${kind}','${r.id}')">`}</td>
         <td style="text-align:center">${r.date}</td>
         <td style="text-align:center;white-space:nowrap">${r.partner}</td>
+        <td style="text-align:center;font-size:11.5px;color:var(--ink-soft);white-space:nowrap">${r.orderNo||'—'}</td>
         <td>${r.name}</td>
         <td style="text-align:left;color:var(--ink-soft)">${r.spec||'—'}</td>
         <td class="num">${(r.qty||0).toLocaleString()}</td>
@@ -8457,7 +8676,7 @@ function renderClosingSection(kind){
         <td class="num" style="white-space:nowrap">${W((r.qty||0)*(r.unitPrice||0))}</td>
         <td style="text-align:center;font-size:10.5px;white-space:nowrap">${issued?`<span class="tag fix">발행됨(${r.closedStmtNo})</span>`:'<span class="tag" style="background:#FDF3E0;color:#B7791F">미발행</span>'}</td>
       </tr>`;
-    }).join('') : `<tr><td colspan="${kind==='out'?9:(kind==='mat'?8:(kind==='cust'?9:7))}" style="color:var(--muted)">조건에 맞는 ${kind==='cust'?'납품':'입고완료'} 건이 없습니다</td></tr>`;
+    }).join('') : `<tr><td colspan="${kind==='out'?9:(kind==='mat'?8:(kind==='cust'?10:7))}" style="color:var(--muted)">조건에 맞는 ${kind==='cust'?'납품':'입고완료'} 건이 없습니다</td></tr>`;
   }
   const cntEl = $(kind==='cust' ? 'custclosing-count' : `${kind}closing-count`);
   if(cntEl){
@@ -8491,13 +8710,24 @@ function renderClosingSection(kind){
   const histTbl = $(histTblId);
   if(histTbl){
     let hist = listMap[kind].slice().sort((a,b)=>a.no<b.no?1:-1);
-    // 2026-08-11(45차 신설): 매출 마감내역서 발행 이력에 발행월·거래처 조회 + 합계금액을 추가했습니다
-    // (상현님 지시). issuedAt이 MM-DD 형식이라 lvMatch로 "08"을 넣으면 8월 발행분만 부분일치됩니다.
+    // 2026-08-11(45차 신설), 2026-08-12(47차 개정): 매출 마감내역서 발행 이력에 발행연도·발행월·거래처
+    // 조회 + 합계금액을 추가했습니다. 연도·월을 각각 select로 분리해달라는 상현님 지시에 따라
+    // issuedYm("YYYY-MM")을 정확히 잘라 비교합니다(기존 issuedAt 부분일치 방식은 폐기).
     if(kind==='cust'){
       const chq = lv('custclosing-hist').search || {};
-      hist = hist.filter(x=>lvMatch(x.issuedAt,chq.ym) && lvMatch(x.partner,chq.cust));
+      hist = hist.filter(x=>{
+        const [xy, xm] = (x.issuedYm||'').split('-');
+        return (!chq.year || xy===chq.year) && (!chq.month || xm===chq.month) && lvMatch(x.partner,chq.cust);
+      });
       const chCntEl = $('custclosing-hist-count'); if(chCntEl) chCntEl.textContent = `${hist.length}건`;
       const chSumEl = $('custclosing-hist-sum'); if(chSumEl) chSumEl.textContent = W(hist.reduce((s,x)=>s+(x.totalAmount||0),0));
+      // 발행연도 select 옵션 — 실제 발행 이력에 존재하는 연도들 + 현재 진행 중인 연도(S.ym)를 합쳐 구성합니다.
+      const yearSel = $('custclosing-hist-year-select');
+      if(yearSel){
+        const years = [...new Set([...listMap.cust.map(x=>(x.issuedYm||'').split('-')[0]).filter(Boolean), S.ym.split('-')[0]])].sort().reverse();
+        const curYear = chq.year || '';
+        yearSel.innerHTML = '<option value="">전체</option>' + years.map(y=>`<option value="${y}" ${y===curYear?'selected':''}>${y}년</option>`).join('');
+      }
     }
     // 2026-08-11(38차): 외주 마감내역서 중 상계차감이 반영된 건은 합계금액 아래에 총액/상계차감/
     // 실지급액을 함께 표시합니다(mat/cust는 상계 개념이 없어 기존과 동일).
@@ -8507,7 +8737,7 @@ function renderClosingSection(kind){
         : W(c.totalAmount);
       return `<tr><td>${c.no}</td><td>${c.partner}</td><td style="font-size:11.5px">${c.from||'전체'} ~ ${c.to||'전체'}</td>
         <td class="num">${c.rows.length}</td><td class="num">${amountCell}</td><td>2026-${c.issuedAt||'—'}</td>
-        <td><button class="btn gh sm" onclick="exportClosingExcel('${kind}','${c.no}')">⬇ 엑셀</button></td></tr>`;
+        <td><button class="btn gh sm" onclick="${kind==='cust' ? `exportCustClosingExcelStyled('${c.no}')` : `exportClosingExcel('${kind}','${c.no}')`}">⬇ 엑셀</button></td></tr>`;
     }).join('')
       : `<tr><td colspan="7" style="color:var(--muted)">발행된 마감내역서가 없습니다</td></tr>`;
   }
@@ -9055,6 +9285,14 @@ function renderClosing(){
   $('t-closing-cost').innerHTML = parts.map(p=>`<tr><td>${p[0]}</td><td class="num">${W(p[1])}</td></tr>`).join('');
   $('cl-cost-sum').textContent = W(r.cost);
 
+  // 2026-08-12(47차 신설): "마감 확정 내역 미리보기"에 매출도 나란히 보여달라는 지시 — 비용이
+  // 항목별로 나뉘어 있으니 매출은 같은 성격의 축인 거래처별로 나눠 대응시켰습니다.
+  const revByCust = {};
+  S.deliveries.forEach(d=>{ revByCust[d.cust] = (revByCust[d.cust]||0) + d.qty*d.unitPrice; });
+  const revRows = Object.entries(revByCust).sort((a,b)=>b[1]-a[1]);
+  $('t-closing-rev-bycust').innerHTML = revRows.length ? revRows.map(([cust,amt])=>`<tr><td>${cust}</td><td class="num">${W(amt)}</td></tr>`).join('') : '<tr><td colspan="2" style="color:var(--muted)">이번 달 매출 없음</td></tr>';
+  $('cl-rev-bycust-sum').textContent = W(r.openRevenue);
+
   const hist = Object.values(S.closings).sort((a,b)=>a.ym<b.ym?1:-1);
   $('t-closing-hist').innerHTML = hist.length ? hist.map(c=>
     `<tr><td>${c.ym}</td><td class="num">${W(c.revenue)}</td><td class="num">${W(c.cost)}</td>
@@ -9079,6 +9317,15 @@ function custBilledTotal(cust){
 function custARBalance(cust){
   return custBilledTotal(cust) - custCollectedTotal(cust);
 }
+// 2026-08-12(47차): 최근 수금일 추가 — 미수 잔액이 남아있는데 마지막으로 돈이 들어온 지 오래된
+// 거래처를 한눈에 골라내기 위한 용도입니다(id가 등록순으로 항상 증가하므로 date 문자열 비교보다
+// id 기준 최신 건을 찾는 쪽이 연도 경계 문제 없이 안전합니다).
+function custLastCollectedDate(cust){
+  const list = S.collections.filter(c=>c.cust===cust);
+  if(!list.length) return null;
+  const latest = list.reduce((a,b)=>a.id>b.id?a:b);
+  return latest.date;
+}
 function arSummaryByCustomer(){
   const custs = [...new Set([
     ...Object.keys(S.customerBilledTotal),
@@ -9086,7 +9333,8 @@ function arSummaryByCustomer(){
     ...S.collections.map(c=>c.cust)
   ])];
   return custs.map(cust=>({
-    cust, billed: custBilledTotal(cust), collected: custCollectedTotal(cust), balance: custARBalance(cust)
+    cust, billed: custBilledTotal(cust), collected: custCollectedTotal(cust), balance: custARBalance(cust),
+    lastCollectedDate: custLastCollectedDate(cust)
   })).sort((a,b)=>b.balance-a.balance);
 }
 function collectionThisMonthTotal(){
@@ -9102,10 +9350,14 @@ function registerCollection(){
   const cust = $('ar-cust-input') ? $('ar-cust-input').value.trim() : '';
   const amount = $('ar-amount-input') ? +$('ar-amount-input').value : 0;
   const note = $('ar-note-input') ? $('ar-note-input').value.trim() : '';
+  // 2026-08-12(47차 신설): 귀속월(몇월분 청구에 대한 입금인지) — 미지정이면 이번 달로 간주합니다.
+  const billingYm = $('ar-billingym-select') && $('ar-billingym-select').value ? $('ar-billingym-select').value : S.ym;
   if(!cust){ alert('거래처를 입력해주세요.'); return; }
   if(!amount || amount<=0){ alert('수금액을 입력해주세요.'); return; }
-  S.collections.push({id:Date.now(), date:`07-${String(S.elapsed).padStart(2,'0')}`, ym:S.ym, cust, amount, note});
-  pushNotification('수금등록', `${cust}로부터 ${amount.toLocaleString()}원이 수금 등록되었습니다.`);
+  // 2026-08-12(47차 수정): date가 "07-"로 하드코딩되어 있어 회사가 다음 달로 넘어간 뒤 등록한 수금도
+  // 계속 7월로 표시되던 버그를 발견해 함께 고쳤습니다(다른 곳에서 이미 쓰는 todayMD() 재사용).
+  S.collections.push({id:Date.now(), date:todayMD(), ym:S.ym, billingYm, cust, amount, note});
+  pushNotification('수금등록', `${cust}로부터 ${amount.toLocaleString()}원이 수금 등록되었습니다(${billingYm}분).`);
   recalc();
 }
 function renderAR(r){
@@ -9124,15 +9376,36 @@ function renderAR(r){
   if($('t-ar-summary')){
     $('t-ar-summary').innerHTML = list.length ? list.map(x=>`
       <tr><td>${x.cust}</td><td class="num">${W(x.billed)}</td><td class="num">${W(x.collected)}</td>
-          <td class="num" style="font-weight:800;color:${x.balance>0?'var(--red)':'var(--muted)'}">${W(x.balance)}</td></tr>`).join('')
-      : '<tr><td colspan="4" style="color:var(--muted)">청구·수금 이력 없음</td></tr>';
+          <td class="num" style="font-weight:800;color:${x.balance>0?'var(--red)':'var(--muted)'}">${W(x.balance)}</td>
+          <td style="font-size:11.5px;color:${x.balance>0 && !x.lastCollectedDate?'var(--red)':'var(--ink-soft)'}">${x.lastCollectedDate ? '2026-'+x.lastCollectedDate : (x.balance>0?'⚠ 수금 이력 없음':'—')}</td></tr>`).join('')
+      : '<tr><td colspan="5" style="color:var(--muted)">청구·수금 이력 없음</td></tr>';
   }
 
+  // 2026-08-12(47차 신설): "귀속월(몇월분)" select — 최근 12개월을 최신순으로 채우고 이번 달을 기본값으로 둡니다.
+  // dataset.builtForYm으로 "이번 달(S.ym) 기준으로 이미 채워졌는지"를 기억해, 같은 달 안에서는 재렌더링
+  // (다른 조작으로 recalc가 다시 돌 때)에도 사용자가 고른 값을 유지하되, 월마감으로 S.ym이 실제로
+  // 넘어가면 새 이번 달이 목록에 반영되도록 다시 채웁니다.
+  const billSel = $('ar-billingym-select');
+  if(billSel && billSel.dataset.builtForYm !== S.ym){
+    let ym = S.ym, opts = [];
+    for(let i=0;i<12;i++){ opts.push(ym); ym = prevYm(ym); }
+    billSel.innerHTML = opts.map(y=>`<option value="${y}" ${y===S.ym?'selected':''}>${y}${y===S.ym?' (이번 달)':''}</option>`).join('');
+    billSel.dataset.builtForYm = S.ym;
+  }
+
+  // 2026-08-12(47차 개편): "최근 10건"으로 고정 노출되던 것을 검색+페이지네이션 있는 전체 이력으로 확장.
   if($('t-ar-collections')){
-    const hist = [...S.collections].sort((a,b)=>b.id-a.id).slice(0,10);
-    $('t-ar-collections').innerHTML = hist.length ? hist.map(c=>
-      `<tr><td>2026-${c.date}</td><td>${c.cust}</td><td class="num">${W(c.amount)}</td><td style="color:var(--muted);font-size:11.5px">${c.note||''}</td></tr>`).join('')
-      : '<tr><td colspan="4" style="color:var(--muted)">수금 등록 이력 없음</td></tr>';
+    const acV = lv('ar-collections', {pageSize:30});
+    const acSorted = [...S.collections].sort((a,b)=>b.id-a.id);
+    const acFiltered = acSorted.filter(x=>lvMatch(x.cust,acV.search.cust) && lvMatch(x.billingYm||x.ym,acV.search.billingYm));
+    const acPg = lvPaginate('ar-collections', acFiltered);
+    const acCntEl = $('ar-collections-count'); if(acCntEl) acCntEl.textContent = `${acFiltered.length}건 (전체 ${acSorted.length}건)`;
+    const acSbEl = $('ar-collections-sizebar'); if(acSbEl) acSbEl.innerHTML = lvSizeBar('ar-collections', [30,50,100]);
+    const acPgEl = $('ar-collections-pager'); if(acPgEl) acPgEl.innerHTML = lvPagerBar('ar-collections', acPg.totalPages, acPg.page);
+    $('t-ar-collections').innerHTML = acPg.rows.length ? acPg.rows.map(c=>
+      `<tr><td>2026-${c.date}</td><td>${c.cust}</td><td class="num">${W(c.amount)}</td><td style="font-size:11.5px;color:var(--ink-soft)">${c.billingYm||'—'}</td><td style="color:var(--muted);font-size:11.5px">${c.note||''}</td></tr>`).join('')
+      : '<tr><td colspan="5" style="color:var(--muted)">수금 등록 이력 없음</td></tr>';
+    const sumEl = $('ar-collections-sum'); if(sumEl) sumEl.textContent = W(acFiltered.reduce((s,x)=>s+x.amount,0));
   }
 }
 
